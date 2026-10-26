@@ -109,15 +109,26 @@ type TwentyInscripcionesResponse = {
 ========================================================= */
 
 async function twentyFetch<T>(
-  endpoint: string
+  endpoint: string,
+  init: {
+    method?: "GET" | "POST" | "PATCH";
+    body?: unknown;
+  } = {}
 ): Promise<T> {
   const response = await fetch(
     `${TWENTY_API_URL}/rest/${endpoint}`,
     {
+      method: init.method ?? "GET",
+
       headers: {
         Authorization: `Bearer ${TWENTY_API_KEY}`,
         "Content-Type": "application/json",
       },
+
+      body:
+        init.body === undefined
+          ? undefined
+          : JSON.stringify(init.body),
 
       cache: "no-store",
     }
@@ -186,7 +197,7 @@ function adaptarAlumno(
       person.fechaDeNacimiento ?? null,
 
     estado:
-      person.estado === "INACTIVO"
+      person.estado === "BAJA"
         ? "Inactivo"
         : "Activo",
   };
@@ -296,6 +307,58 @@ export async function getAlumnoById(
     alumnos.find(
       (alumno) => alumno.id === id
     ) ?? null
+  );
+}
+
+export type NuevoAlumno = {
+  nombres: string;
+  apellidos: string;
+  edad: number;
+  estatura: number;
+  manoHabil: "Derecha" | "Izquierda";
+  estado: "Activo" | "Inactivo";
+};
+
+type TwentyCreatePersonResponse = {
+  data: {
+    createPerson: TwentyPerson;
+  };
+};
+
+export async function createAlumno(
+  alumno: NuevoAlumno
+): Promise<Alumno> {
+  const result =
+    await twentyFetch<TwentyCreatePersonResponse>(
+      "people",
+      {
+        method: "POST",
+
+        body: {
+          name: {
+            firstName: alumno.nombres,
+            lastName: alumno.apellidos,
+          },
+
+          edad: alumno.edad,
+
+          estatura: alumno.estatura,
+
+          manoHabil:
+            alumno.manoHabil === "Izquierda"
+              ? "IZQUIERDA"
+              : "DERECHA",
+
+          estado:
+            alumno.estado === "Inactivo"
+              ? "BAJA"
+              : "ACTIVO",
+        },
+      }
+    );
+
+  return adaptarAlumno(
+    result.data.createPerson
   );
 }
 
