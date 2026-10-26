@@ -3,30 +3,23 @@
 import AppLayout from "@/components/AppLayout";
 import Link from "next/link";
 import { ArrowLeft, Save } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { useActionState, useState } from "react";
+import { crearAlumno, type EstadoFormulario } from "./actions";
+
+const estadoInicial: EstadoFormulario = { error: null };
 
 export default function NuevoAlumnoPage() {
-  const [nombre, setNombre] = useState("");
+  const [nombres, setNombres] = useState("");
+  const [apellidos, setApellidos] = useState("");
   const [edad, setEdad] = useState("");
   const [estatura, setEstatura] = useState("");
   const [manoHabil, setManoHabil] = useState("Derecha");
   const [estado, setEstado] = useState("Activo");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const nuevoAlumno = {
-      nombre,
-      edad: Number(edad),
-      estatura: Number(estatura),
-      manoHabil,
-      estado,
-    };
-
-    console.log("Nuevo alumno:", nuevoAlumno);
-
-    alert("Alumno listo para guardar. Después conectaremos esto con la API.");
-  }
+  const [estadoFormulario, formAction, guardando] = useActionState(
+    crearAlumno,
+    estadoInicial
+  );
 
   return (
     <AppLayout>
@@ -58,23 +51,41 @@ export default function NuevoAlumnoPage() {
 
         {/* FORMULARIO */}
         <form
-          onSubmit={handleSubmit}
+          action={formAction}
           className="max-w-4xl rounded-2xl border border-[#e1dace] bg-white p-5 md:p-7"
         >
 
           <div className="grid gap-5 md:grid-cols-2">
 
-            {/* NOMBRE */}
-            <div className="md:col-span-2">
+            {/* NOMBRES */}
+            <div>
               <label className="mb-2 block text-sm font-semibold text-[#141113]">
-                Nombre completo
+                Nombre(s)
               </label>
 
               <input
                 type="text"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                placeholder="Ej. Oscar Uao"
+                name="nombres"
+                value={nombres}
+                onChange={(e) => setNombres(e.target.value)}
+                placeholder="Ej. Oscar"
+                required
+                className="w-full rounded-xl border border-[#e1dace] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#7d9309]"
+              />
+            </div>
+
+            {/* APELLIDOS */}
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-[#141113]">
+                Apellidos
+              </label>
+
+              <input
+                type="text"
+                name="apellidos"
+                value={apellidos}
+                onChange={(e) => setApellidos(e.target.value)}
+                placeholder="Ej. Uao"
                 required
                 className="w-full rounded-xl border border-[#e1dace] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#7d9309]"
               />
@@ -88,6 +99,7 @@ export default function NuevoAlumnoPage() {
 
               <input
                 type="number"
+                name="edad"
                 value={edad}
                 onChange={(e) => setEdad(e.target.value)}
                 placeholder="Ej. 21"
@@ -106,6 +118,7 @@ export default function NuevoAlumnoPage() {
               <div className="relative">
                 <input
                   type="number"
+                  name="estatura"
                   value={estatura}
                   onChange={(e) => setEstatura(e.target.value)}
                   placeholder="Ej. 170"
@@ -127,6 +140,7 @@ export default function NuevoAlumnoPage() {
               </label>
 
               <select
+                name="manoHabil"
                 value={manoHabil}
                 onChange={(e) => setManoHabil(e.target.value)}
                 className="w-full rounded-xl border border-[#e1dace] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#7d9309]"
@@ -143,6 +157,7 @@ export default function NuevoAlumnoPage() {
               </label>
 
               <select
+                name="estado"
                 value={estado}
                 onChange={(e) => setEstado(e.target.value)}
                 className="w-full rounded-xl border border-[#e1dace] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#7d9309]"
@@ -165,6 +180,16 @@ export default function NuevoAlumnoPage() {
             </p>
           </div>
 
+          {/* ERROR */}
+          {estadoFormulario.error && (
+            <p
+              role="alert"
+              className="mt-6 rounded-xl border border-[#f1c9c4] bg-[#fdf1ef] p-4 text-sm font-semibold text-[#9d3a2e]"
+            >
+              {estadoFormulario.error}
+            </p>
+          )}
+
           {/* BOTONES */}
           <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
 
@@ -177,10 +202,11 @@ export default function NuevoAlumnoPage() {
 
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#141113] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d]"
+              disabled={guardando}
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#141113] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d] disabled:cursor-wait disabled:opacity-60"
             >
               <Save size={18} />
-              Guardar alumno
+              {guardando ? "Guardando…" : "Guardar alumno"}
             </button>
 
           </div>
