@@ -118,10 +118,10 @@ type TwentyInscripcionesResponse = {
    FETCH GENERAL
 ========================================================= */
 
-async function twentyFetch<T>(
+export async function twentyFetch<T>(
   endpoint: string,
   init: {
-    method?: "GET" | "POST" | "PATCH";
+    method?: "GET" | "POST" | "PATCH" | "DELETE";
     body?: unknown;
   } = {}
 ): Promise<T> {
