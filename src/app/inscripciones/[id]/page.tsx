@@ -7,6 +7,7 @@ import {
   CalendarDays,
   CircleCheck,
   ArrowRight,
+  Pencil,
 } from "lucide-react";
 
 import { getInscripcionById } from "@/lib/api";
@@ -101,15 +102,25 @@ export default async function InscripcionDetallePage({
             </p>
           </div>
 
-          <span
-            className={`w-fit rounded-full border px-4 py-2 text-sm font-bold ${
-              inscripcion.estado === "Activa"
-                ? "border-[#98ad09] text-[#7d9309]"
-                : "border-[#d4cfca] text-[#8c847d]"
-            }`}
-          >
-            {inscripcion.estado}
-          </span>
+          <div className="flex items-center gap-3">
+            <span
+              className={`w-fit rounded-full border px-4 py-2 text-sm font-bold ${
+                inscripcion.estado === "Activa"
+                  ? "border-[#98ad09] text-[#7d9309]"
+                  : "border-[#d4cfca] text-[#8c847d]"
+              }`}
+            >
+              {inscripcion.estado}
+            </span>
+
+            <Link
+              href={`/inscripciones/${inscripcion.id}/editar`}
+              className="inline-flex items-center gap-2 rounded-xl border border-[#e1dace] bg-white px-4 py-2 text-sm font-semibold text-[#141113] transition hover:bg-[#f6f4ee]"
+            >
+              <Pencil size={16} />
+              Editar
+            </Link>
+          </div>
 
         </section>
 
