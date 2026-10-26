@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   Package,
   PackageCheck,
@@ -11,120 +12,18 @@ import {
   SlidersHorizontal,
   Boxes,
   ArrowUpRight,
-  CircleCheck,
   X,
   Info,
+  Pencil,
+  ArrowLeftRight,
+  Trash2,
 } from "lucide-react";
+import type { Material, Movimiento } from "@/lib/inventario";
+import { eliminarMaterial } from "./actions";
+import MaterialModal, { CATEGORIAS } from "./MaterialModal";
+import MovimientoModal from "./MovimientoModal";
 
-type Categoria =
-  | "Pelotas"
-  | "Raquetas"
-  | "Entrenamiento"
-  | "Accesorios"
-  | "Mantenimiento";
-
-type Material = {
-  id: string;
-  nombre: string;
-  categoria: Categoria;
-  cantidad: number;
-  minimo: number;
-  unidad: string;
-  ubicacion: string;
-  descripcion: string;
-};
-
-const materialesIniciales: Material[] = [
-  {
-    id: "MAT-001",
-    nombre: "Pelotas de entrenamiento",
-    categoria: "Pelotas",
-    cantidad: 120,
-    minimo: 60,
-    unidad: "piezas",
-    ubicacion: "Bodega principal",
-    descripcion: "Pelotas para sesiones regulares",
-  },
-  {
-    id: "MAT-002",
-    nombre: "Pelotas de baja presión",
-    categoria: "Pelotas",
-    cantidad: 18,
-    minimo: 30,
-    unidad: "piezas",
-    ubicacion: "Bodega principal",
-    descripcion: "Entrenamiento de principiantes",
-  },
-  {
-    id: "MAT-003",
-    nombre: "Raquetas de préstamo",
-    categoria: "Raquetas",
-    cantidad: 12,
-    minimo: 8,
-    unidad: "piezas",
-    ubicacion: "Área de entrenadores",
-    descripcion: "Raquetas disponibles para alumnos",
-  },
-  {
-    id: "MAT-004",
-    nombre: "Conos de entrenamiento",
-    categoria: "Entrenamiento",
-    cantidad: 24,
-    minimo: 20,
-    unidad: "piezas",
-    ubicacion: "Bodega principal",
-    descripcion: "Delimitación de ejercicios",
-  },
-  {
-    id: "MAT-005",
-    nombre: "Escaleras de coordinación",
-    categoria: "Entrenamiento",
-    cantidad: 3,
-    minimo: 4,
-    unidad: "piezas",
-    ubicacion: "Área de entrenadores",
-    descripcion: "Trabajo de velocidad y coordinación",
-  },
-  {
-    id: "MAT-006",
-    nombre: "Redes de repuesto",
-    categoria: "Mantenimiento",
-    cantidad: 2,
-    minimo: 2,
-    unidad: "piezas",
-    ubicacion: "Bodega principal",
-    descripcion: "Redes para mantenimiento de cancha",
-  },
-  {
-    id: "MAT-007",
-    nombre: "Overgrips",
-    categoria: "Accesorios",
-    cantidad: 8,
-    minimo: 20,
-    unidad: "piezas",
-    ubicacion: "Área de entrenadores",
-    descripcion: "Accesorios para empuñaduras",
-  },
-  {
-    id: "MAT-008",
-    nombre: "Canastas para pelotas",
-    categoria: "Entrenamiento",
-    cantidad: 5,
-    minimo: 3,
-    unidad: "piezas",
-    ubicacion: "Bodega principal",
-    descripcion: "Transporte de pelotas",
-  },
-];
-
-const categorias = [
-  "Todas",
-  "Pelotas",
-  "Raquetas",
-  "Entrenamiento",
-  "Accesorios",
-  "Mantenimiento",
-] as const;
+const categorias = ["Todas", ...CATEGORIAS] as const;
 
 type FiltroCategoria = (typeof categorias)[number];
 type FiltroEstado = "Todos" | "Disponible" | "Stock bajo" | "Agotado";
@@ -148,36 +47,84 @@ function estiloEstado(estado: FiltroEstado) {
   }
 }
 
-export default function InventarioClient() {
+const formatoFecha = new Intl.DateTimeFormat("es-MX", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+export default function InventarioClient({
+  materiales,
+  movimientos,
+}: {
+  materiales: Material[];
+  movimientos: Movimiento[];
+}) {
+  const router = useRouter();
+  const [eliminando, startTransition] = useTransition();
   const [busqueda, setBusqueda] = useState("");
   const [categoria, setCategoria] =
     useState<FiltroCategoria>("Todas");
   const [estado, setEstado] = useState<FiltroEstado>("Todos");
-  const [materialSeleccionado, setMaterialSeleccionado] =
-    useState<Material | null>(null);
+  const [seleccionadoId, setSeleccionadoId] = useState<string | null>(
+    null
+  );
+  const [formulario, setFormulario] = useState<
+    { tipo: "material"; material: Material | null } | { tipo: "movimiento" } | null
+  >(null);
 
-  const totalMateriales = materialesIniciales.length;
+  // Se busca por id para que el detalle muestre los datos
+  // actualizados después de guardar.
+  const materialSeleccionado =
+    materiales.find((material) => material.id === seleccionadoId) ?? null;
 
-  const unidadesTotales = materialesIniciales.reduce(
+  const movimientosSeleccionado = movimientos
+    .filter((movimiento) => movimiento.materialId === seleccionadoId)
+    .slice(0, 5);
+
+  const setMaterialSeleccionado = (material: Material | null) =>
+    setSeleccionadoId(material?.id ?? null);
+
+  const eliminar = (material: Material) => {
+    if (!window.confirm(`¿Eliminar «${material.nombre}» de Twenty?`)) {
+      return;
+    }
+
+    startTransition(async () => {
+      const resultado = await eliminarMaterial(material.id);
+
+      if (resultado.error) {
+        window.alert(resultado.error);
+        return;
+      }
+
+      setSeleccionadoId(null);
+      router.refresh();
+    });
+  };
+
+  const totalMateriales = materiales.length;
+
+  const unidadesTotales = materiales.reduce(
     (total, material) => total + material.cantidad,
     0
   );
 
-  const materialesBajos = materialesIniciales.filter(
+  const materialesBajos = materiales.filter(
     (material) => obtenerEstado(material) === "Stock bajo"
   ).length;
 
-  const materialesDisponibles = materialesIniciales.filter(
+  const materialesDisponibles = materiales.filter(
     (material) => obtenerEstado(material) === "Disponible"
   ).length;
 
   const materialesFiltrados = useMemo(() => {
     const texto = busqueda.trim().toLowerCase();
 
-    return materialesIniciales.filter((material) => {
+    return materiales.filter((material) => {
       const coincideBusqueda =
         material.nombre.toLowerCase().includes(texto) ||
-        material.id.toLowerCase().includes(texto) ||
         material.ubicacion.toLowerCase().includes(texto);
 
       const coincideCategoria =
@@ -194,7 +141,7 @@ export default function InventarioClient() {
         coincideEstado
       );
     });
-  }, [busqueda, categoria, estado]);
+  }, [materiales, busqueda, categoria, estado]);
 
   const limpiarFiltros = () => {
     setBusqueda("");
@@ -222,9 +169,8 @@ export default function InventarioClient() {
 
         <button
           type="button"
-          disabled
-          title="Disponible al implementar el registro de materiales"
-          className="inline-flex w-fit cursor-not-allowed items-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d] opacity-60"
+          onClick={() => setFormulario({ tipo: "material", material: null })}
+          className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d] transition hover:bg-[#dce855]"
         >
           <Plus size={18} />
           Nuevo material
@@ -419,7 +365,7 @@ export default function InventarioClient() {
                         {material.nombre}
                       </p>
                       <p className="mt-1 text-xs text-[#8c847d]">
-                        {material.id}
+                        {material.ubicacion || "Sin ubicación"}
                       </p>
                     </td>
 
@@ -429,10 +375,7 @@ export default function InventarioClient() {
 
                     <td className="px-4 py-5">
                       <p className="font-black text-[#141113]">
-                        {material.cantidad}{" "}
-                        <span className="text-xs font-normal text-[#8c847d]">
-                          {material.unidad}
-                        </span>
+                        {material.cantidad}
                       </p>
 
                       <p className="mt-1 text-xs text-[#8c847d]">
@@ -483,7 +426,8 @@ export default function InventarioClient() {
                     </p>
 
                     <p className="mt-1 text-xs text-[#8c847d]">
-                      {material.id} · {material.categoria}
+                      {material.categoria}
+                      {material.ubicacion && ` · ${material.ubicacion}`}
                     </p>
                   </div>
 
@@ -502,7 +446,7 @@ export default function InventarioClient() {
                       Existencias
                     </p>
                     <p className="mt-1 font-black text-[#141113]">
-                      {material.cantidad} {material.unidad}
+                      {material.cantidad}
                     </p>
                   </div>
 
@@ -551,7 +495,8 @@ export default function InventarioClient() {
 
         <div className="flex items-center gap-2 border-t border-[#e1dace] bg-[#fdfcf9] px-5 py-4 text-xs text-[#8c847d]">
           <Info size={15} className="shrink-0" />
-          Datos de demostración. Pendiente de conexión con Twenty.
+          Inventario guardado en Twenty. Las existencias se
+          ajustan registrando entradas y salidas.
         </div>
       </section>
 
@@ -585,7 +530,7 @@ export default function InventarioClient() {
                 </h2>
 
                 <p className="mt-1 text-sm text-[#8c847d]">
-                  {materialSeleccionado.id}
+                  {materialSeleccionado.categoria}
                 </p>
               </div>
 
@@ -616,24 +561,20 @@ export default function InventarioClient() {
 
               {[
                 {
-                  titulo: "Categoría",
-                  valor: materialSeleccionado.categoria,
-                },
-                {
                   titulo: "Existencias",
-                  valor: `${materialSeleccionado.cantidad} ${materialSeleccionado.unidad}`,
+                  valor: `${materialSeleccionado.cantidad}`,
                 },
                 {
                   titulo: "Stock mínimo",
-                  valor: `${materialSeleccionado.minimo} ${materialSeleccionado.unidad}`,
+                  valor: `${materialSeleccionado.minimo}`,
                 },
                 {
                   titulo: "Ubicación",
-                  valor: materialSeleccionado.ubicacion,
+                  valor: materialSeleccionado.ubicacion || "—",
                 },
                 {
-                  titulo: "Descripción",
-                  valor: materialSeleccionado.descripcion,
+                  titulo: "Condición",
+                  valor: materialSeleccionado.condicion ?? "—",
                 },
               ].map((campo) => (
                 <div
@@ -650,13 +591,98 @@ export default function InventarioClient() {
                 </div>
               ))}
 
-              <div className="flex items-center gap-2 rounded-xl bg-[#f0f5d8] p-4 text-xs text-[#657a0b]">
-                <CircleCheck size={17} className="shrink-0" />
-                Información de ejemplo para visualizar el módulo.
+              <div>
+                <p className="text-sm font-bold text-[#141113]">
+                  Últimos movimientos
+                </p>
+
+                {movimientosSeleccionado.length > 0 ? (
+                  <ul className="mt-2 divide-y divide-[#eee9df]">
+                    {movimientosSeleccionado.map((movimiento) => (
+                      <li
+                        key={movimiento.id}
+                        className="flex items-start justify-between gap-3 py-2 text-sm"
+                      >
+                        <div>
+                          <p className="font-semibold text-[#141113]">
+                            {movimiento.tipo}
+                          </p>
+                          <p className="text-xs text-[#8c847d]">
+                            {formatoFecha.format(
+                              new Date(`${movimiento.fecha}T12:00:00Z`)
+                            )}
+                            {movimiento.nota && ` · ${movimiento.nota}`}
+                          </p>
+                        </div>
+
+                        <span className="font-black text-[#141113]">
+                          {movimiento.tipo === "Entrada" ||
+                          movimiento.tipo === "Devolución"
+                            ? "+"
+                            : "−"}
+                          {movimiento.cantidad}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-xs text-[#8c847d]">
+                    Sin movimientos registrados.
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setFormulario({ tipo: "movimiento" })}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#141113] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d]"
+                >
+                  <ArrowLeftRight size={16} />
+                  Registrar movimiento
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFormulario({
+                      tipo: "material",
+                      material: materialSeleccionado,
+                    })
+                  }
+                  className="inline-flex items-center gap-2 rounded-xl border border-[#e1dace] px-4 py-3 text-sm font-semibold text-[#141113] transition hover:bg-[#f6f4ee]"
+                >
+                  <Pencil size={16} />
+                  Editar
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => eliminar(materialSeleccionado)}
+                  disabled={eliminando}
+                  className="inline-flex items-center gap-2 px-2 py-3 text-sm font-bold text-[#b4493c] disabled:opacity-60"
+                >
+                  <Trash2 size={16} />
+                  Eliminar
+                </button>
               </div>
             </div>
           </div>
         </div>
+      )}
+
+      {formulario?.tipo === "material" && (
+        <MaterialModal
+          material={formulario.material}
+          onCerrar={() => setFormulario(null)}
+        />
+      )}
+
+      {formulario?.tipo === "movimiento" && materialSeleccionado && (
+        <MovimientoModal
+          material={materialSeleccionado}
+          onCerrar={() => setFormulario(null)}
+        />
       )}
     </div>
   );

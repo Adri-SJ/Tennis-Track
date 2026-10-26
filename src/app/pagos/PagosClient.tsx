@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   Wallet,
   CircleCheck,
@@ -18,10 +19,15 @@ import {
   Info,
   TrendingUp,
   SlidersHorizontal,
+  Ban,
 } from "lucide-react";
+import type { Mensualidad } from "@/lib/pagos";
+import { anularMensualidad } from "./actions";
+import MensualidadModal from "./MensualidadModal";
+import PagoModal from "./PagoModal";
 
-type EstadoPago = "Pagado" | "Pendiente" | "Vencido";
-type MetodoPago = "Efectivo" | "Tarjeta" | "Transferencia";
+type EstadoPago = Mensualidad["estado"];
+type MetodoPago = NonNullable<NonNullable<Mensualidad["pago"]>["metodo"]>;
 
 type Pago = {
   id: string;
@@ -35,102 +41,26 @@ type Pago = {
   referencia: string | null;
 };
 
-const pagosIniciales: Pago[] = [
-  {
-    id: "PAG-001",
-    alumno: "Adrian",
-    concepto: "Mensualidad octubre",
-    monto: 1200,
-    vencimiento: "2026-10-05",
-    fechaPago: "2026-10-03",
-    estado: "Pagado",
-    metodo: "Transferencia",
-    referencia: "TRF-20261003-001",
-  },
-  {
-    id: "PAG-002",
-    alumno: "Patrick Collison",
-    concepto: "Mensualidad octubre",
-    monto: 1200,
-    vencimiento: "2026-10-05",
-    fechaPago: "2026-10-04",
-    estado: "Pagado",
-    metodo: "Efectivo",
-    referencia: null,
-  },
-  {
-    id: "PAG-003",
-    alumno: "Ivan Zhao",
-    concepto: "Mensualidad octubre",
-    monto: 1200,
-    vencimiento: "2026-10-05",
-    fechaPago: null,
-    estado: "Vencido",
-    metodo: null,
-    referencia: null,
-  },
-  {
-    id: "PAG-004",
-    alumno: "Marcelo Hernandez",
-    concepto: "Mensualidad octubre",
-    monto: 1200,
-    vencimiento: "2026-10-12",
-    fechaPago: null,
-    estado: "Pendiente",
-    metodo: null,
-    referencia: null,
-  },
-  {
-    id: "PAG-005",
-    alumno: "Oscar Uao",
-    concepto: "Mensualidad octubre",
-    monto: 950,
-    vencimiento: "2026-10-05",
-    fechaPago: "2026-10-02",
-    estado: "Pagado",
-    metodo: "Tarjeta",
-    referencia: "TAR-0021",
-  },
-  {
-    id: "PAG-006",
-    alumno: "Dylan Field",
-    concepto: "Mensualidad octubre",
-    monto: 950,
-    vencimiento: "2026-10-05",
-    fechaPago: null,
-    estado: "Vencido",
-    metodo: null,
-    referencia: null,
-  },
-  {
-    id: "PAG-007",
-    alumno: "Dario Amodei",
-    concepto: "Mensualidad octubre",
-    monto: 950,
-    vencimiento: "2026-10-15",
-    fechaPago: null,
-    estado: "Pendiente",
-    metodo: null,
-    referencia: null,
-  },
-  {
-    id: "PAG-008",
-    alumno: "Brian Chesky",
-    concepto: "Mensualidad octubre",
-    monto: 950,
-    vencimiento: "2026-10-04",
-    fechaPago: "2026-10-04",
-    estado: "Pagado",
-    metodo: "Efectivo",
-    referencia: null,
-  },
-];
+function aPago(mensualidad: Mensualidad): Pago {
+  return {
+    id: mensualidad.id,
+    alumno: mensualidad.alumno,
+    concepto: mensualidad.concepto,
+    monto: mensualidad.monto,
+    vencimiento: mensualidad.vencimiento,
+    fechaPago: mensualidad.pago?.fecha ?? null,
+    estado: mensualidad.estado,
+    metodo: mensualidad.pago?.metodo ?? null,
+    referencia: mensualidad.pago?.referencia || null,
+  };
+}
 
 const estados = [
   "Todos",
   "Pagado",
   "Pendiente",
   "Vencido",
+  "Cancelado",
 ] as const;
 
 type FiltroEstado = (typeof estados)[number];
@@ -161,6 +91,10 @@ function estiloEstado(estado: EstadoPago) {
     return "border-[#e6c58d] bg-[#fff5df] text-[#a16a1b]";
   }
 
+  if (estado === "Cancelado") {
+    return "border-[#d8d0c4] bg-[#f6f4ee] text-[#8c847d]";
+  }
+
   return "border-[#e6b1a9] bg-[#fff0ed] text-[#b4493c]";
 }
 
@@ -170,29 +104,73 @@ function IconoMetodo({ metodo }: { metodo: MetodoPago | null }) {
   return <Wallet size={18} />;
 }
 
-export default function PagosClient() {
+export default function PagosClient({
+  mensualidades,
+  alumnos,
+}: {
+  mensualidades: Mensualidad[];
+  alumnos: { id: string; nombre: string }[];
+}) {
+  const router = useRouter();
+  const [cancelando, startTransition] = useTransition();
   const [busqueda, setBusqueda] = useState("");
   const [estado, setEstado] = useState<FiltroEstado>("Todos");
-  const [pagoSeleccionado, setPagoSeleccionado] =
-    useState<Pago | null>(null);
+  const [seleccionadoId, setSeleccionadoId] = useState<string | null>(
+    null
+  );
+  const [formulario, setFormulario] = useState<
+    "mensualidad" | "pago" | null
+  >(null);
 
-  const totalRecaudado = pagosIniciales
+  const pagos = useMemo(() => mensualidades.map(aPago), [mensualidades]);
+
+  // Las canceladas no cuentan en los importes.
+  const vigentes = pagos.filter((pago) => pago.estado !== "Cancelado");
+
+  // Se busca por id para mostrar los datos actualizados.
+  const pagoSeleccionado =
+    pagos.find((pago) => pago.id === seleccionadoId) ?? null;
+
+  const mensualidadSeleccionada =
+    mensualidades.find((item) => item.id === seleccionadoId) ?? null;
+
+  const setPagoSeleccionado = (pago: Pago | null) =>
+    setSeleccionadoId(pago?.id ?? null);
+
+  const cancelar = (id: string) => {
+    if (!window.confirm("¿Cancelar esta mensualidad? Ya no se cobrará.")) {
+      return;
+    }
+
+    startTransition(async () => {
+      const resultado = await anularMensualidad(id);
+
+      if (resultado.error) {
+        window.alert(resultado.error);
+        return;
+      }
+
+      router.refresh();
+    });
+  };
+
+  const totalRecaudado = vigentes
     .filter((pago) => pago.estado === "Pagado")
     .reduce((total, pago) => total + pago.monto, 0);
 
-  const totalPendiente = pagosIniciales
+  const totalPendiente = vigentes
     .filter((pago) => pago.estado !== "Pagado")
     .reduce((total, pago) => total + pago.monto, 0);
 
-  const pagosVencidos = pagosIniciales.filter(
+  const pagosVencidos = vigentes.filter(
     (pago) => pago.estado === "Vencido"
   ).length;
 
-  const pagosRealizados = pagosIniciales.filter(
+  const pagosRealizados = vigentes.filter(
     (pago) => pago.estado === "Pagado"
   ).length;
 
-  const montoTotal = pagosIniciales.reduce(
+  const montoTotal = vigentes.reduce(
     (total, pago) => total + pago.monto,
     0
   );
@@ -205,18 +183,18 @@ export default function PagosClient() {
   const pagosFiltrados = useMemo(() => {
     const texto = busqueda.trim().toLowerCase();
 
-    return pagosIniciales.filter((pago) => {
+    return pagos.filter((pago) => {
       const coincideBusqueda =
         pago.alumno.toLowerCase().includes(texto) ||
         pago.concepto.toLowerCase().includes(texto) ||
-        pago.id.toLowerCase().includes(texto);
+        (pago.referencia ?? "").toLowerCase().includes(texto);
 
       const coincideEstado =
         estado === "Todos" || pago.estado === estado;
 
       return coincideBusqueda && coincideEstado;
     });
-  }, [busqueda, estado]);
+  }, [pagos, busqueda, estado]);
 
   return (
     <div className="px-5 py-6 md:px-8 lg:px-10">
@@ -239,12 +217,11 @@ export default function PagosClient() {
 
         <button
           type="button"
-          disabled
-          title="Disponible al conectar los pagos con Twenty"
-          className="inline-flex w-fit cursor-not-allowed items-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d] opacity-60"
+          onClick={() => setFormulario("mensualidad")}
+          className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d] transition hover:bg-[#dce855]"
         >
           <Plus size={18} />
-          Registrar pago
+          Nueva mensualidad
         </button>
       </section>
 
@@ -312,11 +289,12 @@ export default function PagosClient() {
             </div>
 
             <h2 className="mt-3 text-2xl font-black md:text-3xl">
-              Cobranza de octubre
+              Cobranza registrada
             </h2>
 
             <p className="mt-2 text-sm text-[#d1d5ba]">
-              Porcentaje del importe registrado que ya fue pagado.
+              Porcentaje del importe registrado que ya fue pagado
+              (sin contar mensualidades canceladas).
             </p>
           </div>
 
@@ -370,7 +348,7 @@ export default function PagosClient() {
 
               <input
                 type="search"
-                placeholder="Buscar alumno, concepto o folio..."
+                placeholder="Buscar alumno, concepto o referencia..."
                 value={busqueda}
                 onChange={(event) =>
                   setBusqueda(event.target.value)
@@ -429,9 +407,11 @@ export default function PagosClient() {
                     <p className="font-bold text-[#141113]">
                       {pago.alumno}
                     </p>
-                    <p className="mt-1 text-xs text-[#8c847d]">
-                      {pago.id}
-                    </p>
+                    {pago.metodo && (
+                      <p className="mt-1 text-xs text-[#8c847d]">
+                        {pago.metodo}
+                      </p>
+                    )}
                   </td>
 
                   <td className="px-4 py-5 text-sm text-[#6f6964]">
@@ -482,7 +462,7 @@ export default function PagosClient() {
                     {pago.alumno}
                   </p>
                   <p className="mt-1 text-xs text-[#8c847d]">
-                    {pago.id} · {pago.concepto}
+                    {pago.concepto}
                   </p>
                 </div>
 
@@ -551,7 +531,9 @@ export default function PagosClient() {
 
         <div className="flex items-center gap-2 border-t border-[#e1dace] bg-[#fdfcf9] px-5 py-4 text-xs text-[#8c847d]">
           <Info size={15} className="shrink-0" />
-          Datos financieros de demostración. Pendiente de conexión con Twenty.
+          Mensualidades y pagos guardados en Twenty. Una
+          mensualidad pendiente se marca como vencida al pasar
+          su fecha de vencimiento.
         </div>
       </section>
 
@@ -585,7 +567,7 @@ export default function PagosClient() {
                 </h2>
 
                 <p className="mt-1 text-sm text-[#8c847d]">
-                  {pagoSeleccionado.id}
+                  {pagoSeleccionado.concepto}
                 </p>
               </div>
 
@@ -678,13 +660,46 @@ export default function PagosClient() {
                 </div>
               )}
 
-              <div className="flex items-start gap-2 text-xs leading-relaxed text-[#8c847d]">
-                <Info size={15} className="mt-0.5 shrink-0" />
-                Registro de demostración. No representa un cobro real.
-              </div>
+              {(pagoSeleccionado.estado === "Pendiente" ||
+                pagoSeleccionado.estado === "Vencido") && (
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormulario("pago")}
+                    className="inline-flex items-center gap-2 rounded-xl bg-[#141113] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d]"
+                  >
+                    <CircleCheck size={16} />
+                    Registrar pago
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => cancelar(pagoSeleccionado.id)}
+                    disabled={cancelando}
+                    className="inline-flex items-center gap-2 px-2 py-3 text-sm font-bold text-[#b4493c] disabled:opacity-60"
+                  >
+                    <Ban size={16} />
+                    Cancelar mensualidad
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
+      )}
+
+      {formulario === "mensualidad" && (
+        <MensualidadModal
+          alumnos={alumnos}
+          onCerrar={() => setFormulario(null)}
+        />
+      )}
+
+      {formulario === "pago" && mensualidadSeleccionada && (
+        <PagoModal
+          mensualidad={mensualidadSeleccionada}
+          onCerrar={() => setFormulario(null)}
+        />
       )}
     </div>
   );

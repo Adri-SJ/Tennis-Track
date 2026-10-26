@@ -1,11 +1,23 @@
-
 import AppLayout from "@/components/AppLayout";
+import { getAlumnos } from "@/lib/api";
+import { getMensualidades } from "@/lib/pagos";
 import PagosClient from "./PagosClient";
 
-export default function PagosPage() {
+export default async function PagosPage() {
+  const [mensualidades, alumnos] = await Promise.all([
+    getMensualidades(),
+    getAlumnos(),
+  ]);
+
   return (
     <AppLayout>
-      <PagosClient />
+      <PagosClient
+        mensualidades={mensualidades}
+        alumnos={alumnos
+          .filter((alumno) => alumno.nombre && alumno.estado === "Activo")
+          .map((alumno) => ({ id: alumno.id, nombre: alumno.nombre }))
+          .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))}
+      />
     </AppLayout>
   );
 }

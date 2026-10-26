@@ -1,134 +1,66 @@
 
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
-  ArrowRight,
   CalendarDays,
   Check,
   ChevronDown,
   CircleCheck,
-  Clock3,
   Info,
   LayoutGrid,
   List,
-  Mail,
-  MessageCircle,
   Pencil,
   Phone,
   Plus,
   Search,
   Trash2,
   UserPlus,
+  UserRoundPlus,
   Users,
   X,
+  XCircle,
 } from "lucide-react";
-
-type Etapa =
-  | "Nuevo"
-  | "Contactado"
-  | "Clase de prueba"
-  | "Inscrito";
-
-type Origen =
-  | "Recomendación"
-  | "Redes sociales"
-  | "WhatsApp"
-  | "Visita"
-  | "Otro";
-
-type Prospecto = {
-  id: string;
-  nombre: string;
-  telefono: string;
-  correo: string;
-  edad: string;
-  origen: Origen;
-  etapa: Etapa;
-  fechaContacto: string;
-  notas: string;
-};
-
-const STORAGE_KEY = "tennistrack-prospectos-v1";
+import type {
+  DatosProspecto,
+  Etapa,
+  Origen,
+  Prospecto,
+} from "@/lib/prospectos";
+import {
+  cambiarEtapaProspecto,
+  convertirEnAlumno,
+  eliminarProspecto,
+  guardarProspecto,
+} from "./actions";
 
 const etapas: Etapa[] = [
   "Nuevo",
   "Contactado",
   "Clase de prueba",
   "Inscrito",
+  "Perdido",
 ];
 
 const origenes: Origen[] = [
+  "Instagram",
+  "Facebook",
   "Recomendación",
-  "Redes sociales",
-  "WhatsApp",
-  "Visita",
+  "Publicidad",
   "Otro",
 ];
+
+type Formulario = DatosProspecto & { id: string };
 
 const coloresEtapa: Record<Etapa, string> = {
   Nuevo: "bg-[#eef0f7] text-[#5d6b91]",
   Contactado: "bg-[#fff5df] text-[#a16a1b]",
   "Clase de prueba": "bg-[#eaf3f1] text-[#397f75]",
   Inscrito: "bg-[#eef2cf] text-[#52620a]",
+  Perdido: "bg-[#f3eeee] text-[#8c5a54]",
 };
-
-const prospectosDemo: Prospecto[] = [
-  {
-    id: "demo-1",
-    nombre: "Sofía Martínez",
-    telefono: "9510000001",
-    correo: "sofia.ejemplo@example.com",
-    edad: "14",
-    origen: "Redes sociales",
-    etapa: "Nuevo",
-    fechaContacto: "2026-10-07",
-    notas: "Interesada en conocer los horarios disponibles.",
-  },
-  {
-    id: "demo-2",
-    nombre: "Diego López",
-    telefono: "9510000002",
-    correo: "",
-    edad: "11",
-    origen: "Recomendación",
-    etapa: "Contactado",
-    fechaContacto: "2026-10-05",
-    notas: "Solicitó información sobre clases por la mañana.",
-  },
-  {
-    id: "demo-3",
-    nombre: "Valentina Ruiz",
-    telefono: "9510000003",
-    correo: "valentina.ejemplo@example.com",
-    edad: "16",
-    origen: "WhatsApp",
-    etapa: "Clase de prueba",
-    fechaContacto: "2026-10-02",
-    notas: "Pendiente de asistir a una sesión de prueba.",
-  },
-  {
-    id: "demo-4",
-    nombre: "Mateo García",
-    telefono: "9510000004",
-    correo: "",
-    edad: "12",
-    origen: "Visita",
-    etapa: "Inscrito",
-    fechaContacto: "2026-09-29",
-    notas: "Registro de ejemplo para mostrar el proceso.",
-  },
-];
-
-function fechaHoy() {
-  const fecha = new Date();
-
-  return [
-    fecha.getFullYear(),
-    String(fecha.getMonth() + 1).padStart(2, "0"),
-    String(fecha.getDate()).padStart(2, "0"),
-  ].join("-");
-}
 
 function formatearFecha(fecha: string) {
   if (!fecha) return "—";
@@ -141,17 +73,15 @@ function formatearFecha(fecha: string) {
   }).format(new Date(`${fecha}T12:00:00Z`));
 }
 
-function formularioVacio(): Prospecto {
+function formularioVacio(): Formulario {
   return {
     id: "",
     nombre: "",
     telefono: "",
     correo: "",
-    edad: "",
-    origen: "WhatsApp",
+    origen: "Instagram",
     etapa: "Nuevo",
-    fechaContacto: fechaHoy(),
-    notas: "",
+    fechaClaseMuestra: "",
   };
 }
 
@@ -161,13 +91,17 @@ function IconoEtapa({ etapa }: { etapa: Etapa }) {
   if (etapa === "Clase de prueba") {
     return <CalendarDays size={17} />;
   }
+  if (etapa === "Perdido") return <XCircle size={17} />;
   return <CircleCheck size={17} />;
 }
 
-export default function ProspectosClient() {
-  const [prospectos, setProspectos] = useState<Prospecto[]>([]);
-  const [cargado, setCargado] = useState(false);
-  const [mostrarDemo, setMostrarDemo] = useState(true);
+export default function ProspectosClient({
+  prospectos,
+}: {
+  prospectos: Prospecto[];
+}) {
+  const router = useRouter();
+  const [guardando, startTransition] = useTransition();
 
   const [busqueda, setBusqueda] = useState("");
   const [filtroEtapa, setFiltroEtapa] = useState<
@@ -178,62 +112,15 @@ export default function ProspectosClient() {
   );
 
   const [modalAbierto, setModalAbierto] = useState(false);
-  const [formulario, setFormulario] = useState<Prospecto>(
+  const [formulario, setFormulario] = useState<Formulario>(
     formularioVacio
   );
+  const [alumnoDelFormulario, setAlumnoDelFormulario] = useState<
+    string | null
+  >(null);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    try {
-      const datos = localStorage.getItem(STORAGE_KEY);
-
-      if (datos) {
-        const registros = JSON.parse(datos);
-
-        if (Array.isArray(registros)) {
-          setProspectos(
-            registros.filter(
-              (item): item is Prospecto =>
-                typeof item?.id === "string" &&
-                typeof item?.nombre === "string" &&
-                typeof item?.telefono === "string" &&
-                typeof item?.correo === "string" &&
-                typeof item?.edad === "string" &&
-                origenes.includes(item?.origen) &&
-                etapas.includes(item?.etapa) &&
-                typeof item?.fechaContacto === "string" &&
-                typeof item?.notas === "string"
-            )
-          );
-        }
-      }
-    } catch {
-      console.warn("No se pudieron recuperar los prospectos.");
-    }
-
-    setCargado(true);
-  }, []);
-
-  useEffect(() => {
-    if (!cargado) return;
-
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(prospectos)
-      );
-    } catch {
-      console.warn("No se pudieron guardar los prospectos.");
-    }
-  }, [prospectos, cargado]);
-
-  const todos = useMemo(
-    () => [
-      ...(mostrarDemo ? prospectosDemo : []),
-      ...prospectos,
-    ],
-    [mostrarDemo, prospectos]
-  );
+  const todos = prospectos;
 
   const filtrados = useMemo(() => {
     const texto = busqueda.trim().toLowerCase();
@@ -271,109 +158,94 @@ export default function ProspectosClient() {
 
   const abrirNuevo = () => {
     setFormulario(formularioVacio());
+    setAlumnoDelFormulario(null);
     setError("");
     setModalAbierto(true);
   };
 
   const abrirEditar = (prospecto: Prospecto) => {
-    setFormulario({ ...prospecto });
+    setFormulario({
+      id: prospecto.id,
+      nombre: prospecto.nombre,
+      telefono: prospecto.telefono,
+      correo: prospecto.correo,
+      origen: prospecto.origen,
+      etapa: prospecto.etapa,
+      fechaClaseMuestra: prospecto.fechaClaseMuestra,
+    });
+    setAlumnoDelFormulario(prospecto.alumnoId);
     setError("");
     setModalAbierto(true);
   };
 
   const guardar = () => {
-    if (!formulario.nombre.trim()) {
-      setError("Escribe el nombre del prospecto.");
-      return;
-    }
+    setError("");
 
-    if (!formulario.telefono.trim()) {
-      setError("Escribe un teléfono de contacto.");
-      return;
-    }
+    const { id, ...datos } = formulario;
 
-    if (
-      formulario.correo.trim() &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-        formulario.correo.trim()
-      )
-    ) {
-      setError("El correo electrónico no es válido.");
-      return;
-    }
+    startTransition(async () => {
+      const resultado = await guardarProspecto(id || null, datos);
 
-    if (
-      formulario.edad &&
-      (!Number.isInteger(Number(formulario.edad)) ||
-        Number(formulario.edad) < 1 ||
-        Number(formulario.edad) > 120)
-    ) {
-      setError("Escribe una edad válida.");
-      return;
-    }
+      if (resultado.error) {
+        setError(resultado.error);
+        return;
+      }
 
-    if (!formulario.fechaContacto) {
-      setError("Selecciona la fecha de contacto.");
-      return;
-    }
-
-    const registro: Prospecto = {
-      ...formulario,
-      id:
-        formulario.id ||
-        `pros-${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2, 8)}`,
-      nombre: formulario.nombre.trim(),
-      telefono: formulario.telefono.trim(),
-      correo: formulario.correo.trim(),
-      notas: formulario.notas.trim(),
-    };
-
-    setProspectos((actuales) => {
-      const existe = actuales.some(
-        (item) => item.id === registro.id
-      );
-
-      return existe
-        ? actuales.map((item) =>
-            item.id === registro.id ? registro : item
-          )
-        : [registro, ...actuales];
+      setModalAbierto(false);
+      router.refresh();
     });
-
-    setModalAbierto(false);
   };
 
   const cambiarEtapa = (id: string, etapa: Etapa) => {
-    setProspectos((actuales) =>
-      actuales.map((prospecto) =>
-        prospecto.id === id
-          ? { ...prospecto, etapa }
-          : prospecto
-      )
-    );
+    startTransition(async () => {
+      const resultado = await cambiarEtapaProspecto(id, etapa);
+
+      if (resultado.error) {
+        window.alert(resultado.error);
+        return;
+      }
+
+      router.refresh();
+    });
   };
 
   const eliminar = (id: string) => {
+    if (!window.confirm("¿Eliminar este prospecto de Twenty?")) {
+      return;
+    }
+
+    startTransition(async () => {
+      const resultado = await eliminarProspecto(id);
+
+      if (resultado.error) {
+        setError(resultado.error);
+        return;
+      }
+
+      setModalAbierto(false);
+      router.refresh();
+    });
+  };
+
+  const convertir = (id: string) => {
     if (
       !window.confirm(
-        "¿Eliminar este prospecto del navegador?"
+        "Se creará un alumno en Twenty con los datos de este prospecto. ¿Continuar?"
       )
     ) {
       return;
     }
 
-    setProspectos((actuales) =>
-      actuales.filter((prospecto) => prospecto.id !== id)
-    );
+    startTransition(async () => {
+      const resultado = await convertirEnAlumno(id);
 
-    setModalAbierto(false);
+      if (resultado?.error) {
+        setError(resultado.error);
+      }
+    });
   };
 
   const tarjetaProspecto = (prospecto: Prospecto) => {
-    const esDemo = prospecto.id.startsWith("demo-");
-
     return (
       <div
         key={prospecto.id}
@@ -396,16 +268,14 @@ export default function ProspectosClient() {
             </div>
           </div>
 
-          {!esDemo && (
-            <button
-              type="button"
-              onClick={() => abrirEditar(prospecto)}
-              aria-label={`Editar a ${prospecto.nombre}`}
-              className="rounded-lg p-2 text-[#8c847d] hover:bg-[#f6f4ee]"
-            >
-              <Pencil size={16} />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => abrirEditar(prospecto)}
+            aria-label={`Editar a ${prospecto.nombre}`}
+            className="rounded-lg p-2 text-[#8c847d] hover:bg-[#f6f4ee]"
+          >
+            <Pencil size={16} />
+          </button>
         </div>
 
         <div className="mt-4 space-y-2">
@@ -416,26 +286,30 @@ export default function ProspectosClient() {
 
           <p className="flex items-center gap-2 text-xs text-[#6f6964]">
             <CalendarDays size={14} />
-            {formatearFecha(prospecto.fechaContacto)}
+            Registrado el {formatearFecha(prospecto.fechaContacto)}
           </p>
+
+          {prospecto.fechaClaseMuestra && (
+            <p className="flex items-center gap-2 text-xs text-[#397f75]">
+              <CalendarDays size={14} />
+              Clase de prueba: {formatearFecha(prospecto.fechaClaseMuestra)}
+            </p>
+          )}
+
+          {prospecto.alumnoId && (
+            <p className="flex items-center gap-2 text-xs font-semibold text-[#52620a]">
+              <CircleCheck size={14} />
+              Ya es alumno
+            </p>
+          )}
         </div>
 
-        {prospecto.notas && (
-          <p className="mt-4 line-clamp-2 rounded-lg bg-[#f6f4ee] p-3 text-xs leading-relaxed text-[#6f6964]">
-            {prospecto.notas}
-          </p>
-        )}
-
         <div className="mt-4 border-t border-[#eee9df] pt-3">
-          {esDemo ? (
-            <span className="text-xs font-semibold text-[#a16a1b]">
-              Registro de ejemplo
-            </span>
-          ) : (
-            <div className="relative">
+          <div className="relative">
               <select
                 aria-label={`Etapa de ${prospecto.nombre}`}
                 value={prospecto.etapa}
+                disabled={guardando}
                 onChange={(event) =>
                   cambiarEtapa(
                     prospecto.id,
@@ -455,8 +329,7 @@ export default function ProspectosClient() {
                 size={15}
                 className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#52620a]"
               />
-            </div>
-          )}
+          </div>
         </div>
       </div>
     );
@@ -651,24 +524,12 @@ export default function ProspectosClient() {
           <span className="text-xs text-[#8c847d]">
             {filtrados.length} prospectos encontrados
           </span>
-
-          <label className="flex cursor-pointer items-center gap-2 text-xs font-semibold text-[#6f6964]">
-            <input
-              type="checkbox"
-              checked={mostrarDemo}
-              onChange={(event) =>
-                setMostrarDemo(event.target.checked)
-              }
-              className="accent-[#7d9309]"
-            />
-            Mostrar ejemplos
-          </label>
         </div>
       </section>
 
       {/* TABLERO */}
       {vista === "tablero" && (
-        <section className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
           {etapas.map((etapa) => {
             const registros = filtrados.filter(
               (prospecto) => prospecto.etapa === etapa
@@ -732,9 +593,6 @@ export default function ProspectosClient() {
 
               <tbody className="divide-y divide-[#eee9df]">
                 {filtrados.map((prospecto) => {
-                  const esDemo =
-                    prospecto.id.startsWith("demo-");
-
                   return (
                     <tr key={prospecto.id}>
                       <td className="px-6 py-5 font-bold text-[#141113]">
@@ -764,21 +622,15 @@ export default function ProspectosClient() {
                       </td>
 
                       <td className="px-6 py-5 text-right">
-                        {esDemo ? (
-                          <span className="text-xs text-[#a16a1b]">
-                            Ejemplo
-                          </span>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              abrirEditar(prospecto)
-                            }
-                            className="text-sm font-bold text-[#7d9309]"
-                          >
-                            Editar
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            abrirEditar(prospecto)
+                          }
+                          className="text-sm font-bold text-[#7d9309]"
+                        >
+                          Editar
+                        </button>
                       </td>
                     </tr>
                   );
@@ -802,10 +654,9 @@ export default function ProspectosClient() {
 
       <div className="mt-5 flex items-start gap-2 rounded-xl border border-[#e1dace] bg-white p-4 text-xs leading-relaxed text-[#8c847d]">
         <Info size={16} className="mt-0.5 shrink-0" />
-        Los prospectos nuevos se guardan solo en este
-        navegador. Los registros de ejemplo son ficticios.
-        Cambiar la etapa a Inscrito no crea todavía un
-        alumno en Twenty.
+        Los prospectos se guardan en Twenty. Para crear
+        el alumno de un prospecto usa «Convertir en
+        alumno» al editarlo.
       </div>
 
       {/* FORMULARIO */}
@@ -867,7 +718,7 @@ export default function ProspectosClient() {
                 />
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div>
                 <div>
                   <label
                     htmlFor="prospecto-telefono"
@@ -892,30 +743,6 @@ export default function ProspectosClient() {
                   />
                 </div>
 
-                <div>
-                  <label
-                    htmlFor="prospecto-edad"
-                    className="mb-2 block text-sm font-bold"
-                  >
-                    Edad
-                  </label>
-
-                  <input
-                    id="prospecto-edad"
-                    type="number"
-                    min={1}
-                    max={120}
-                    value={formulario.edad}
-                    onChange={(event) =>
-                      setFormulario((actual) => ({
-                        ...actual,
-                        edad: event.target.value,
-                      }))
-                    }
-                    placeholder="Opcional"
-                    className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm outline-none focus:border-[#7d9309]"
-                  />
-                </div>
               </div>
 
               <div>
@@ -1003,44 +830,20 @@ export default function ProspectosClient() {
                   htmlFor="prospecto-fecha"
                   className="mb-2 block text-sm font-bold"
                 >
-                  Fecha de contacto
+                  Fecha de la clase de prueba
                 </label>
 
                 <input
                   id="prospecto-fecha"
                   type="date"
-                  value={formulario.fechaContacto}
+                  value={formulario.fechaClaseMuestra}
                   onChange={(event) =>
                     setFormulario((actual) => ({
                       ...actual,
-                      fechaContacto: event.target.value,
+                      fechaClaseMuestra: event.target.value,
                     }))
                   }
                   className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm outline-none"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="prospecto-notas"
-                  className="mb-2 block text-sm font-bold"
-                >
-                  Notas de seguimiento
-                </label>
-
-                <textarea
-                  id="prospecto-notas"
-                  rows={4}
-                  maxLength={1000}
-                  value={formulario.notas}
-                  onChange={(event) =>
-                    setFormulario((actual) => ({
-                      ...actual,
-                      notas: event.target.value,
-                    }))
-                  }
-                  placeholder="Intereses, horarios solicitados, próxima acción..."
-                  className="w-full resize-y rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm outline-none"
                 />
               </div>
 
@@ -1054,14 +857,37 @@ export default function ProspectosClient() {
               )}
 
               {formulario.id && (
-                <button
-                  type="button"
-                  onClick={() => eliminar(formulario.id)}
-                  className="inline-flex items-center gap-2 text-sm font-bold text-[#b4493c]"
-                >
-                  <Trash2 size={17} />
-                  Eliminar prospecto
-                </button>
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#eee9df] pt-4">
+                  {alumnoDelFormulario ? (
+                    <Link
+                      href={`/alumnos/${alumnoDelFormulario}`}
+                      className="inline-flex items-center gap-2 text-sm font-bold text-[#52620a]"
+                    >
+                      <CircleCheck size={17} />
+                      Ver alumno
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => convertir(formulario.id)}
+                      disabled={guardando}
+                      className="inline-flex items-center gap-2 rounded-xl bg-[#eef2cf] px-4 py-2 text-sm font-bold text-[#52620a] disabled:opacity-60"
+                    >
+                      <UserRoundPlus size={17} />
+                      Convertir en alumno
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => eliminar(formulario.id)}
+                    disabled={guardando}
+                    className="inline-flex items-center gap-2 text-sm font-bold text-[#b4493c] disabled:opacity-60"
+                  >
+                    <Trash2 size={17} />
+                    Eliminar prospecto
+                  </button>
+                </div>
               )}
             </div>
 
@@ -1077,10 +903,11 @@ export default function ProspectosClient() {
               <button
                 type="button"
                 onClick={guardar}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d]"
+                disabled={guardando}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d] disabled:cursor-wait disabled:opacity-60"
               >
                 <Check size={18} />
-                Guardar prospecto
+                {guardando ? "Guardando…" : "Guardar prospecto"}
               </button>
             </div>
           </div>

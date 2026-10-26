@@ -1,11 +1,19 @@
-
 import AppLayout from "@/components/AppLayout";
+import { getMateriales, getMovimientos } from "@/lib/inventario";
 import InventarioClient from "./InventarioClient";
 
-export default function InventarioPage() {
+export default async function InventarioPage() {
+  const [materiales, movimientos] = await Promise.all([
+    getMateriales(),
+    getMovimientos(),
+  ]);
+
   return (
     <AppLayout>
-      <InventarioClient />
+      <InventarioClient
+        materiales={materiales}
+        movimientos={movimientos}
+      />
     </AppLayout>
   );
 }

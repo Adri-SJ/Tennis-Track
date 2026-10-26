@@ -1,8 +1,15 @@
 
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import type { Alumno } from "@/lib/types";
+import type {
+  Evaluacion,
+  Habilidad,
+  Puntuaciones,
+} from "@/lib/evaluaciones";
+import { borrarEvaluacion, guardarEvaluacion } from "./actions";
 import {
   Activity,
   ArrowDownRight,
@@ -15,7 +22,6 @@ import {
   Dumbbell,
   Info,
   Plus,
-  RotateCcw,
   Save,
   Search,
   Target,
@@ -26,31 +32,11 @@ import {
   X,
 } from "lucide-react";
 
-type Habilidad =
-  | "saque"
-  | "derecha"
-  | "reves"
-  | "movilidad"
-  | "resistencia";
-
-type Puntuaciones = Record<Habilidad, number>;
-
-type Evaluacion = {
-  id: string;
-  alumnoId: string;
-  fecha: string;
-  puntuaciones: Puntuaciones;
-  observaciones: string;
-  origen: "demo" | "local";
-};
-
 type Formulario = {
   fecha: string;
   puntuaciones: Puntuaciones;
   observaciones: string;
 };
-
-const STORAGE_KEY = "tennistrack-desarrollo-v1";
 
 const habilidades: {
   key: Habilidad;
@@ -60,11 +46,11 @@ const habilidades: {
   { key: "saque", nombre: "Saque", corto: "Saque" },
   { key: "derecha", nombre: "Derecha", corto: "Derecha" },
   { key: "reves", nombre: "Revés", corto: "Revés" },
-  { key: "movilidad", nombre: "Movilidad", corto: "Movilidad" },
+  { key: "volea", nombre: "Volea", corto: "Volea" },
   {
-    key: "resistencia",
-    nombre: "Resistencia",
-    corto: "Resistencia",
+    key: "condicionFisica",
+    nombre: "Condición física",
+    corto: "Físico",
   },
 ];
 
@@ -72,57 +58,9 @@ const puntuacionesIniciales: Puntuaciones = {
   saque: 5,
   derecha: 5,
   reves: 5,
-  movilidad: 5,
-  resistencia: 5,
+  volea: 5,
+  condicionFisica: 5,
 };
-
-const evaluacionesDemo: Evaluacion[] = [
-  {
-    id: "demo-1",
-    alumnoId: "",
-    fecha: "2026-07-10",
-    puntuaciones: {
-      saque: 5,
-      derecha: 6,
-      reves: 4,
-      movilidad: 6,
-      resistencia: 5,
-    },
-    observaciones:
-      "Buena disposición. Trabajar la consistencia del revés y la colocación del saque.",
-    origen: "demo",
-  },
-  {
-    id: "demo-2",
-    alumnoId: "",
-    fecha: "2026-08-14",
-    puntuaciones: {
-      saque: 6,
-      derecha: 7,
-      reves: 5,
-      movilidad: 7,
-      resistencia: 6,
-    },
-    observaciones:
-      "Mejoró el desplazamiento lateral. Continuar ejercicios de coordinación.",
-    origen: "demo",
-  },
-  {
-    id: "demo-3",
-    alumnoId: "",
-    fecha: "2026-09-18",
-    puntuaciones: {
-      saque: 7,
-      derecha: 8,
-      reves: 6,
-      movilidad: 8,
-      resistencia: 7,
-    },
-    observaciones:
-      "Mayor control de golpes y mejor recuperación entre puntos. Reforzar revés.",
-    origen: "demo",
-  },
-];
 
 function promedio(puntuaciones: Puntuaciones) {
   const total = habilidades.reduce(
@@ -208,7 +146,7 @@ function RadarChart({
       <svg
         viewBox="0 0 300 295"
         role="img"
-        aria-label="Gráfica radar con puntuaciones de saque, derecha, revés, movilidad y resistencia"
+        aria-label="Gráfica radar con puntuaciones de saque, derecha, revés, volea y condición física"
         className="mx-auto w-full max-w-[360px]"
       >
         {[2, 4, 6, 8, 10].map((nivel) => (
@@ -219,8 +157,8 @@ function RadarChart({
                 saque: nivel,
                 derecha: nivel,
                 reves: nivel,
-                movilidad: nivel,
-                resistencia: nivel,
+                volea: nivel,
+                condicionFisica: nivel,
               }
             )}
             fill="none"
@@ -465,9 +403,14 @@ function EvolucionChart({
 
 export default function DesarrolloClient({
   alumnos,
+  evaluaciones,
 }: {
   alumnos: Alumno[];
+  evaluaciones: Evaluacion[];
 }) {
+  const router = useRouter();
+  const [guardando, startTransition] = useTransition();
+
   const [alumnoId, setAlumnoId] = useState(
     alumnos[0]?.id ?? ""
   );
@@ -475,13 +418,6 @@ export default function DesarrolloClient({
   const [busquedaAlumno, setBusquedaAlumno] = useState("");
   const [selectorAbierto, setSelectorAbierto] =
     useState(false);
-
-  const [evaluacionesLocales, setEvaluacionesLocales] =
-    useState<Evaluacion[]>([]);
-
-  const [datosCargados, setDatosCargados] = useState(false);
-
-  const [mostrarDemo, setMostrarDemo] = useState(true);
 
   const [modalAbierto, setModalAbierto] = useState(false);
   const [formulario, setFormulario] =
@@ -491,58 +427,6 @@ export default function DesarrolloClient({
     useState<Evaluacion | null>(null);
 
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    try {
-      const guardado = localStorage.getItem(STORAGE_KEY);
-
-      if (guardado) {
-        const datos = JSON.parse(guardado);
-
-        if (Array.isArray(datos)) {
-          setEvaluacionesLocales(
-            datos.filter(
-              (item): item is Evaluacion =>
-                typeof item?.id === "string" &&
-                typeof item?.alumnoId === "string" &&
-                typeof item?.fecha === "string" &&
-                typeof item?.puntuaciones === "object" &&
-                item?.puntuaciones !== null &&
-                habilidades.every(
-                  (habilidad) =>
-                    Number.isInteger(
-                      item.puntuaciones[habilidad.key]
-                    ) &&
-                    item.puntuaciones[habilidad.key] >= 1 &&
-                    item.puntuaciones[habilidad.key] <= 10
-                )
-            )
-          );
-        }
-      }
-    } catch {
-      console.warn(
-        "No se pudieron recuperar las evaluaciones locales."
-      );
-    }
-
-    setDatosCargados(true);
-  }, []);
-
-  useEffect(() => {
-    if (!datosCargados) return;
-
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(evaluacionesLocales)
-      );
-    } catch {
-      console.warn(
-        "No se pudieron guardar las evaluaciones."
-      );
-    }
-  }, [evaluacionesLocales, datosCargados]);
 
   const alumnoSeleccionado = alumnos.find(
     (alumno) => alumno.id === alumnoId
@@ -554,29 +438,12 @@ export default function DesarrolloClient({
       .includes(busquedaAlumno.toLowerCase())
   );
 
-  // Los datos de ejemplo se muestran únicamente para
-  // el primer alumno, sin mezclarse con otros alumnos.
-  const demosAlumno =
-    mostrarDemo && alumnoId === alumnos[0]?.id
-      ? evaluacionesDemo.map((evaluacion) => ({
-          ...evaluacion,
-          alumnoId,
-        }))
-      : [];
-
   const evaluacionesAlumno = useMemo(
     () =>
-      [...demosAlumno, ...evaluacionesLocales].filter(
-        (evaluacion) =>
-          evaluacion.alumnoId === alumnoId
+      evaluaciones.filter(
+        (evaluacion) => evaluacion.alumnoId === alumnoId
       ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      alumnoId,
-      mostrarDemo,
-      evaluacionesLocales,
-      alumnos,
-    ]
+    [alumnoId, evaluaciones]
   );
 
   const historial = [...evaluacionesAlumno].sort(
@@ -633,7 +500,7 @@ export default function DesarrolloClient({
     }));
   };
 
-  const guardarEvaluacion = () => {
+  const guardarEvaluacionActual = () => {
     if (!alumnoSeleccionado) {
       setError("Selecciona un alumno.");
       return;
@@ -651,38 +518,44 @@ export default function DesarrolloClient({
       return;
     }
 
-    const nueva: Evaluacion = {
-      id: `local-${Date.now()}-${Math.random()
-        .toString(36)
-        .slice(2, 8)}`,
-      alumnoId,
-      fecha: formulario.fecha,
-      puntuaciones: { ...formulario.puntuaciones },
-      observaciones: formulario.observaciones.trim(),
-      origen: "local",
-    };
-
-    setEvaluacionesLocales((actuales) => [
-      ...actuales,
-      nueva,
-    ]);
-
-    setModalAbierto(false);
     setError("");
+
+    startTransition(async () => {
+      const resultado = await guardarEvaluacion({
+        alumnoId,
+        fecha: formulario.fecha,
+        puntuaciones: { ...formulario.puntuaciones },
+        observaciones: formulario.observaciones,
+      });
+
+      if (resultado.error) {
+        setError(resultado.error);
+        return;
+      }
+
+      setModalAbierto(false);
+      router.refresh();
+    });
   };
 
   const eliminarEvaluacion = (id: string) => {
     const confirmacion = window.confirm(
-      "¿Eliminar esta evaluación guardada en el navegador?"
+      "¿Eliminar esta evaluación de Twenty?"
     );
 
     if (!confirmacion) return;
 
-    setEvaluacionesLocales((actuales) =>
-      actuales.filter((evaluacion) => evaluacion.id !== id)
-    );
+    startTransition(async () => {
+      const resultado = await borrarEvaluacion(id);
 
-    setEvaluacionDetalle(null);
+      if (resultado.error) {
+        window.alert(resultado.error);
+        return;
+      }
+
+      setEvaluacionDetalle(null);
+      router.refresh();
+    });
   };
 
   const totalEvaluaciones = evaluacionesAlumno.length;
@@ -830,17 +703,6 @@ export default function DesarrolloClient({
             Alumnos obtenidos directamente de Twenty CRM.
           </p>
 
-          <label className="flex cursor-pointer items-center gap-2 text-xs font-semibold text-[#6f6964]">
-            <input
-              type="checkbox"
-              checked={mostrarDemo}
-              onChange={(event) =>
-                setMostrarDemo(event.target.checked)
-              }
-              className="accent-[#7d9309]"
-            />
-            Mostrar evaluaciones de ejemplo
-          </label>
         </div>
       </section>
 
@@ -1183,17 +1045,6 @@ export default function DesarrolloClient({
                       /10
                     </p>
 
-                    <span
-                      className={`mt-2 inline-flex rounded-full px-2 py-1 text-[10px] font-bold ${
-                        evaluacion.origen === "demo"
-                          ? "bg-[#fff5df] text-[#a16a1b]"
-                          : "bg-[#eef2cf] text-[#52620a]"
-                      }`}
-                    >
-                      {evaluacion.origen === "demo"
-                        ? "Ejemplo"
-                        : "Guardada localmente"}
-                    </span>
                   </div>
                 </div>
 
@@ -1231,10 +1082,9 @@ export default function DesarrolloClient({
           <Info size={15} className="mt-0.5 shrink-0" />
 
           <p>
-            Los alumnos provienen de Twenty. Las
-            evaluaciones creadas se guardan únicamente
-            en este navegador. Los registros de ejemplo
-            son ficticios.
+            Los alumnos y las evaluaciones se guardan
+            en Twenty. Cada habilidad se califica del
+            1 al 10.
           </p>
         </div>
       </section>
@@ -1405,8 +1255,7 @@ export default function DesarrolloClient({
 
               <div className="flex items-start gap-2 text-xs text-[#8c847d]">
                 <Info size={16} className="shrink-0" />
-                Esta evaluación se guardará solo en el
-                navegador actual, no en Twenty.
+                La evaluación se guardará en Twenty.
               </div>
             </div>
 
@@ -1421,11 +1270,12 @@ export default function DesarrolloClient({
 
               <button
                 type="button"
-                onClick={guardarEvaluacion}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d]"
+                onClick={guardarEvaluacionActual}
+                disabled={guardando}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d] disabled:cursor-wait disabled:opacity-60"
               >
                 <Save size={18} />
-                Guardar evaluación
+                {guardando ? "Guardando…" : "Guardar evaluación"}
               </button>
             </div>
           </div>
@@ -1516,27 +1366,17 @@ export default function DesarrolloClient({
                 </p>
               </div>
 
-              {evaluacionDetalle.origen === "local" && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    eliminarEvaluacion(
-                      evaluacionDetalle.id
-                    )
-                  }
-                  className="inline-flex items-center gap-2 rounded-xl border border-[#e6b1a9] px-4 py-3 text-sm font-bold text-[#b4493c]"
-                >
-                  <Trash2 size={17} />
-                  Eliminar evaluación
-                </button>
-              )}
-
-              {evaluacionDetalle.origen === "demo" && (
-                <p className="text-xs text-[#8c847d]">
-                  Este registro es de demostración y no
-                  puede modificarse.
-                </p>
-              )}
+              <button
+                type="button"
+                onClick={() =>
+                  eliminarEvaluacion(evaluacionDetalle.id)
+                }
+                disabled={guardando}
+                className="inline-flex items-center gap-2 rounded-xl border border-[#e6b1a9] px-4 py-3 text-sm font-bold text-[#b4493c] disabled:cursor-wait disabled:opacity-60"
+              >
+                <Trash2 size={17} />
+                Eliminar evaluación
+              </button>
             </div>
           </div>
         </div>

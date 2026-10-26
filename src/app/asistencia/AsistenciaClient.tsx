@@ -1,8 +1,9 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ClipboardCheck,
   CalendarDays,
@@ -13,38 +14,51 @@ import {
   ChevronRight,
   Info,
   RotateCcw,
+  Save,
+  AlarmClock,
 } from "lucide-react";
 import type { Alumno, Grupo } from "@/lib/types";
+import type { EstadoAsistencia } from "@/lib/asistencias";
+import { guardarPaseDeLista } from "./actions";
 
 type GrupoConAlumnos = Grupo & {
   alumnos: Alumno[];
 };
 
-type EstadoAsistencia =
-  | "Presente"
-  | "Ausente"
-  | "Justificada";
-
 type Props = {
   grupos: GrupoConAlumnos[];
+  grupoId: string;
+  fecha: string;
+  guardadas: Record<string, EstadoAsistencia>;
 };
 
-export default function AsistenciaClient({ grupos }: Props) {
-  const [grupoId, setGrupoId] = useState(grupos[0]?.id ?? "");
+export default function AsistenciaClient({
+  grupos,
+  grupoId,
+  fecha,
+  guardadas,
+}: Props) {
+  const router = useRouter();
 
-  const [fecha, setFecha] = useState(() => {
-    const hoy = new Date();
-    const fechaLocal = new Date(
-      hoy.getTime() - hoy.getTimezoneOffset() * 60000
-    );
-    return fechaLocal.toISOString().slice(0, 10);
-  });
+  // Las marcas parten de lo guardado en Twenty para este
+  // grupo y fecha; los cambios se guardan con el botón.
+  const [marcas, setMarcas] =
+    useState<Record<string, EstadoAsistencia>>(guardadas);
+  const [error, setError] = useState<string | null>(null);
+  const [aviso, setAviso] = useState<string | null>(null);
+  const [guardando, startTransition] = useTransition();
 
-  // Las marcas se conservan mientras esta pantalla esté abierta.
-  // Todavía NO se guardan en Twenty.
-  const [marcas, setMarcas] = useState<
-    Record<string, EstadoAsistencia>
-  >({});
+  const cambiarSeleccion = (siguiente: {
+    grupo?: string;
+    fecha?: string;
+  }) => {
+    const parametros = new URLSearchParams({
+      grupo: siguiente.grupo ?? grupoId,
+      fecha: siguiente.fecha ?? fecha,
+    });
+
+    router.push(`/asistencia?${parametros}`);
+  };
 
   const grupo = grupos.find((item) => item.id === grupoId);
 
@@ -56,20 +70,46 @@ export default function AsistenciaClient({ grupos }: Props) {
     [grupo]
   );
 
-  const claveAlumno = (alumnoId: string) =>
-    `${grupoId}:${fecha}:${alumnoId}`;
-
   const obtenerEstado = (alumnoId: string) =>
-    marcas[claveAlumno(alumnoId)] ?? null;
+    marcas[alumnoId] ?? null;
 
   const marcar = (
     alumnoId: string,
     estado: EstadoAsistencia
   ) => {
+    setAviso(null);
     setMarcas((anterior) => ({
       ...anterior,
-      [claveAlumno(alumnoId)]: estado,
+      [alumnoId]: estado,
     }));
+  };
+
+  const hayCambios = alumnos.some(
+    (alumno) =>
+      (marcas[alumno.id] ?? null) !== (guardadas[alumno.id] ?? null)
+  );
+
+  const guardar = () => {
+    setError(null);
+    setAviso(null);
+
+    startTransition(async () => {
+      const resultado = await guardarPaseDeLista(
+        grupoId,
+        fecha,
+        Object.fromEntries(
+          alumnos.map((alumno) => [alumno.id, marcas[alumno.id] ?? null])
+        )
+      );
+
+      if (resultado.error) {
+        setError(resultado.error);
+        return;
+      }
+
+      setAviso("Asistencia guardada en Twenty.");
+      router.refresh();
+    });
   };
 
   const presentes = alumnos.filter(
@@ -84,20 +124,26 @@ export default function AsistenciaClient({ grupos }: Props) {
     (alumno) => obtenerEstado(alumno.id) === "Justificada"
   ).length;
 
-  const pendientes =
-    alumnos.length - presentes - ausentes - justificadas;
+  const retardos = alumnos.filter(
+    (alumno) => obtenerEstado(alumno.id) === "Retardo"
+  ).length;
 
+  const pendientes =
+    alumnos.length - presentes - ausentes - justificadas - retardos;
+
+  // Un retardo cuenta como asistencia.
   const porcentaje =
     alumnos.length > 0
-      ? Math.round((presentes / alumnos.length) * 100)
+      ? Math.round(((presentes + retardos) / alumnos.length) * 100)
       : 0;
 
   const marcarTodos = () => {
+    setAviso(null);
     setMarcas((anterior) => {
       const siguiente = { ...anterior };
 
       alumnos.forEach((alumno) => {
-        siguiente[claveAlumno(alumno.id)] = "Presente";
+        siguiente[alumno.id] = "Presente";
       });
 
       return siguiente;
@@ -105,11 +151,12 @@ export default function AsistenciaClient({ grupos }: Props) {
   };
 
   const limpiarMarcas = () => {
+    setAviso(null);
     setMarcas((anterior) => {
       const siguiente = { ...anterior };
 
       alumnos.forEach((alumno) => {
-        delete siguiente[claveAlumno(alumno.id)];
+        delete siguiente[alumno.id];
       });
 
       return siguiente;
@@ -146,7 +193,9 @@ export default function AsistenciaClient({ grupos }: Props) {
           <select
             id="grupo-asistencia"
             value={grupoId}
-            onChange={(event) => setGrupoId(event.target.value)}
+            onChange={(event) =>
+              cambiarSeleccion({ grupo: event.target.value })
+            }
             className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm font-semibold text-[#141113] outline-none focus:border-[#7d9309]"
           >
             {grupos.length === 0 && (
@@ -179,7 +228,10 @@ export default function AsistenciaClient({ grupos }: Props) {
               id="fecha-asistencia"
               type="date"
               value={fecha}
-              onChange={(event) => setFecha(event.target.value)}
+              onChange={(event) =>
+                event.target.value &&
+                cambiarSeleccion({ fecha: event.target.value })
+              }
               className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] py-3 pl-11 pr-4 text-sm font-semibold text-[#141113] outline-none focus:border-[#7d9309]"
             />
           </div>
@@ -187,7 +239,7 @@ export default function AsistenciaClient({ grupos }: Props) {
       </section>
 
       {/* INDICADORES */}
-      <section className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
         {[
           {
             titulo: "Presentes",
@@ -203,6 +255,11 @@ export default function AsistenciaClient({ grupos }: Props) {
             titulo: "Justificadas",
             valor: justificadas,
             color: "text-[#b18432]",
+          },
+          {
+            titulo: "Retardos",
+            valor: retardos,
+            color: "text-[#5d6b91]",
           },
           {
             titulo: "Sin marcar",
@@ -352,7 +409,7 @@ export default function AsistenciaClient({ grupos }: Props) {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     <button
                       type="button"
                       onClick={() => marcar(alumno.id, "Presente")}
@@ -394,6 +451,20 @@ export default function AsistenciaClient({ grupos }: Props) {
                       <Info size={15} />
                       Justificada
                     </button>
+
+                    <button
+                      type="button"
+                      onClick={() => marcar(alumno.id, "Retardo")}
+                      aria-pressed={estado === "Retardo"}
+                      className={`flex items-center justify-center gap-1 rounded-xl border px-3 py-3 text-xs font-bold transition ${
+                        estado === "Retardo"
+                          ? "border-[#5d6b91] bg-[#eef0f7] text-[#4a5679]"
+                          : "border-[#e1dace] bg-white text-[#8c847d] hover:bg-[#f6f4ee]"
+                      }`}
+                    >
+                      <AlarmClock size={15} />
+                      Retardo
+                    </button>
                   </div>
                 </div>
               );
@@ -403,21 +474,46 @@ export default function AsistenciaClient({ grupos }: Props) {
 
         {/* PIE */}
         <div className="flex flex-col gap-3 border-t border-[#e1dace] bg-[#fdfcf9] p-5 sm:flex-row sm:items-center sm:justify-between md:px-6">
-          <p className="flex items-start gap-2 text-xs leading-relaxed text-[#8c847d]">
-            <Info size={15} className="mt-0.5 shrink-0" />
-            Vista de demostración: las marcas no se guardan
-            todavía en Twenty.
-          </p>
+          <div className="text-xs leading-relaxed">
+            {error ? (
+              <p role="alert" className="font-semibold text-[#9d3a2e]">
+                {error}
+              </p>
+            ) : aviso ? (
+              <p role="status" className="font-semibold text-[#52620a]">
+                {aviso}
+              </p>
+            ) : (
+              <p className="flex items-start gap-2 text-[#8c847d]">
+                <Info size={15} className="mt-0.5 shrink-0" />
+                {hayCambios
+                  ? "Hay cambios sin guardar."
+                  : "El pase de lista está guardado en Twenty."}
+              </p>
+            )}
+          </div>
 
-          {grupo && (
-            <Link
-              href={`/grupos/${grupo.id}`}
-              className="inline-flex shrink-0 items-center gap-1 text-sm font-bold text-[#7d9309]"
+          <div className="flex shrink-0 items-center gap-4">
+            {grupo && (
+              <Link
+                href={`/grupos/${grupo.id}`}
+                className="inline-flex items-center gap-1 text-sm font-bold text-[#7d9309]"
+              >
+                Ver grupo
+                <ChevronRight size={16} />
+              </Link>
+            )}
+
+            <button
+              type="button"
+              onClick={guardar}
+              disabled={!hayCambios || guardando}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#141113] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Ver grupo
-              <ChevronRight size={16} />
-            </Link>
-          )}
+              <Save size={16} />
+              {guardando ? "Guardando…" : "Guardar asistencia"}
+            </button>
+          </div>
         </div>
       </section>
     </div>
