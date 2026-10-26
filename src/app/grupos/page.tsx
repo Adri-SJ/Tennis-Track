@@ -65,10 +65,13 @@ export default async function GruposPage() {
             </p>
           </div>
 
-          <button className="flex w-fit items-center gap-2 rounded-xl bg-[#141113] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d]">
+          <Link
+            href="/grupos/nuevo"
+            className="flex w-fit items-center gap-2 rounded-xl bg-[#141113] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d]"
+          >
             <Plus size={18} />
             Nuevo grupo
-          </button>
+          </Link>
 
         </section>
 
