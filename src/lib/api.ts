@@ -1,7 +1,9 @@
 import type {
   Alumno,
+  DiaEntrenamiento,
   Grupo,
   Inscripcion,
+  NivelGrupo,
 } from "@/lib/types";
 
 const TWENTY_API_URL = process.env.TWENTY_API_URL;
@@ -49,6 +51,14 @@ type TwentyGrupo = {
 
   horaDeInicio: string | null;
   horaDeFin: string | null;
+
+  nivel:
+    | "PRINCIPIANTE"
+    | "INTERMEDIO"
+    | "AVANZADO"
+    | null;
+
+  capacidadMaxima: number | null;
 };
 
 /*
@@ -182,6 +192,10 @@ function adaptarAlumno(
 
     nombre,
 
+    nombres: person.name?.firstName ?? "",
+
+    apellidos: person.name?.lastName ?? "",
+
     edad: person.edad ?? null,
 
     estatura: person.estatura ?? null,
@@ -202,6 +216,24 @@ function adaptarAlumno(
         : "Activo",
   };
 }
+
+const DIAS_DE_ENTRENAMIENTO: DiaEntrenamiento[] = [
+  "LUNES",
+  "MARTES",
+  "MIERCOLES",
+  "JUEVES",
+  "VIERNES",
+  "SABADO",
+];
+
+const NIVELES: Record<
+  NonNullable<TwentyGrupo["nivel"]>,
+  NivelGrupo
+> = {
+  PRINCIPIANTE: "Principiante",
+  INTERMEDIO: "Intermedio",
+  AVANZADO: "Avanzado",
+};
 
 function adaptarDias(
   dias: string[]
@@ -233,11 +265,26 @@ function adaptarGrupo(
       grupo.diasDeEntrenamiento ?? []
     ),
 
+    diasDeEntrenamiento: (
+      grupo.diasDeEntrenamiento ?? []
+    ).filter((dia): dia is DiaEntrenamiento =>
+      DIAS_DE_ENTRENAMIENTO.includes(
+        dia as DiaEntrenamiento
+      )
+    ),
+
     horaInicio:
-      grupo.horaDeInicio ?? "—",
+      grupo.horaDeInicio || "—",
 
     horaFin:
-      grupo.horaDeFin ?? "—",
+      grupo.horaDeFin || "—",
+
+    nivel: grupo.nivel
+      ? NIVELES[grupo.nivel]
+      : null,
+
+    capacidadMaxima:
+      grupo.capacidadMaxima ?? null,
 
     estado:
       grupo.estado === "INACTIVO"
@@ -325,6 +372,35 @@ type TwentyCreatePersonResponse = {
   };
 };
 
+type TwentyUpdatePersonResponse = {
+  data: {
+    updatePerson: TwentyPerson;
+  };
+};
+
+function cuerpoAlumno(alumno: NuevoAlumno) {
+  return {
+    name: {
+      firstName: alumno.nombres,
+      lastName: alumno.apellidos,
+    },
+
+    edad: alumno.edad,
+
+    estatura: alumno.estatura,
+
+    manoHabil:
+      alumno.manoHabil === "Izquierda"
+        ? "IZQUIERDA"
+        : "DERECHA",
+
+    estado:
+      alumno.estado === "Inactivo"
+        ? "BAJA"
+        : "ACTIVO",
+  };
+}
+
 export async function createAlumno(
   alumno: NuevoAlumno
 ): Promise<Alumno> {
@@ -333,32 +409,30 @@ export async function createAlumno(
       "people",
       {
         method: "POST",
-
-        body: {
-          name: {
-            firstName: alumno.nombres,
-            lastName: alumno.apellidos,
-          },
-
-          edad: alumno.edad,
-
-          estatura: alumno.estatura,
-
-          manoHabil:
-            alumno.manoHabil === "Izquierda"
-              ? "IZQUIERDA"
-              : "DERECHA",
-
-          estado:
-            alumno.estado === "Inactivo"
-              ? "BAJA"
-              : "ACTIVO",
-        },
+        body: cuerpoAlumno(alumno),
       }
     );
 
   return adaptarAlumno(
     result.data.createPerson
+  );
+}
+
+export async function updateAlumno(
+  id: string,
+  alumno: NuevoAlumno
+): Promise<Alumno> {
+  const result =
+    await twentyFetch<TwentyUpdatePersonResponse>(
+      `people/${id}`,
+      {
+        method: "PATCH",
+        body: cuerpoAlumno(alumno),
+      }
+    );
+
+  return adaptarAlumno(
+    result.data.updatePerson
   );
 }
 
@@ -391,6 +465,88 @@ export async function getGrupoById(
   );
 }
 
+export type NuevoGrupo = {
+  nombre: string;
+  dias: DiaEntrenamiento[];
+  horaInicio: string;
+  horaFin: string;
+  nivel: NivelGrupo | null;
+  capacidadMaxima: number | null;
+  estado: "Activo" | "Inactivo";
+};
+
+type TwentyCreateGrupoResponse = {
+  data: {
+    createGrupo: TwentyGrupo;
+  };
+};
+
+type TwentyUpdateGrupoResponse = {
+  data: {
+    updateGrupo: TwentyGrupo;
+  };
+};
+
+function cuerpoGrupo(grupo: NuevoGrupo) {
+  const nivel = Object.entries(NIVELES).find(
+    ([, valor]) => valor === grupo.nivel
+  )?.[0];
+
+  return {
+    name: grupo.nombre,
+
+    diasDeEntrenamiento: grupo.dias,
+
+    horaDeInicio: grupo.horaInicio,
+
+    horaDeFin: grupo.horaFin,
+
+    nivel: nivel ?? null,
+
+    capacidadMaxima: grupo.capacidadMaxima,
+
+    estado:
+      grupo.estado === "Inactivo"
+        ? "INACTIVO"
+        : "ACTIVO",
+  };
+}
+
+export async function createGrupo(
+  grupo: NuevoGrupo
+): Promise<Grupo> {
+  const result =
+    await twentyFetch<TwentyCreateGrupoResponse>(
+      "grupos",
+      {
+        method: "POST",
+        body: cuerpoGrupo(grupo),
+      }
+    );
+
+  return adaptarGrupo(
+    result.data.createGrupo
+  );
+}
+
+export async function updateGrupo(
+  id: string,
+  grupo: NuevoGrupo
+): Promise<Grupo> {
+  const result =
+    await twentyFetch<TwentyUpdateGrupoResponse>(
+      `grupos/${id}`,
+      {
+        method: "PATCH",
+        body: cuerpoGrupo(grupo),
+      }
+    );
+
+  return adaptarGrupo(
+    result.data.updateGrupo
+  );
+}
+
 /* =========================================================
    INSCRIPCIONES
 ========================================================= */
@@ -420,6 +576,157 @@ export async function getInscripcionById(
         inscripcion.id === id
     ) ?? null
   );
+}
+
+export type NuevaInscripcion = {
+  alumnoId: string;
+  grupoId: string;
+  fechaInicio: string;
+  fechaFin: string | null;
+  estado: "Activa" | "Inactiva";
+};
+
+export type CambiosInscripcion = Partial<
+  Omit<NuevaInscripcion, "alumnoId" | "grupoId">
+>;
+
+type TwentyCreateInscripcionResponse = {
+  data: {
+    createInscripcion: TwentyInscripcion;
+  };
+};
+
+/*
+  El nombre sigue la convención que ya existe en Twenty:
+  "Alumno · Grupo".
+*/
+export async function createInscripcion(
+  inscripcion: NuevaInscripcion
+): Promise<{ id: string }> {
+  const [alumno, grupo] = await Promise.all([
+    getAlumnoById(inscripcion.alumnoId),
+    getGrupoById(inscripcion.grupoId),
+  ]);
+
+  if (!alumno || !grupo) {
+    throw new Error(
+      "El alumno o el grupo de la inscripción no existe."
+    );
+  }
+
+  const result =
+    await twentyFetch<TwentyCreateInscripcionResponse>(
+      "inscripciones",
+      {
+        method: "POST",
+
+        body: {
+          name: `${alumno.nombre} · ${grupo.nombre}`,
+
+          alumnoId: alumno.id,
+
+          grupoId: grupo.id,
+
+          fechaDeInicio: inscripcion.fechaInicio,
+
+          fechaDeFin: inscripcion.fechaFin,
+
+          estado:
+            inscripcion.estado === "Inactiva"
+              ? "INACTIVO"
+              : "ACTIVO",
+        },
+      }
+    );
+
+  return {
+    id: result.data.createInscripcion.id,
+  };
+}
+
+export async function updateInscripcion(
+  id: string,
+  cambios: CambiosInscripcion
+): Promise<void> {
+  await twentyFetch(
+    `inscripciones/${id}`,
+    {
+      method: "PATCH",
+
+      body: {
+        ...(cambios.fechaInicio !== undefined && {
+          fechaDeInicio: cambios.fechaInicio,
+        }),
+
+        ...(cambios.fechaFin !== undefined && {
+          fechaDeFin: cambios.fechaFin,
+        }),
+
+        ...(cambios.estado !== undefined && {
+          estado:
+            cambios.estado === "Inactiva"
+              ? "INACTIVO"
+              : "ACTIVO",
+        }),
+      },
+    }
+  );
+}
+
+/*
+  Cambiar de grupo no modifica la inscripción anterior:
+  la cierra (fecha de fin = día del cambio, estado
+  INACTIVO) y crea una nueva. Así queda el historial
+  de grupos del alumno.
+*/
+export async function cambiarGrupoDeAlumno(
+  alumnoId: string,
+  nuevoGrupoId: string,
+  fechaCambio: string
+): Promise<{ id: string }> {
+  const inscripciones = await getInscripciones();
+
+  const activas = inscripciones.filter(
+    (inscripcion) =>
+      inscripcion.estado === "Activa" &&
+      inscripcion.alumnos.some(
+        (alumno) => alumno.id === alumnoId
+      )
+  );
+
+  await Promise.all(
+    activas.map((inscripcion) =>
+      updateInscripcion(inscripcion.id, {
+        fechaFin: fechaCambio,
+        estado: "Inactiva",
+      })
+    )
+  );
+
+  return createInscripcion({
+    alumnoId,
+    grupoId: nuevoGrupoId,
+    fechaInicio: fechaCambio,
+    fechaFin: null,
+    estado: "Activa",
+  });
+}
+
+export async function getInscripcionesDeAlumno(
+  alumnoId: string
+): Promise<Inscripcion[]> {
+  const inscripciones =
+    await getInscripciones();
+
+  return inscripciones
+    .filter((inscripcion) =>
+      inscripcion.alumnos.some(
+        (alumno) => alumno.id === alumnoId
+      )
+    )
+    .sort((a, b) =>
+      b.fechaInicio.localeCompare(a.fechaInicio)
+    );
 }
 
 /* =========================================================

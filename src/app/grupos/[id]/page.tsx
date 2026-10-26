@@ -6,6 +6,8 @@ import {
   Clock3,
   Users,
   ArrowRight,
+  Pencil,
+  Plus,
 } from "lucide-react";
 
 import {
@@ -79,9 +81,27 @@ export default async function GrupoPage({
               </p>
             </div>
 
-            <span className="w-fit rounded-full border border-[#98ad09] px-4 py-2 text-xs font-bold text-[#7d9309]">
-              {grupo.estado}
-            </span>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="w-fit rounded-full border border-[#98ad09] px-4 py-2 text-xs font-bold text-[#7d9309]">
+                {grupo.estado}
+              </span>
+
+              <Link
+                href={`/grupos/${grupo.id}/editar`}
+                className="inline-flex items-center gap-2 rounded-xl border border-[#e1dace] px-4 py-2 text-sm font-semibold text-[#141113] transition hover:bg-[#f6f4ee]"
+              >
+                <Pencil size={16} />
+                Editar
+              </Link>
+
+              <Link
+                href={`/inscripciones/nueva?grupo=${grupo.id}`}
+                className="inline-flex items-center gap-2 rounded-xl bg-[#141113] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#32390d]"
+              >
+                <Plus size={16} />
+                Inscribir alumno
+              </Link>
+            </div>
 
           </div>
 
@@ -93,7 +113,11 @@ export default async function GrupoPage({
           <InfoCard
             icon={<Users size={20} />}
             label="Alumnos inscritos"
-            value={`${alumnosDelGrupo.length}`}
+            value={
+              grupo.capacidadMaxima !== null
+                ? `${alumnosDelGrupo.length} / ${grupo.capacidadMaxima}`
+                : `${alumnosDelGrupo.length}`
+            }
           />
 
           <InfoCard
@@ -141,6 +165,22 @@ export default async function GrupoPage({
                 label="Hora de fin"
                 value={grupo.horaFin}
               />
+
+              <InfoRow
+                label="Nivel"
+                value={grupo.nivel ?? "Sin definir"}
+              />
+
+
+              <InfoRow
+                label="Capacidad máxima"
+                value={
+                  grupo.capacidadMaxima !== null
+                    ? `${grupo.capacidadMaxima} alumnos`
+                    : "Sin límite"
+                }
+              />
+
 
               <InfoRow
                 label="Estado"

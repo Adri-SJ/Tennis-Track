@@ -7,12 +7,17 @@ import {
   UsersRound,
   CalendarDays,
   UserRound,
+  Pencil,
+  ArrowLeftRight,
+  Plus,
+  History,
 } from "lucide-react";
 
 import {
   getAlumnoById,
   getGrupoDeAlumno,
   getInscripcionActivaDeAlumno,
+  getInscripcionesDeAlumno,
 } from "@/lib/api";
 
 export default async function AlumnoPage({
@@ -44,9 +49,10 @@ export default async function AlumnoPage({
     );
   }
 
-  const [grupo, inscripcion] = await Promise.all([
+  const [grupo, inscripcion, historial] = await Promise.all([
     getGrupoDeAlumno(alumno.id),
     getInscripcionActivaDeAlumno(alumno.id),
+    getInscripcionesDeAlumno(alumno.id),
   ]);
 
   const iniciales = alumno.nombre
@@ -105,9 +111,19 @@ export default async function AlumnoPage({
               </div>
             </div>
 
-            <span className="w-fit rounded-full border border-[#98ad09] px-4 py-2 text-xs font-bold text-[#7d9309]">
-              {alumno.estado}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="w-fit rounded-full border border-[#98ad09] px-4 py-2 text-xs font-bold text-[#7d9309]">
+                {alumno.estado}
+              </span>
+
+              <Link
+                href={`/alumnos/${alumno.id}/editar`}
+                className="inline-flex items-center gap-2 rounded-xl border border-[#e1dace] px-4 py-2 text-sm font-semibold text-[#141113] transition hover:bg-[#f6f4ee]"
+              >
+                <Pencil size={16} />
+                Editar
+              </Link>
+            </div>
 
           </div>
         </section>
@@ -213,12 +229,22 @@ export default async function AlumnoPage({
                   value={inscripcion.estado}
                 />
 
-                <Link
-                  href={`/grupos/${grupo.id}`}
-                  className="mt-5 inline-flex rounded-xl bg-[#141113] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d]"
-                >
-                  Ver grupo
-                </Link>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <Link
+                    href={`/grupos/${grupo.id}`}
+                    className="inline-flex rounded-xl bg-[#141113] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d]"
+                  >
+                    Ver grupo
+                  </Link>
+
+                  <Link
+                    href={`/alumnos/${alumno.id}/cambiar-grupo`}
+                    className="inline-flex items-center gap-2 rounded-xl border border-[#e1dace] px-4 py-3 text-sm font-semibold text-[#141113] transition hover:bg-[#f6f4ee]"
+                  >
+                    <ArrowLeftRight size={16} />
+                    Cambiar de grupo
+                  </Link>
+                </div>
               </div>
             ) : (
               <div className="mt-5 rounded-xl bg-[#f6f4ee] p-4">
@@ -229,10 +255,69 @@ export default async function AlumnoPage({
                 <p className="mt-1 text-sm text-[#8c847d]">
                   Este alumno no está asignado actualmente a ningún grupo.
                 </p>
+
+                <Link
+                  href={`/inscripciones/nueva?alumno=${alumno.id}`}
+                  className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#141113] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d]"
+                >
+                  <Plus size={16} />
+                  Inscribir a un grupo
+                </Link>
               </div>
             )}
           </div>
 
+        </section>
+
+        {/* HISTORIAL */}
+        <section className="mt-5 rounded-2xl border border-[#e1dace] bg-white p-5 md:p-6">
+          <div className="flex items-center gap-2">
+            <History
+              size={20}
+              className="text-[#7d9309]"
+            />
+
+            <h2 className="text-lg font-black text-[#141113]">
+              HISTORIAL DE GRUPOS
+            </h2>
+          </div>
+
+          {historial.length > 0 ? (
+            <ul className="mt-5 divide-y divide-[#e1dace]">
+              {historial.map((item) => (
+                <li key={item.id}>
+                  <Link
+                    href={`/inscripciones/${item.id}`}
+                    className="flex items-center justify-between gap-4 py-3 transition hover:text-[#7d9309]"
+                  >
+                    <div>
+                      <p className="text-sm font-semibold text-[#141113]">
+                        {item.grupo?.nombre ?? "Sin grupo"}
+                      </p>
+
+                      <p className="text-xs text-[#8c847d]">
+                        {item.fechaInicio} → {item.fechaFin ?? "actual"}
+                      </p>
+                    </div>
+
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-bold ${
+                        item.estado === "Activa"
+                          ? "bg-[#eef3c4] text-[#5f6d14]"
+                          : "bg-[#f6f4ee] text-[#8c847d]"
+                      }`}
+                    >
+                      {item.estado}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-5 text-sm text-[#8c847d]">
+              Todavía no tiene inscripciones.
+            </p>
+          )}
         </section>
 
       </div>
