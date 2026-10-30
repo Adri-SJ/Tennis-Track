@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AppLayout from "@/components/AppLayout";
 import AlumnoForm from "@/components/AlumnoForm";
 import EncabezadoFormulario from "@/components/EncabezadoFormulario";
 import { getAlumnoById } from "@/lib/api";
 import { actualizarAlumno } from "../../actions";
+
+export const metadata: Metadata = {
+  title: "Editar alumno",
+};
 
 export default async function EditarAlumnoPage({
   params,

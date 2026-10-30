@@ -1,5 +1,6 @@
 "use server";
 
+import { autorizarAccion } from "@/lib/auth/servidor";
 import { revalidatePath } from "next/cache";
 import { getAlumnosDeGrupo } from "@/lib/api";
 import {
@@ -14,6 +15,12 @@ export async function guardarPaseDeLista(
   fecha: string,
   marcas: Record<string, EstadoAsistencia | null>
 ): Promise<{ error: string | null }> {
+  const sinPermiso = await autorizarAccion("/asistencia");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   if (!grupoId || !esFecha(fecha)) {
     return { error: "Elige un grupo y una fecha." };
   }

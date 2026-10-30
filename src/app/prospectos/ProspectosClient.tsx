@@ -55,11 +55,11 @@ const origenes: Origen[] = [
 type Formulario = DatosProspecto & { id: string };
 
 const coloresEtapa: Record<Etapa, string> = {
-  Nuevo: "bg-[#eef0f7] text-[#5d6b91]",
-  Contactado: "bg-[#fff5df] text-[#a16a1b]",
-  "Clase de prueba": "bg-[#eaf3f1] text-[#397f75]",
-  Inscrito: "bg-[#eef2cf] text-[#52620a]",
-  Perdido: "bg-[#f3eeee] text-[#8c5a54]",
+  Nuevo: "bg-azul-suave text-azul",
+  Contactado: "bg-alerta-suave text-alerta",
+  "Clase de prueba": "bg-teal-suave text-teal",
+  Inscrito: "bg-lima-suave text-verde-oscuro",
+  Perdido: "bg-peligro-suave text-peligro-apagado",
 };
 
 function formatearFecha(fecha: string) {
@@ -249,20 +249,20 @@ export default function ProspectosClient({
     return (
       <div
         key={prospecto.id}
-        className="rounded-xl border border-[#e1dace] bg-white p-4 shadow-sm"
+        className="rounded-xl border border-borde bg-superficie p-4 shadow-sm"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2cf] font-black text-[#52620a]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lima-suave font-black text-verde-oscuro">
               {prospecto.nombre.charAt(0).toUpperCase()}
             </div>
 
             <div className="min-w-0">
-              <p className="truncate font-black text-[#141113]">
+              <p className="truncate font-black text-texto">
                 {prospecto.nombre}
               </p>
 
-              <p className="mt-1 text-xs text-[#8c847d]">
+              <p className="mt-1 text-xs text-texto-suave">
                 {prospecto.origen}
               </p>
             </div>
@@ -272,39 +272,39 @@ export default function ProspectosClient({
             type="button"
             onClick={() => abrirEditar(prospecto)}
             aria-label={`Editar a ${prospecto.nombre}`}
-            className="rounded-lg p-2 text-[#8c847d] hover:bg-[#f6f4ee]"
+            className="rounded-lg p-2 text-texto-suave hover:bg-fondo"
           >
             <Pencil size={16} />
           </button>
         </div>
 
         <div className="mt-4 space-y-2">
-          <p className="flex items-center gap-2 text-xs text-[#6f6964]">
+          <p className="flex items-center gap-2 text-xs text-texto-3">
             <Phone size={14} />
             {prospecto.telefono}
           </p>
 
-          <p className="flex items-center gap-2 text-xs text-[#6f6964]">
+          <p className="flex items-center gap-2 text-xs text-texto-3">
             <CalendarDays size={14} />
             Registrado el {formatearFecha(prospecto.fechaContacto)}
           </p>
 
           {prospecto.fechaClaseMuestra && (
-            <p className="flex items-center gap-2 text-xs text-[#397f75]">
+            <p className="flex items-center gap-2 text-xs text-teal">
               <CalendarDays size={14} />
               Clase de prueba: {formatearFecha(prospecto.fechaClaseMuestra)}
             </p>
           )}
 
           {prospecto.alumnoId && (
-            <p className="flex items-center gap-2 text-xs font-semibold text-[#52620a]">
+            <p className="flex items-center gap-2 text-xs font-semibold text-verde-oscuro">
               <CircleCheck size={14} />
               Ya es alumno
             </p>
           )}
         </div>
 
-        <div className="mt-4 border-t border-[#eee9df] pt-3">
+        <div className="mt-4 border-t border-borde-suave pt-3">
           <div className="relative">
               <select
                 aria-label={`Etapa de ${prospecto.nombre}`}
@@ -316,7 +316,7 @@ export default function ProspectosClient({
                     event.target.value as Etapa
                   )
                 }
-                className="w-full appearance-none rounded-lg bg-[#f6f4ee] px-3 py-2 pr-9 text-xs font-bold text-[#52620a] outline-none"
+                className="w-full appearance-none rounded-lg bg-fondo px-3 py-2 pr-9 text-xs font-bold text-verde-oscuro outline-none"
               >
                 {etapas.map((etapa) => (
                   <option key={etapa} value={etapa}>
@@ -327,7 +327,7 @@ export default function ProspectosClient({
 
               <ChevronDown
                 size={15}
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#52620a]"
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-verde-oscuro"
               />
           </div>
         </div>
@@ -340,15 +340,15 @@ export default function ProspectosClient({
       {/* ENCABEZADO */}
       <section className="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7d9309]">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
             Crecimiento de la academia
           </p>
 
-          <h1 className="mt-1 text-3xl font-black text-[#141113] md:text-5xl">
+          <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
             PROSPECTOS
           </h1>
 
-          <p className="mt-2 text-sm text-[#6f6964] md:text-base">
+          <p className="mt-2 text-sm text-texto-3 md:text-base">
             Seguimiento de personas interesadas en formar
             parte de la academia.
           </p>
@@ -357,7 +357,7 @@ export default function ProspectosClient({
         <button
           type="button"
           onClick={abrirNuevo}
-          className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d] transition hover:bg-[#dce855]"
+          className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-sobre-lima transition hover:bg-[#dce855]"
         >
           <Plus size={18} />
           Nuevo prospecto
@@ -393,20 +393,20 @@ export default function ProspectosClient({
           return (
             <div
               key={indicador.titulo}
-              className="rounded-2xl border border-[#e1dace] bg-white p-5"
+              className="rounded-2xl border border-borde bg-superficie p-5"
             >
               <div className="flex items-center justify-between gap-2">
-                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#8c847d]">
+                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-texto-suave">
                   {indicador.titulo}
                 </p>
 
                 <Icono
                   size={18}
-                  className="shrink-0 text-[#7d9309]"
+                  className="shrink-0 text-verde"
                 />
               </div>
 
-              <p className="mt-4 text-3xl font-black text-[#141113]">
+              <p className="mt-4 text-3xl font-black text-texto">
                 {indicador.valor}
               </p>
             </div>
@@ -415,7 +415,7 @@ export default function ProspectosClient({
       </section>
 
       {/* CONVERSIÓN */}
-      <section className="mb-7 rounded-2xl bg-[#32390d] p-6 text-white md:p-7">
+      <section className="mb-7 rounded-2xl bg-banner p-6 text-white md:p-7">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#dce6a1]">
@@ -437,7 +437,7 @@ export default function ProspectosClient({
           </p>
         </div>
 
-        <div className="mt-6 h-3 overflow-hidden rounded-full bg-white/20">
+        <div className="mt-6 h-3 overflow-hidden rounded-full bg-superficie/20">
           <div
             className="h-full rounded-full bg-[#cbd90a]"
             style={{ width: `${conversion}%` }}
@@ -451,13 +451,13 @@ export default function ProspectosClient({
       </section>
 
       {/* CONTROLES */}
-      <section className="mb-5 rounded-2xl border border-[#e1dace] bg-white p-5">
+      <section className="mb-5 rounded-2xl border border-borde bg-superficie p-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="grid flex-1 gap-3 sm:grid-cols-[1fr_200px]">
             <div className="relative">
               <Search
                 size={17}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8c847d]"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-texto-suave"
               />
 
               <input
@@ -467,7 +467,7 @@ export default function ProspectosClient({
                 onChange={(event) =>
                   setBusqueda(event.target.value)
                 }
-                className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] py-3 pl-11 pr-4 text-sm outline-none focus:border-[#7d9309]"
+                className="w-full rounded-xl border border-borde bg-fondo py-3 pl-11 pr-4 text-sm outline-none focus:border-verde"
               />
             </div>
 
@@ -479,7 +479,7 @@ export default function ProspectosClient({
                   event.target.value as Etapa | "Todas"
                 )
               }
-              className="rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm font-semibold outline-none"
+              className="rounded-xl border border-borde bg-fondo px-4 py-3 text-sm font-semibold outline-none"
             >
               <option value="Todas">Todas las etapas</option>
 
@@ -497,8 +497,8 @@ export default function ProspectosClient({
               onClick={() => setVista("tablero")}
               className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold ${
                 vista === "tablero"
-                  ? "bg-[#eef2cf] text-[#52620a]"
-                  : "bg-[#f6f4ee] text-[#8c847d]"
+                  ? "bg-lima-suave text-verde-oscuro"
+                  : "bg-fondo text-texto-suave"
               }`}
             >
               <LayoutGrid size={17} />
@@ -510,8 +510,8 @@ export default function ProspectosClient({
               onClick={() => setVista("lista")}
               className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold ${
                 vista === "lista"
-                  ? "bg-[#eef2cf] text-[#52620a]"
-                  : "bg-[#f6f4ee] text-[#8c847d]"
+                  ? "bg-lima-suave text-verde-oscuro"
+                  : "bg-fondo text-texto-suave"
               }`}
             >
               <List size={17} />
@@ -521,7 +521,7 @@ export default function ProspectosClient({
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <span className="text-xs text-[#8c847d]">
+          <span className="text-xs text-texto-suave">
             {filtrados.length} prospectos encontrados
           </span>
         </div>
@@ -538,7 +538,7 @@ export default function ProspectosClient({
             return (
               <div
                 key={etapa}
-                className="min-h-72 rounded-2xl border border-[#e1dace] bg-[#f6f4ee] p-3"
+                className="min-h-72 rounded-2xl border border-borde bg-fondo p-3"
               >
                 <div className="mb-4 flex items-center justify-between px-2 py-2">
                   <div className="flex items-center gap-2">
@@ -548,12 +548,12 @@ export default function ProspectosClient({
                       <IconoEtapa etapa={etapa} />
                     </span>
 
-                    <h3 className="text-sm font-black text-[#141113]">
+                    <h3 className="text-sm font-black text-texto">
                       {etapa}
                     </h3>
                   </div>
 
-                  <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-[#6f6964]">
+                  <span className="rounded-full bg-superficie px-3 py-1 text-xs font-black text-texto-3">
                     {registros.length}
                   </span>
                 </div>
@@ -562,7 +562,7 @@ export default function ProspectosClient({
                   {registros.map(tarjetaProspecto)}
 
                   {registros.length === 0 && (
-                    <div className="rounded-xl border border-dashed border-[#d8d0c4] px-4 py-10 text-center text-xs text-[#8c847d]">
+                    <div className="rounded-xl border border-dashed border-borde-fuerte px-4 py-10 text-center text-xs text-texto-suave">
                       Sin prospectos en esta etapa
                     </div>
                   )}
@@ -575,11 +575,11 @@ export default function ProspectosClient({
 
       {/* LISTA */}
       {vista === "lista" && (
-        <section className="overflow-hidden rounded-2xl border border-[#e1dace] bg-white">
+        <section className="overflow-hidden rounded-2xl border border-borde bg-superficie">
           <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-left">
-              <thead className="bg-[#f6f4ee]">
-                <tr className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#8c847d]">
+              <thead className="bg-fondo">
+                <tr className="text-[11px] font-bold uppercase tracking-[0.12em] text-texto-suave">
                   <th className="px-6 py-4">Prospecto</th>
                   <th className="px-4 py-4">Contacto</th>
                   <th className="px-4 py-4">Origen</th>
@@ -591,19 +591,19 @@ export default function ProspectosClient({
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-[#eee9df]">
+              <tbody className="divide-y divide-borde-suave">
                 {filtrados.map((prospecto) => {
                   return (
                     <tr key={prospecto.id}>
-                      <td className="px-6 py-5 font-bold text-[#141113]">
+                      <td className="px-6 py-5 font-bold text-texto">
                         {prospecto.nombre}
                       </td>
 
-                      <td className="px-4 py-5 text-sm text-[#6f6964]">
+                      <td className="px-4 py-5 text-sm text-texto-3">
                         {prospecto.telefono}
                       </td>
 
-                      <td className="px-4 py-5 text-sm text-[#6f6964]">
+                      <td className="px-4 py-5 text-sm text-texto-3">
                         {prospecto.origen}
                       </td>
 
@@ -615,7 +615,7 @@ export default function ProspectosClient({
                         </span>
                       </td>
 
-                      <td className="px-4 py-5 text-sm text-[#6f6964]">
+                      <td className="px-4 py-5 text-sm text-texto-3">
                         {formatearFecha(
                           prospecto.fechaContacto
                         )}
@@ -627,7 +627,7 @@ export default function ProspectosClient({
                           onClick={() =>
                             abrirEditar(prospecto)
                           }
-                          className="text-sm font-bold text-[#7d9309]"
+                          className="text-sm font-bold text-verde"
                         >
                           Editar
                         </button>
@@ -644,7 +644,7 @@ export default function ProspectosClient({
           </div>
 
           {filtrados.length === 0 && (
-            <p className="px-5 py-12 text-center text-sm text-[#8c847d]">
+            <p className="px-5 py-12 text-center text-sm text-texto-suave">
               No hay prospectos que coincidan con los
               filtros.
             </p>
@@ -652,7 +652,7 @@ export default function ProspectosClient({
         </section>
       )}
 
-      <div className="mt-5 flex items-start gap-2 rounded-xl border border-[#e1dace] bg-white p-4 text-xs leading-relaxed text-[#8c847d]">
+      <div className="mt-5 flex items-start gap-2 rounded-xl border border-borde bg-superficie p-4 text-xs leading-relaxed text-texto-suave">
         <Info size={16} className="mt-0.5 shrink-0" />
         Los prospectos se guardan en Twenty. Para crear
         el alumno de un prospecto usa «Convertir en
@@ -666,17 +666,17 @@ export default function ProspectosClient({
             role="dialog"
             aria-modal="true"
             aria-labelledby="titulo-prospecto"
-            className="flex max-h-[92dvh] w-full max-w-xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+            className="flex max-h-[92dvh] w-full max-w-xl flex-col overflow-hidden rounded-2xl bg-superficie shadow-2xl"
           >
-            <div className="flex shrink-0 items-start justify-between bg-[#f6f4ee] p-5 md:p-6">
+            <div className="flex shrink-0 items-start justify-between bg-fondo p-5 md:p-6">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7d9309]">
+                <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
                   Captación de alumnos
                 </p>
 
                 <h2
                   id="titulo-prospecto"
-                  className="mt-1 text-2xl font-black text-[#141113]"
+                  className="mt-1 text-2xl font-black text-texto"
                 >
                   {formulario.id
                     ? "EDITAR PROSPECTO"
@@ -688,7 +688,7 @@ export default function ProspectosClient({
                 type="button"
                 aria-label="Cerrar formulario"
                 onClick={() => setModalAbierto(false)}
-                className="rounded-full bg-white p-2"
+                className="rounded-full bg-superficie p-2"
               >
                 <X size={20} />
               </button>
@@ -714,7 +714,7 @@ export default function ProspectosClient({
                   }
                   placeholder="Nombre del interesado"
                   maxLength={120}
-                  className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm outline-none focus:border-[#7d9309]"
+                  className="w-full rounded-xl border border-borde bg-fondo px-4 py-3 text-sm outline-none focus:border-verde"
                 />
               </div>
 
@@ -739,7 +739,7 @@ export default function ProspectosClient({
                     }
                     placeholder="951..."
                     maxLength={25}
-                    className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm outline-none focus:border-[#7d9309]"
+                    className="w-full rounded-xl border border-borde bg-fondo px-4 py-3 text-sm outline-none focus:border-verde"
                   />
                 </div>
 
@@ -765,7 +765,7 @@ export default function ProspectosClient({
                   }
                   placeholder="correo@ejemplo.com"
                   maxLength={180}
-                  className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm outline-none focus:border-[#7d9309]"
+                  className="w-full rounded-xl border border-borde bg-fondo px-4 py-3 text-sm outline-none focus:border-verde"
                 />
               </div>
 
@@ -787,7 +787,7 @@ export default function ProspectosClient({
                         origen: event.target.value as Origen,
                       }))
                     }
-                    className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm outline-none"
+                    className="w-full rounded-xl border border-borde bg-fondo px-4 py-3 text-sm outline-none"
                   >
                     {origenes.map((origen) => (
                       <option key={origen} value={origen}>
@@ -814,7 +814,7 @@ export default function ProspectosClient({
                         etapa: event.target.value as Etapa,
                       }))
                     }
-                    className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm outline-none"
+                    className="w-full rounded-xl border border-borde bg-fondo px-4 py-3 text-sm outline-none"
                   >
                     {etapas.map((etapa) => (
                       <option key={etapa} value={etapa}>
@@ -843,25 +843,25 @@ export default function ProspectosClient({
                       fechaClaseMuestra: event.target.value,
                     }))
                   }
-                  className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm outline-none"
+                  className="w-full rounded-xl border border-borde bg-fondo px-4 py-3 text-sm outline-none"
                 />
               </div>
 
               {error && (
                 <p
                   role="alert"
-                  className="rounded-xl bg-[#fff0ed] p-3 text-sm font-bold text-[#b4493c]"
+                  className="rounded-xl bg-peligro-suave p-3 text-sm font-bold text-peligro"
                 >
                   {error}
                 </p>
               )}
 
               {formulario.id && (
-                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#eee9df] pt-4">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-borde-suave pt-4">
                   {alumnoDelFormulario ? (
                     <Link
                       href={`/alumnos/${alumnoDelFormulario}`}
-                      className="inline-flex items-center gap-2 text-sm font-bold text-[#52620a]"
+                      className="inline-flex items-center gap-2 text-sm font-bold text-verde-oscuro"
                     >
                       <CircleCheck size={17} />
                       Ver alumno
@@ -871,7 +871,7 @@ export default function ProspectosClient({
                       type="button"
                       onClick={() => convertir(formulario.id)}
                       disabled={guardando}
-                      className="inline-flex items-center gap-2 rounded-xl bg-[#eef2cf] px-4 py-2 text-sm font-bold text-[#52620a] disabled:opacity-60"
+                      className="inline-flex items-center gap-2 rounded-xl bg-lima-suave px-4 py-2 text-sm font-bold text-verde-oscuro disabled:opacity-60"
                     >
                       <UserRoundPlus size={17} />
                       Convertir en alumno
@@ -882,7 +882,7 @@ export default function ProspectosClient({
                     type="button"
                     onClick={() => eliminar(formulario.id)}
                     disabled={guardando}
-                    className="inline-flex items-center gap-2 text-sm font-bold text-[#b4493c] disabled:opacity-60"
+                    className="inline-flex items-center gap-2 text-sm font-bold text-peligro disabled:opacity-60"
                   >
                     <Trash2 size={17} />
                     Eliminar prospecto
@@ -891,11 +891,11 @@ export default function ProspectosClient({
               )}
             </div>
 
-            <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-[#e1dace] p-5 sm:flex-row sm:justify-end">
+            <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-borde p-5 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={() => setModalAbierto(false)}
-                className="rounded-xl border border-[#e1dace] px-5 py-3 text-sm font-bold text-[#6f6964]"
+                className="rounded-xl border border-borde px-5 py-3 text-sm font-bold text-texto-3"
               >
                 Cancelar
               </button>
@@ -904,7 +904,7 @@ export default function ProspectosClient({
                 type="button"
                 onClick={guardar}
                 disabled={guardando}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d] disabled:cursor-wait disabled:opacity-60"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-sobre-lima disabled:cursor-wait disabled:opacity-60"
               >
                 <Check size={18} />
                 {guardando ? "Guardando…" : "Guardar prospecto"}

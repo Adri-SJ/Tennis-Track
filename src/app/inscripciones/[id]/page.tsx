@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import AppLayout from "@/components/AppLayout";
 import Link from "next/link";
 import {
@@ -11,6 +12,10 @@ import {
 } from "lucide-react";
 
 import { getInscripcionById } from "@/lib/api";
+
+export const metadata: Metadata = {
+  title: "Inscripción",
+};
 
 type Props = {
   params: Promise<{
@@ -37,22 +42,22 @@ export default async function InscripcionDetallePage({
 
           <Link
             href="/inscripciones"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#7d9309]"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-verde"
           >
             <ArrowLeft size={17} />
             Volver a inscripciones
           </Link>
 
-          <div className="mt-6 rounded-2xl border border-[#e1dace] bg-white p-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7d9309]">
+          <div className="mt-6 rounded-2xl border border-borde bg-superficie p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
               Inscripción
             </p>
 
-            <h1 className="mt-2 text-3xl font-black text-[#141113]">
+            <h1 className="mt-2 text-3xl font-black text-texto">
               INSCRIPCIÓN NO ENCONTRADA
             </h1>
 
-            <p className="mt-3 text-sm text-[#6f6964]">
+            <p className="mt-3 text-sm text-texto-3">
               No se encontró una inscripción con este identificador.
             </p>
           </div>
@@ -79,7 +84,7 @@ export default async function InscripcionDetallePage({
         {/* VOLVER */}
         <Link
           href="/inscripciones"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[#7d9309] transition hover:text-[#5f6d14]"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-verde transition hover:text-verde-musgo"
         >
           <ArrowLeft size={17} />
           Volver a inscripciones
@@ -89,15 +94,15 @@ export default async function InscripcionDetallePage({
         <section className="mt-5 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7d9309]">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
               Inscripción
             </p>
 
-            <h1 className="mt-1 text-3xl font-black text-[#141113] md:text-5xl">
+            <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
               {inscripcion.nombre}
             </h1>
 
-            <p className="mt-2 text-sm text-[#6f6964] md:text-base">
+            <p className="mt-2 text-sm text-texto-3 md:text-base">
               Información de la inscripción y su asignación.
             </p>
           </div>
@@ -106,8 +111,8 @@ export default async function InscripcionDetallePage({
             <span
               className={`w-fit rounded-full border px-4 py-2 text-sm font-bold ${
                 inscripcion.estado === "Activa"
-                  ? "border-[#98ad09] text-[#7d9309]"
-                  : "border-[#d4cfca] text-[#8c847d]"
+                  ? "border-[#98ad09] text-verde"
+                  : "border-borde-fuerte text-texto-suave"
               }`}
             >
               {inscripcion.estado}
@@ -115,7 +120,7 @@ export default async function InscripcionDetallePage({
 
             <Link
               href={`/inscripciones/${inscripcion.id}/editar`}
-              className="inline-flex items-center gap-2 rounded-xl border border-[#e1dace] bg-white px-4 py-2 text-sm font-semibold text-[#141113] transition hover:bg-[#f6f4ee]"
+              className="inline-flex items-center gap-2 rounded-xl border border-borde bg-superficie px-4 py-2 text-sm font-semibold text-texto transition hover:bg-fondo"
             >
               <Pencil size={16} />
               Editar
@@ -128,19 +133,19 @@ export default async function InscripcionDetallePage({
         <section className="mt-7 grid gap-4 md:grid-cols-2">
 
           {/* ALUMNO */}
-          <div className="rounded-2xl border border-[#e1dace] bg-white p-5">
+          <div className="rounded-2xl border border-borde bg-superficie p-5">
 
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#cbd90a] text-[#32390d]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#cbd90a] text-sobre-lima">
                 <UserRound size={20} />
               </div>
 
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#8c847d]">
+                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
                   Alumno
                 </p>
 
-                <p className="mt-1 font-black text-[#141113]">
+                <p className="mt-1 font-black text-texto">
                   {alumno
                     ? alumno.nombre
                     : "Sin alumno asignado"}
@@ -151,7 +156,7 @@ export default async function InscripcionDetallePage({
             {alumno && (
               <Link
                 href={`/alumnos/${alumno.id}`}
-                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#7d9309]"
+                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-verde"
               >
                 Ver alumno
                 <ArrowRight size={16} />
@@ -161,19 +166,19 @@ export default async function InscripcionDetallePage({
           </div>
 
           {/* GRUPO */}
-          <div className="rounded-2xl border border-[#e1dace] bg-white p-5">
+          <div className="rounded-2xl border border-borde bg-superficie p-5">
 
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#eef310] text-[#32390d]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#eef310] text-sobre-lima">
                 <UsersRound size={20} />
               </div>
 
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#8c847d]">
+                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
                   Grupo
                 </p>
 
-                <p className="mt-1 font-black text-[#141113]">
+                <p className="mt-1 font-black text-texto">
                   {grupo
                     ? grupo.nombre
                     : "Sin grupo asignado"}
@@ -184,7 +189,7 @@ export default async function InscripcionDetallePage({
             {grupo && (
               <Link
                 href={`/grupos/${grupo.id}`}
-                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#7d9309]"
+                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-verde"
               >
                 Ver grupo
                 <ArrowRight size={16} />
@@ -196,20 +201,20 @@ export default async function InscripcionDetallePage({
         </section>
 
         {/* PERIODO */}
-        <section className="mt-4 rounded-2xl border border-[#e1dace] bg-white p-5 md:p-6">
+        <section className="mt-4 rounded-2xl border border-borde bg-superficie p-5 md:p-6">
 
           <div className="mb-5 flex items-center gap-3">
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f6f4ee] text-[#7d9309]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-fondo text-verde">
               <CalendarDays size={20} />
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#8c847d]">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
                 Periodo
               </p>
 
-              <h2 className="font-black text-[#141113]">
+              <h2 className="font-black text-texto">
                 Vigencia de la inscripción
               </h2>
             </div>
@@ -219,23 +224,23 @@ export default async function InscripcionDetallePage({
           <div className="grid gap-3 sm:grid-cols-2">
 
             {/* INICIO */}
-            <div className="rounded-xl bg-[#f6f4ee] p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#8c847d]">
+            <div className="rounded-xl bg-fondo p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
                 Fecha de inicio
               </p>
 
-              <p className="mt-2 text-lg font-black text-[#141113]">
+              <p className="mt-2 text-lg font-black text-texto">
                 {inscripcion.fechaInicio || "—"}
               </p>
             </div>
 
             {/* FIN */}
-            <div className="rounded-xl bg-[#f6f4ee] p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#8c847d]">
+            <div className="rounded-xl bg-fondo p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
                 Fecha de fin
               </p>
 
-              <p className="mt-2 text-lg font-black text-[#141113]">
+              <p className="mt-2 text-lg font-black text-texto">
                 {inscripcion.fechaFin || "Sin fecha de fin"}
               </p>
             </div>
@@ -245,20 +250,20 @@ export default async function InscripcionDetallePage({
         </section>
 
         {/* ESTADO */}
-        <section className="mt-4 rounded-2xl border border-[#e1dace] bg-white p-5">
+        <section className="mt-4 rounded-2xl border border-borde bg-superficie p-5">
 
           <div className="flex items-center gap-3">
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f6f4ee] text-[#7d9309]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-fondo text-verde">
               <CircleCheck size={20} />
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#8c847d]">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
                 Estado
               </p>
 
-              <p className="mt-1 font-black text-[#141113]">
+              <p className="mt-1 font-black text-texto">
                 {inscripcion.estado}
               </p>
             </div>

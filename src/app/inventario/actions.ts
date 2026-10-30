@@ -1,5 +1,6 @@
 "use server";
 
+import { autorizarAccion } from "@/lib/auth/servidor";
 import { revalidatePath } from "next/cache";
 import { esFecha, hoy } from "@/lib/formulario";
 import {
@@ -46,6 +47,12 @@ export async function guardarMaterial(
   id: string | null,
   datos: DatosMaterial
 ): Promise<Resultado> {
+  const sinPermiso = await autorizarAccion("/inventario");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   const limpio: DatosMaterial = {
     ...datos,
     nombre: datos.nombre.trim(),
@@ -79,6 +86,12 @@ export async function guardarMaterial(
 }
 
 export async function eliminarMaterial(id: string): Promise<Resultado> {
+  const sinPermiso = await autorizarAccion("/inventario");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   try {
     await deleteMaterial(id);
   } catch (error) {
@@ -101,6 +114,12 @@ export async function guardarMovimiento(
     nota: string;
   }
 ): Promise<Resultado> {
+  const sinPermiso = await autorizarAccion("/inventario");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   if (!LISTA_TIPOS.includes(datos.tipo)) {
     return { error: "Elige el tipo de movimiento." };
   }

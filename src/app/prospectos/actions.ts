@@ -1,5 +1,6 @@
 "use server";
 
+import { autorizarAccion } from "@/lib/auth/servidor";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { esFecha } from "@/lib/formulario";
@@ -52,6 +53,12 @@ export async function guardarProspecto(
   id: string | null,
   datos: DatosProspecto
 ): Promise<Resultado> {
+  const sinPermiso = await autorizarAccion("/prospectos");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   const limpio: DatosProspecto = {
     ...datos,
     nombre: datos.nombre.trim(),
@@ -89,6 +96,12 @@ export async function cambiarEtapaProspecto(
   id: string,
   etapa: Etapa
 ): Promise<Resultado> {
+  const sinPermiso = await autorizarAccion("/prospectos");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   if (!LISTA_ETAPAS.includes(etapa)) {
     return { error: "Etapa no válida." };
   }
@@ -107,6 +120,12 @@ export async function cambiarEtapaProspecto(
 }
 
 export async function eliminarProspecto(id: string): Promise<Resultado> {
+  const sinPermiso = await autorizarAccion("/prospectos");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   try {
     await deleteProspecto(id);
   } catch (error) {
@@ -121,6 +140,12 @@ export async function eliminarProspecto(id: string): Promise<Resultado> {
 }
 
 export async function convertirEnAlumno(id: string): Promise<Resultado> {
+  const sinPermiso = await autorizarAccion("/prospectos");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   let alumnoId: string;
 
   try {

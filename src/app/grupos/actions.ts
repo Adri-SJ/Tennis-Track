@@ -1,5 +1,6 @@
 "use server";
 
+import { autorizarAccion } from "@/lib/auth/servidor";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
@@ -87,6 +88,12 @@ export async function crearGrupo(
   _estadoPrevio: EstadoFormulario,
   formData: FormData
 ): Promise<EstadoFormulario> {
+  const sinPermiso = await autorizarAccion("/grupos/nuevo");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   const datos = leerGrupo(formData);
 
   if ("error" in datos) {
@@ -118,6 +125,12 @@ export async function actualizarGrupo(
   _estadoPrevio: EstadoFormulario,
   formData: FormData
 ): Promise<EstadoFormulario> {
+  const sinPermiso = await autorizarAccion("/grupos/id/editar");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   const datos = leerGrupo(formData);
 
   if ("error" in datos) {

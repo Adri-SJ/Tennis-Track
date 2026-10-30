@@ -166,19 +166,19 @@ export default async function Home() {
       <div className="px-5 py-6 md:px-8 lg:px-10">
 
         {/* HEADER */}
-        <section className="mb-6 border-b border-[#e1dace] pb-5">
+        <section className="mb-6 border-b border-borde pb-5">
           <div className="flex items-start justify-between gap-4">
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7d9309]">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
                 TennisTrack
               </p>
 
-              <h1 className="mt-1 text-3xl font-black text-[#141113] md:text-5xl">
+              <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
                 RESUMEN DEL DÍA
               </h1>
 
-              <p className="mt-2 max-w-xl text-sm text-[#6f6964] md:text-base">
+              <p className="mt-2 max-w-xl text-sm text-texto-3 md:text-base">
                 Todo lo que pasa hoy en la academia, en una sola pantalla.
               </p>
             </div>
@@ -187,7 +187,7 @@ export default async function Home() {
 
           <div className="mt-4 flex items-center justify-between md:justify-end md:gap-4">
 
-            <div className="rounded-full border border-[#e1dace] bg-white px-3 py-2 text-xs font-semibold md:text-sm">
+            <div className="rounded-full border border-borde bg-superficie px-3 py-2 text-xs font-semibold md:text-sm">
               <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[#98ad09]" />
               Datos en vivo
             </div>
@@ -232,7 +232,7 @@ export default async function Home() {
         <section className="mt-6 grid gap-6 xl:grid-cols-2">
 
           {/* ALUMNOS POR GRUPO */}
-          <div className="rounded-2xl border border-[#e1dace] bg-white p-6">
+          <div className="rounded-2xl border border-borde bg-superficie p-6">
 
             <h2 className="text-xl font-black">
               ALUMNOS POR GRUPO
@@ -275,7 +275,7 @@ export default async function Home() {
           </div>
 
           {/* MANO HÁBIL */}
-          <div className="rounded-2xl border border-[#e1dace] bg-white p-6">
+          <div className="rounded-2xl border border-borde bg-superficie p-6">
 
             <h2 className="text-xl font-black">
               MANO HÁBIL
@@ -302,7 +302,7 @@ export default async function Home() {
         </section>
 
         {/* HOY */}
-        <section className="mt-6 rounded-2xl border border-[#e1dace] bg-white p-6">
+        <section className="mt-6 rounded-2xl border border-borde bg-superficie p-6">
 
           <div className="flex items-center justify-between gap-4">
 
@@ -312,7 +312,7 @@ export default async function Home() {
 
             <Link
               href="/horario"
-              className="shrink-0 font-semibold text-[#7d9309] hover:text-[#5f6d14]"
+              className="shrink-0 font-semibold text-verde hover:text-verde-musgo"
             >
               Ver horario →
             </Link>
@@ -320,7 +320,7 @@ export default async function Home() {
           </div>
 
           {gruposHoy.length > 0 ? (
-            <div className="mt-5 divide-y divide-[#e1dace]">
+            <div className="mt-5 divide-y divide-borde">
 
               {gruposHoy.map((grupo) => (
                 <TrainingRow
@@ -335,13 +335,13 @@ export default async function Home() {
 
             </div>
           ) : (
-            <div className="mt-5 rounded-xl bg-[#f6f4ee] p-4">
+            <div className="mt-5 rounded-xl bg-fondo p-4">
 
-              <p className="text-sm font-semibold text-[#141113]">
+              <p className="text-sm font-semibold text-texto">
                 No hay entrenamientos programados hoy.
               </p>
 
-              <p className="mt-1 text-sm text-[#8c847d]">
+              <p className="mt-1 text-sm text-texto-suave">
                 No encontramos grupos activos que entrenen este día.
               </p>
 
@@ -365,17 +365,17 @@ function MetricCard({
   subtitle: string;
 }) {
   return (
-    <div className="rounded-2xl border border-[#e1dace] bg-white p-6">
+    <div className="rounded-2xl border border-borde bg-superficie p-6">
 
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8c847d]">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-texto-suave">
         {title}
       </p>
 
-      <p className="mt-2 text-5xl font-black text-[#141113]">
+      <p className="mt-2 text-5xl font-black text-texto">
         {value}
       </p>
 
-      <p className="mt-2 text-sm text-[#6f6964]">
+      <p className="mt-2 text-sm text-texto-3">
         {subtitle}
       </p>
 
@@ -401,16 +401,16 @@ function ProgressRow({
           {label}
         </span>
 
-        <span className="text-right text-[#6f6964]">
+        <span className="text-right text-texto-3">
           {value}
         </span>
 
       </div>
 
-      <div className="h-2 rounded-full bg-[#ede9dc]">
+      <div className="h-2 rounded-full bg-hundido">
 
         <div
-          className="h-2 rounded-full bg-[#7d9309]"
+          className="h-2 rounded-full bg-verde"
           style={{ width }}
         />
 
@@ -443,12 +443,12 @@ function TrainingRow({
             {group}
           </p>
 
-          <p className="mt-1 text-sm text-[#6f6964]">
+          <p className="mt-1 text-sm text-texto-3">
             {students}
           </p>
         </div>
 
-        <span className="rounded-full border border-[#98ad09] px-3 py-1 text-xs font-bold text-[#7d9309]">
+        <span className="rounded-full border border-[#98ad09] px-3 py-1 text-xs font-bold text-verde">
           ACTIVO
         </span>
 

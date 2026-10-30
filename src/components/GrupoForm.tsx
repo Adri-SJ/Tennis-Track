@@ -66,7 +66,7 @@ export default function GrupoForm({
   return (
     <form
       action={formAction}
-      className="max-w-4xl rounded-2xl border border-[#e1dace] bg-white p-5 md:p-7"
+      className="max-w-4xl rounded-2xl border border-borde bg-superficie p-5 md:p-7"
     >
       <div className="grid gap-5 md:grid-cols-2">
 
@@ -98,8 +98,8 @@ export default function GrupoForm({
                   key={dia.valor}
                   className={`cursor-pointer rounded-xl border px-4 py-2 text-sm font-semibold transition ${
                     elegido
-                      ? "border-[#7d9309] bg-[#cbd90a] text-[#32390d]"
-                      : "border-[#e1dace] bg-white text-[#6f6964] hover:bg-[#f6f4ee]"
+                      ? "border-verde bg-[#cbd90a] text-sobre-lima"
+                      : "border-borde bg-superficie text-texto-3 hover:bg-fondo"
                   }`}
                 >
                   <input

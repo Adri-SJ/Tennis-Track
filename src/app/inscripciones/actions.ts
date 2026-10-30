@@ -1,5 +1,6 @@
 "use server";
 
+import { autorizarAccion } from "@/lib/auth/servidor";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
@@ -39,6 +40,12 @@ export async function crearInscripcion(
   _estadoPrevio: EstadoFormulario,
   formData: FormData
 ): Promise<EstadoFormulario> {
+  const sinPermiso = await autorizarAccion("/inscripciones");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   const alumnoId = String(formData.get("alumnoId") ?? "");
   const grupoId = String(formData.get("grupoId") ?? "");
   const fechas = leerFechas(formData);
@@ -116,6 +123,12 @@ export async function actualizarInscripcion(
   _estadoPrevio: EstadoFormulario,
   formData: FormData
 ): Promise<EstadoFormulario> {
+  const sinPermiso = await autorizarAccion("/inscripciones");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   const fechas = leerFechas(formData);
   const estado = formData.get("estado");
 

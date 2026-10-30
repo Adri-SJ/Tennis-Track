@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import AppLayout from "@/components/AppLayout";
 import Link from "next/link";
 import {
@@ -14,6 +15,10 @@ import {
   getGrupoById,
   getAlumnosDeGrupo,
 } from "@/lib/api";
+
+export const metadata: Metadata = {
+  title: "Grupo",
+};
 
 export default async function GrupoPage({
   params,
@@ -34,13 +39,13 @@ export default async function GrupoPage({
 
           <Link
             href="/grupos"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#7d9309]"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-verde"
           >
             <ArrowLeft size={18} />
             Volver a grupos
           </Link>
 
-          <p className="mt-6 font-semibold text-[#141113]">
+          <p className="mt-6 font-semibold text-texto">
             Grupo no encontrado.
           </p>
 
@@ -56,39 +61,39 @@ export default async function GrupoPage({
         {/* VOLVER */}
         <Link
           href="/grupos"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-[#7d9309] transition hover:text-[#5f6d14]"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-verde transition hover:text-verde-musgo"
         >
           <ArrowLeft size={18} />
           Volver a grupos
         </Link>
 
         {/* CABECERA */}
-        <section className="rounded-2xl border border-[#e1dace] bg-white p-6">
+        <section className="rounded-2xl border border-borde bg-superficie p-6">
 
           <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7d9309]">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
                 Grupo
               </p>
 
-              <h1 className="mt-1 text-3xl font-black text-[#141113] md:text-5xl">
+              <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
                 {grupo.nombre}
               </h1>
 
-              <p className="mt-2 text-sm text-[#6f6964] md:text-base">
+              <p className="mt-2 text-sm text-texto-3 md:text-base">
                 Información general y alumnos inscritos en el grupo.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <span className="w-fit rounded-full border border-[#98ad09] px-4 py-2 text-xs font-bold text-[#7d9309]">
+              <span className="w-fit rounded-full border border-[#98ad09] px-4 py-2 text-xs font-bold text-verde">
                 {grupo.estado}
               </span>
 
               <Link
                 href={`/grupos/${grupo.id}/editar`}
-                className="inline-flex items-center gap-2 rounded-xl border border-[#e1dace] px-4 py-2 text-sm font-semibold text-[#141113] transition hover:bg-[#f6f4ee]"
+                className="inline-flex items-center gap-2 rounded-xl border border-borde px-4 py-2 text-sm font-semibold text-texto transition hover:bg-fondo"
               >
                 <Pencil size={16} />
                 Editar
@@ -96,7 +101,7 @@ export default async function GrupoPage({
 
               <Link
                 href={`/inscripciones/nueva?grupo=${grupo.id}`}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#141113] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#32390d]"
+                className="inline-flex items-center gap-2 rounded-xl bg-boton px-4 py-2 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover"
               >
                 <Plus size={16} />
                 Inscribir alumno
@@ -138,9 +143,9 @@ export default async function GrupoPage({
         <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_2fr]">
 
           {/* INFORMACIÓN DEL GRUPO */}
-          <div className="rounded-2xl border border-[#e1dace] bg-white p-6">
+          <div className="rounded-2xl border border-borde bg-superficie p-6">
 
-            <h2 className="text-xl font-black text-[#141113]">
+            <h2 className="text-xl font-black text-texto">
               INFORMACIÓN DEL GRUPO
             </h2>
 
@@ -192,32 +197,32 @@ export default async function GrupoPage({
           </div>
 
           {/* ALUMNOS INSCRITOS */}
-          <div className="rounded-2xl border border-[#e1dace] bg-white p-6">
+          <div className="rounded-2xl border border-borde bg-superficie p-6">
 
             <div>
-              <h2 className="text-xl font-black text-[#141113]">
+              <h2 className="text-xl font-black text-texto">
                 ALUMNOS INSCRITOS
               </h2>
 
-              <p className="mt-1 text-sm text-[#6f6964]">
+              <p className="mt-1 text-sm text-texto-3">
                 {alumnosDelGrupo.length} alumnos actualmente en este grupo.
               </p>
             </div>
 
             {alumnosDelGrupo.length > 0 ? (
-              <div className="mt-5 divide-y divide-[#e1dace]">
+              <div className="mt-5 divide-y divide-borde">
 
                 {alumnosDelGrupo.map((alumno) => (
                   <Link
                     key={alumno.id}
                     href={`/alumnos/${alumno.id}`}
-                    className="group flex items-center justify-between gap-4 py-4 transition hover:bg-[#fbfaf7]"
+                    className="group flex items-center justify-between gap-4 py-4 transition hover:bg-superficie-2"
                   >
 
                     <div className="flex items-center gap-3">
 
                       {/* AVATAR */}
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#cbd90a] font-black text-[#32390d]">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#cbd90a] font-black text-sobre-lima">
                         {alumno.nombre
                           .split(" ")
                           .map((parte) => parte[0])
@@ -227,11 +232,11 @@ export default async function GrupoPage({
 
                       {/* DATOS */}
                       <div>
-                        <p className="font-semibold text-[#141113]">
+                        <p className="font-semibold text-texto">
                           {alumno.nombre}
                         </p>
 
-                        <p className="text-sm text-[#6f6964]">
+                        <p className="text-sm text-texto-3">
                           {alumno.edad !== null
                             ? `${alumno.edad} años`
                             : "Edad no registrada"}
@@ -242,13 +247,13 @@ export default async function GrupoPage({
 
                     <div className="flex items-center gap-3">
 
-                      <span className="hidden rounded-full border border-[#98ad09] px-3 py-1 text-xs font-bold text-[#7d9309] sm:block">
+                      <span className="hidden rounded-full border border-[#98ad09] px-3 py-1 text-xs font-bold text-verde sm:block">
                         {alumno.estado}
                       </span>
 
                       <ArrowRight
                         size={18}
-                        className="text-[#8c847d] transition group-hover:translate-x-1 group-hover:text-[#7d9309]"
+                        className="text-texto-suave transition group-hover:translate-x-1 group-hover:text-verde"
                       />
 
                     </div>
@@ -258,13 +263,13 @@ export default async function GrupoPage({
 
               </div>
             ) : (
-              <div className="mt-5 rounded-xl bg-[#f6f4ee] p-4">
+              <div className="mt-5 rounded-xl bg-fondo p-4">
 
-                <p className="text-sm font-semibold text-[#141113]">
+                <p className="text-sm font-semibold text-texto">
                   Sin alumnos inscritos
                 </p>
 
-                <p className="mt-1 text-sm text-[#8c847d]">
+                <p className="mt-1 text-sm text-texto-suave">
                   Este grupo todavía no tiene inscripciones activas.
                 </p>
 
@@ -290,9 +295,9 @@ function InfoCard({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl border border-[#e1dace] bg-white p-5">
+    <div className="rounded-2xl border border-borde bg-superficie p-5">
 
-      <div className="flex items-center gap-2 text-[#7d9309]">
+      <div className="flex items-center gap-2 text-verde">
         {icon}
 
         <p className="text-xs font-semibold uppercase tracking-[0.15em]">
@@ -300,7 +305,7 @@ function InfoCard({
         </p>
       </div>
 
-      <p className="mt-3 text-lg font-black text-[#141113]">
+      <p className="mt-3 text-lg font-black text-texto">
         {value}
       </p>
 
@@ -316,13 +321,13 @@ function InfoRow({
   value: string;
 }) {
   return (
-    <div className="flex items-start justify-between gap-6 border-b border-[#e1dace] pb-3">
+    <div className="flex items-start justify-between gap-6 border-b border-borde pb-3">
 
-      <span className="text-sm text-[#6f6964]">
+      <span className="text-sm text-texto-3">
         {label}
       </span>
 
-      <span className="text-right font-semibold text-[#141113]">
+      <span className="text-right font-semibold text-texto">
         {value}
       </span>
 

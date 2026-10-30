@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import AppLayout from "@/components/AppLayout";
 import Link from "next/link";
 import {
@@ -20,6 +21,10 @@ import {
   getInscripcionesDeAlumno,
 } from "@/lib/api";
 
+export const metadata: Metadata = {
+  title: "Alumno",
+};
+
 export default async function AlumnoPage({
   params,
 }: {
@@ -35,13 +40,13 @@ export default async function AlumnoPage({
         <div className="px-5 py-6 md:px-8 lg:px-10">
           <Link
             href="/alumnos"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#7d9309]"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-verde"
           >
             <ArrowLeft size={18} />
             Volver a alumnos
           </Link>
 
-          <p className="mt-6 font-semibold text-[#141113]">
+          <p className="mt-6 font-semibold text-texto">
             Alumno no encontrado.
           </p>
         </div>
@@ -81,44 +86,44 @@ export default async function AlumnoPage({
         {/* VOLVER */}
         <Link
           href="/alumnos"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-[#7d9309] transition hover:text-[#5f6d14]"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-verde transition hover:text-verde-musgo"
         >
           <ArrowLeft size={18} />
           Volver a alumnos
         </Link>
 
         {/* PERFIL */}
-        <section className="rounded-2xl border border-[#e1dace] bg-white p-5 md:p-7">
+        <section className="rounded-2xl border border-borde bg-superficie p-5 md:p-7">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#cbd90a] text-xl font-black text-[#32390d] md:h-20 md:w-20 md:text-2xl">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#cbd90a] text-xl font-black text-sobre-lima md:h-20 md:w-20 md:text-2xl">
                 {iniciales}
               </div>
 
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7d9309]">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
                   Alumno
                 </p>
 
-                <h1 className="mt-1 text-2xl font-black text-[#141113] md:text-4xl">
+                <h1 className="mt-1 text-2xl font-black text-texto md:text-4xl">
                   {alumno.nombre}
                 </h1>
 
-                <p className="mt-1 text-sm text-[#6f6964]">
+                <p className="mt-1 text-sm text-texto-3">
                   {grupo?.nombre ?? "Sin grupo"}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="w-fit rounded-full border border-[#98ad09] px-4 py-2 text-xs font-bold text-[#7d9309]">
+              <span className="w-fit rounded-full border border-[#98ad09] px-4 py-2 text-xs font-bold text-verde">
                 {alumno.estado}
               </span>
 
               <Link
                 href={`/alumnos/${alumno.id}/editar`}
-                className="inline-flex items-center gap-2 rounded-xl border border-[#e1dace] px-4 py-2 text-sm font-semibold text-[#141113] transition hover:bg-[#f6f4ee]"
+                className="inline-flex items-center gap-2 rounded-xl border border-borde px-4 py-2 text-sm font-semibold text-texto transition hover:bg-fondo"
               >
                 <Pencil size={16} />
                 Editar
@@ -161,8 +166,8 @@ export default async function AlumnoPage({
         <section className="mt-5 grid gap-5 xl:grid-cols-2">
 
           {/* INFORMACIÓN GENERAL */}
-          <div className="rounded-2xl border border-[#e1dace] bg-white p-5 md:p-6">
-            <h2 className="text-lg font-black text-[#141113]">
+          <div className="rounded-2xl border border-borde bg-superficie p-5 md:p-6">
+            <h2 className="text-lg font-black text-texto">
               INFORMACIÓN GENERAL
             </h2>
 
@@ -195,14 +200,14 @@ export default async function AlumnoPage({
           </div>
 
           {/* INSCRIPCIÓN */}
-          <div className="rounded-2xl border border-[#e1dace] bg-white p-5 md:p-6">
+          <div className="rounded-2xl border border-borde bg-superficie p-5 md:p-6">
             <div className="flex items-center gap-2">
               <CalendarDays
                 size={20}
-                className="text-[#7d9309]"
+                className="text-verde"
               />
 
-              <h2 className="text-lg font-black text-[#141113]">
+              <h2 className="text-lg font-black text-texto">
                 INSCRIPCIÓN ACTUAL
               </h2>
             </div>
@@ -232,14 +237,14 @@ export default async function AlumnoPage({
                 <div className="mt-5 flex flex-wrap gap-3">
                   <Link
                     href={`/grupos/${grupo.id}`}
-                    className="inline-flex rounded-xl bg-[#141113] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d]"
+                    className="inline-flex rounded-xl bg-boton px-4 py-3 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover"
                   >
                     Ver grupo
                   </Link>
 
                   <Link
                     href={`/alumnos/${alumno.id}/cambiar-grupo`}
-                    className="inline-flex items-center gap-2 rounded-xl border border-[#e1dace] px-4 py-3 text-sm font-semibold text-[#141113] transition hover:bg-[#f6f4ee]"
+                    className="inline-flex items-center gap-2 rounded-xl border border-borde px-4 py-3 text-sm font-semibold text-texto transition hover:bg-fondo"
                   >
                     <ArrowLeftRight size={16} />
                     Cambiar de grupo
@@ -247,18 +252,18 @@ export default async function AlumnoPage({
                 </div>
               </div>
             ) : (
-              <div className="mt-5 rounded-xl bg-[#f6f4ee] p-4">
-                <p className="text-sm font-semibold text-[#141113]">
+              <div className="mt-5 rounded-xl bg-fondo p-4">
+                <p className="text-sm font-semibold text-texto">
                   Sin inscripción activa
                 </p>
 
-                <p className="mt-1 text-sm text-[#8c847d]">
+                <p className="mt-1 text-sm text-texto-suave">
                   Este alumno no está asignado actualmente a ningún grupo.
                 </p>
 
                 <Link
                   href={`/inscripciones/nueva?alumno=${alumno.id}`}
-                  className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#141113] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d]"
+                  className="mt-4 inline-flex items-center gap-2 rounded-xl bg-boton px-4 py-3 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover"
                 >
                   <Plus size={16} />
                   Inscribir a un grupo
@@ -270,32 +275,32 @@ export default async function AlumnoPage({
         </section>
 
         {/* HISTORIAL */}
-        <section className="mt-5 rounded-2xl border border-[#e1dace] bg-white p-5 md:p-6">
+        <section className="mt-5 rounded-2xl border border-borde bg-superficie p-5 md:p-6">
           <div className="flex items-center gap-2">
             <History
               size={20}
-              className="text-[#7d9309]"
+              className="text-verde"
             />
 
-            <h2 className="text-lg font-black text-[#141113]">
+            <h2 className="text-lg font-black text-texto">
               HISTORIAL DE GRUPOS
             </h2>
           </div>
 
           {historial.length > 0 ? (
-            <ul className="mt-5 divide-y divide-[#e1dace]">
+            <ul className="mt-5 divide-y divide-borde">
               {historial.map((item) => (
                 <li key={item.id}>
                   <Link
                     href={`/inscripciones/${item.id}`}
-                    className="flex items-center justify-between gap-4 py-3 transition hover:text-[#7d9309]"
+                    className="flex items-center justify-between gap-4 py-3 transition hover:text-verde"
                   >
                     <div>
-                      <p className="text-sm font-semibold text-[#141113]">
+                      <p className="text-sm font-semibold text-texto">
                         {item.grupo?.nombre ?? "Sin grupo"}
                       </p>
 
-                      <p className="text-xs text-[#8c847d]">
+                      <p className="text-xs text-texto-suave">
                         {item.fechaInicio} → {item.fechaFin ?? "actual"}
                       </p>
                     </div>
@@ -303,8 +308,8 @@ export default async function AlumnoPage({
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-bold ${
                         item.estado === "Activa"
-                          ? "bg-[#eef3c4] text-[#5f6d14]"
-                          : "bg-[#f6f4ee] text-[#8c847d]"
+                          ? "bg-lima-suave text-verde-musgo"
+                          : "bg-fondo text-texto-suave"
                       }`}
                     >
                       {item.estado}
@@ -314,7 +319,7 @@ export default async function AlumnoPage({
               ))}
             </ul>
           ) : (
-            <p className="mt-5 text-sm text-[#8c847d]">
+            <p className="mt-5 text-sm text-texto-suave">
               Todavía no tiene inscripciones.
             </p>
           )}
@@ -335,8 +340,8 @@ function InfoCard({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl border border-[#e1dace] bg-white p-4 md:p-5">
-      <div className="flex items-center gap-2 text-[#7d9309]">
+    <div className="rounded-2xl border border-borde bg-superficie p-4 md:p-5">
+      <div className="flex items-center gap-2 text-verde">
         {icon}
 
         <p className="text-xs font-semibold uppercase tracking-[0.12em]">
@@ -344,7 +349,7 @@ function InfoCard({
         </p>
       </div>
 
-      <p className="mt-3 font-black text-[#141113] md:text-lg">
+      <p className="mt-3 font-black text-texto md:text-lg">
         {value}
       </p>
     </div>
@@ -359,12 +364,12 @@ function InfoRow({
   value: string;
 }) {
   return (
-    <div className="flex items-start justify-between gap-5 border-b border-[#e1dace] pb-3">
-      <span className="text-sm text-[#6f6964]">
+    <div className="flex items-start justify-between gap-5 border-b border-borde pb-3">
+      <span className="text-sm text-texto-3">
         {label}
       </span>
 
-      <span className="text-right text-sm font-semibold text-[#141113]">
+      <span className="text-right text-sm font-semibold text-texto">
         {value}
       </span>
     </div>

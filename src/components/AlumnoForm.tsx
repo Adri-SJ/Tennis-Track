@@ -45,7 +45,7 @@ export default function AlumnoForm({
   return (
     <form
       action={formAction}
-      className="max-w-4xl rounded-2xl border border-[#e1dace] bg-white p-5 md:p-7"
+      className="max-w-4xl rounded-2xl border border-borde bg-superficie p-5 md:p-7"
     >
       <div className="grid gap-5 md:grid-cols-2">
 
@@ -111,7 +111,7 @@ export default function AlumnoForm({
               className={`${claseCampo} pr-12`}
             />
 
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-[#8c847d]">
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-texto-suave">
               cm
             </span>
           </div>
@@ -151,12 +151,12 @@ export default function AlumnoForm({
 
       {/* NOTA */}
       {!alumno && (
-        <div className="mt-6 rounded-xl bg-[#f6f4ee] p-4">
-          <p className="text-sm font-semibold text-[#141113]">
+        <div className="mt-6 rounded-xl bg-fondo p-4">
+          <p className="text-sm font-semibold text-texto">
             El grupo se asignará mediante una inscripción
           </p>
 
-          <p className="mt-1 text-sm text-[#8c847d]">
+          <p className="mt-1 text-sm text-texto-suave">
             Primero registramos al alumno y después lo relacionamos con un grupo.
           </p>
         </div>

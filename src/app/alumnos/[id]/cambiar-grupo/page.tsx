@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AppLayout from "@/components/AppLayout";
 import CambiarGrupoForm from "@/components/CambiarGrupoForm";
@@ -5,6 +6,10 @@ import EncabezadoFormulario from "@/components/EncabezadoFormulario";
 import type { OpcionGrupo } from "@/components/InscripcionForm";
 import { getAlumnoById, getGrupos, getInscripciones } from "@/lib/api";
 import { cambiarDeGrupo } from "../../actions";
+
+export const metadata: Metadata = {
+  title: "Cambiar de grupo",
+};
 
 export default async function CambiarGrupoPage({
   params,

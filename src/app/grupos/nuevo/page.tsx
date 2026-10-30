@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import AppLayout from "@/components/AppLayout";
 import EncabezadoFormulario from "@/components/EncabezadoFormulario";
 import GrupoForm from "@/components/GrupoForm";
 import { crearGrupo } from "../actions";
+
+export const metadata: Metadata = {
+  title: "Nuevo grupo",
+};
 
 export default function NuevoGrupoPage() {
   return (

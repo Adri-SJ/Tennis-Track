@@ -1,22 +1,219 @@
 @import "tailwindcss";
 
+/*
+  Tema de TennisTrack. Los componentes usan estos tokens (bg-fondo,
+  text-texto, border-borde…) en lugar de colores fijos, así el modo
+  oscuro cambia todo el panel y las pantallas de acceso.
+
+  Sin data-theme se sigue al sistema; ThemeToggle guarda la elección
+  en localStorage y el script de layout.tsx la aplica antes de pintar.
+*/
+
 :root {
-  --background: #f6f4ee;
-  --foreground: #141113;
+  color-scheme: light;
 
-  --surface: #ffffff;
-  --border: #e1dace;
+  /* Superficies */
+  --fondo: #f6f4ee;
+  --superficie: #ffffff;
+  --superficie-2: #fdfcf9;
+  --hundido: #eeeae0;
+  --borde: #e1dace;
+  --borde-fuerte: #d8d0c4;
+  --borde-suave: #eee9df;
 
-  --green-dark: #32390d;
-  --green: #7d9309;
-  --green-light: #98ad09;
-  --lime: #cbd90a;
-  --lime-bright: #eef310;
+  /* Texto */
+  --texto: #141113;
+  --texto-2: #5f5b55;
+  --texto-3: #6f6964;
+  --texto-suave: #8c847d;
+  --texto-tenue: #aaa39c;
 
-  --muted: #8c847d;
+  /* Marca */
+  --verde: #7d9309;
+  --verde-oscuro: #52620a;
+  --verde-musgo: #5f6d14;
+  --verde-medio: #657a0b;
+  --verde-noche: #32390d;
+  --banner: #32390d;
+  --lima-suave: #eef2cf;
+  --lima-suave-2: #eaf0c5;
+  --borde-lima: #b9ca75;
+
+  /* Sobre la lima (#cbd90a), igual en ambos temas */
+  --sobre-lima: #32390d;
+  --borde-logo: #5f6d14;
+
+  /* Botón principal */
+  --boton: #141113;
+  --boton-hover: #32390d;
+  --sobre-boton: #ffffff;
+
+  /* Estados */
+  --peligro: #b4493c;
+  --peligro-fuerte: #9d3a2e;
+  --peligro-apagado: #8c5a54;
+  --peligro-suave: #fff0ed;
+  --borde-peligro: #e6b1a9;
+  --alerta: #a16a1b;
+  --alerta-suave: #fff5df;
+  --borde-alerta: #e6c58d;
+  --exito: #2f8a3e;
+  --azul: #5d6b91;
+  --azul-suave: #eef0f7;
+  --teal: #397f75;
+  --teal-suave: #eaf3f1;
+
+  /* Pantallas de acceso */
+  --primario: #52620a;
+  --primario-texto: #ffffff;
+  --primario-suave: #eef2cf;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="claro"]) {
+    color-scheme: dark;
+
+    --fondo: #141113;
+    --superficie: #1f1c1e;
+    --superficie-2: #242123;
+    --hundido: #2a2628;
+    --borde: #3a3533;
+    --borde-fuerte: #4a4543;
+    --borde-suave: #2e2a2c;
+
+    --texto: #f1efea;
+    --texto-2: #cfc9c1;
+    --texto-3: #bdb7af;
+    --texto-suave: #a6a39b;
+    --texto-tenue: #857f79;
+
+    --verde: #b8c94a;
+    --verde-oscuro: #d0dc5a;
+    --verde-musgo: #bfcc4f;
+    --verde-medio: #c2d14a;
+    --verde-noche: #dce6a1;
+    --banner: #2a300b;
+    --lima-suave: #2c3207;
+    --lima-suave-2: #343b0a;
+    --borde-lima: #4a5419;
+
+    --boton: #cbd90a;
+    --boton-hover: #dce855;
+    --sobre-boton: #141113;
+
+    --peligro: #ef7366;
+    --peligro-fuerte: #ef7366;
+    --peligro-apagado: #c9938c;
+    --peligro-suave: #3a1f1b;
+    --borde-peligro: #6b3029;
+    --alerta: #e0a84a;
+    --alerta-suave: #3b2f19;
+    --borde-alerta: #6b5326;
+    --exito: #5cc06b;
+    --azul: #9fb0e0;
+    --azul-suave: #22263a;
+    --teal: #6cc4b6;
+    --teal-suave: #1b2e2b;
+
+    --primario: #cbd90a;
+    --primario-texto: #141113;
+    --primario-suave: #2c3207;
+  }
+}
+
+:root[data-theme="oscuro"] {
+  color-scheme: dark;
+
+  --fondo: #141113;
+  --superficie: #1f1c1e;
+  --superficie-2: #242123;
+  --hundido: #2a2628;
+  --borde: #3a3533;
+  --borde-fuerte: #4a4543;
+  --borde-suave: #2e2a2c;
+
+  --texto: #f1efea;
+  --texto-2: #cfc9c1;
+  --texto-3: #bdb7af;
+  --texto-suave: #a6a39b;
+  --texto-tenue: #857f79;
+
+  --verde: #b8c94a;
+  --verde-oscuro: #d0dc5a;
+  --verde-musgo: #bfcc4f;
+  --verde-medio: #c2d14a;
+  --verde-noche: #dce6a1;
+  --banner: #2a300b;
+  --lima-suave: #2c3207;
+  --lima-suave-2: #343b0a;
+  --borde-lima: #4a5419;
+
+  --boton: #cbd90a;
+  --boton-hover: #dce855;
+  --sobre-boton: #141113;
+
+  --peligro: #ef7366;
+  --peligro-fuerte: #ef7366;
+  --peligro-apagado: #c9938c;
+  --peligro-suave: #3a1f1b;
+  --borde-peligro: #6b3029;
+  --alerta: #e0a84a;
+  --alerta-suave: #3b2f19;
+  --borde-alerta: #6b5326;
+  --exito: #5cc06b;
+  --azul: #9fb0e0;
+  --azul-suave: #22263a;
+  --teal: #6cc4b6;
+  --teal-suave: #1b2e2b;
+
+  --primario: #cbd90a;
+  --primario-texto: #141113;
+  --primario-suave: #2c3207;
+}
+
+@theme inline {
+  --color-fondo: var(--fondo);
+  --color-superficie: var(--superficie);
+  --color-superficie-2: var(--superficie-2);
+  --color-hundido: var(--hundido);
+  --color-borde: var(--borde);
+  --color-borde-fuerte: var(--borde-fuerte);
+  --color-borde-suave: var(--borde-suave);
+  --color-texto: var(--texto);
+  --color-texto-2: var(--texto-2);
+  --color-texto-3: var(--texto-3);
+  --color-texto-suave: var(--texto-suave);
+  --color-texto-tenue: var(--texto-tenue);
+  --color-verde: var(--verde);
+  --color-verde-oscuro: var(--verde-oscuro);
+  --color-verde-musgo: var(--verde-musgo);
+  --color-verde-medio: var(--verde-medio);
+  --color-verde-noche: var(--verde-noche);
+  --color-banner: var(--banner);
+  --color-lima-suave: var(--lima-suave);
+  --color-lima-suave-2: var(--lima-suave-2);
+  --color-borde-lima: var(--borde-lima);
+  --color-sobre-lima: var(--sobre-lima);
+  --color-borde-logo: var(--borde-logo);
+  --color-boton: var(--boton);
+  --color-boton-hover: var(--boton-hover);
+  --color-sobre-boton: var(--sobre-boton);
+  --color-peligro: var(--peligro);
+  --color-peligro-fuerte: var(--peligro-fuerte);
+  --color-peligro-apagado: var(--peligro-apagado);
+  --color-peligro-suave: var(--peligro-suave);
+  --color-borde-peligro: var(--borde-peligro);
+  --color-alerta: var(--alerta);
+  --color-alerta-suave: var(--alerta-suave);
+  --color-borde-alerta: var(--borde-alerta);
+  --color-exito: var(--exito);
+  --color-azul: var(--azul);
+  --color-azul-suave: var(--azul-suave);
+  --color-teal: var(--teal);
+  --color-teal-suave: var(--teal-suave);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--fondo);
+  color: var(--texto);
 }

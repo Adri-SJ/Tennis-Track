@@ -1,5 +1,6 @@
 "use server";
 
+import { autorizarAccion } from "@/lib/auth/servidor";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
@@ -53,6 +54,12 @@ export async function crearAlumno(
   _estadoPrevio: EstadoFormulario,
   formData: FormData
 ): Promise<EstadoFormulario> {
+  const sinPermiso = await autorizarAccion("/alumnos/nuevo");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   const datos = leerAlumno(formData);
 
   if ("error" in datos) {
@@ -84,6 +91,12 @@ export async function actualizarAlumno(
   _estadoPrevio: EstadoFormulario,
   formData: FormData
 ): Promise<EstadoFormulario> {
+  const sinPermiso = await autorizarAccion("/alumnos/id/editar");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   const datos = leerAlumno(formData);
 
   if ("error" in datos) {
@@ -111,6 +124,12 @@ export async function cambiarDeGrupo(
   _estadoPrevio: EstadoFormulario,
   formData: FormData
 ): Promise<EstadoFormulario> {
+  const sinPermiso = await autorizarAccion("/alumnos/id/cambiar-grupo");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   const grupoId = String(formData.get("grupoId") ?? "");
   const fecha = String(formData.get("fecha") ?? "");
 

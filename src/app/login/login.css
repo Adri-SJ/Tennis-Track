@@ -1,0 +1,305 @@
+/*
+  Estilos de las pantallas de acceso (login, registro, recuperar).
+  Los colores salen del tema de globals.css (claro u oscuro).
+*/
+
+.auth {
+  min-height: 100dvh;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: var(--fondo);
+  color: var(--texto);
+  font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.auth *,
+.auth *::before,
+.auth *::after {
+  box-sizing: border-box;
+}
+
+/* TARJETA */
+
+.auth-tarjeta {
+  width: min(440px, 100%);
+  padding: 28px;
+  border-radius: 20px;
+  background: var(--superficie);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 12px 32px rgb(20 17 19 / 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.auth-logo {
+  width: 150px;
+  height: auto;
+  color: var(--texto);
+}
+
+.auth-titulo {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.auth-subtitulo {
+  margin: -8px 0 0;
+  color: var(--texto-suave);
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+/* FORMULARIOS */
+
+.auth-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.auth-ayuda {
+  font-weight: 400;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+}
+
+.auth-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--borde);
+  border-radius: 10px;
+  background: var(--fondo);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 400;
+}
+
+.auth-input:focus {
+  border-color: var(--primario);
+}
+
+.auth :focus-visible {
+  outline: 3px solid var(--primario);
+  outline-offset: 2px;
+}
+
+.auth-input:focus-visible {
+  outline-offset: 0;
+}
+
+/* BOTONES */
+
+.auth-boton {
+  min-height: 44px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.auth-boton-principal {
+  width: 100%;
+  height: 52px;
+  font-size: 1.05rem;
+  background: var(--primario);
+  color: var(--primario-texto);
+}
+
+.auth-boton-texto {
+  min-height: 44px;
+  padding: 0 4px;
+  background: none;
+  color: var(--primario);
+}
+
+.auth-boton-texto:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.auth-olvide {
+  align-self: flex-end;
+  margin-top: -8px;
+  font-size: 0.9rem;
+}
+
+/* MENSAJES */
+
+.auth-error {
+  margin: 0;
+  color: var(--peligro);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.auth-exito {
+  margin: 0;
+  color: var(--exito);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.auth-nota {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+
+.auth-aviso {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--alerta-suave);
+  color: var(--texto);
+  border-left: 4px solid var(--alerta);
+  font-size: 0.9rem;
+}
+
+.auth-centrado {
+  text-align: center;
+}
+
+/* PIE DE LA TARJETA */
+
+.auth-pie {
+  width: 100%;
+  padding-top: 14px;
+  border-top: 1px solid var(--borde);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--texto-suave);
+  font-size: 0.95rem;
+}
+
+/* PASO DEL CÓDIGO */
+
+.auth-codigo-encabezado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.auth-sobre {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--primario-suave);
+  color: var(--primario);
+  font-size: 1.5rem;
+}
+
+.auth-codigo-texto {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.auth-casillas {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.auth-casilla {
+  width: 48px;
+  height: 58px;
+  border: 2px solid var(--borde);
+  border-radius: 12px;
+  background: var(--fondo);
+  color: var(--texto);
+  font: inherit;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.auth-casilla:focus {
+  border-color: var(--primario);
+  transform: translateY(-2px);
+}
+
+/* La sacudida de 0.3 s la hace CasillasCodigo con element.animate(). */
+.auth-casillas-error .auth-casilla {
+  border-color: var(--peligro);
+}
+
+.auth-codigo-acciones {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+}
+
+.auth-espera {
+  color: var(--texto-suave);
+}
+
+@media (max-width: 400px) {
+  .auth-casilla {
+    width: 40px;
+    height: 50px;
+    font-size: 1.35rem;
+  }
+
+  .auth-casillas {
+    gap: 6px;
+  }
+
+  .auth-tarjeta {
+    padding: 22px 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-casilla,
+  .auth-casilla:focus {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* CAMBIO DE TEMA */
+
+.auth-tema {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  width: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--superficie);
+  color: var(--texto-suave);
+  border: 1px solid var(--borde);
+}

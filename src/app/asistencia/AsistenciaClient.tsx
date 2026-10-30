@@ -167,25 +167,25 @@ export default function AsistenciaClient({
     <div className="px-5 py-6 md:px-8 lg:px-10">
       {/* ENCABEZADO */}
       <section className="mb-7">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7d9309]">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
           Entrenamientos
         </p>
 
-        <h1 className="mt-1 text-3xl font-black text-[#141113] md:text-5xl">
+        <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
           ASISTENCIA
         </h1>
 
-        <p className="mt-2 text-sm text-[#6f6964] md:text-base">
+        <p className="mt-2 text-sm text-texto-3 md:text-base">
           Control de asistencia por grupo y fecha.
         </p>
       </section>
 
       {/* SELECTORES */}
-      <section className="mb-6 grid gap-4 rounded-2xl border border-[#e1dace] bg-white p-5 md:grid-cols-2 md:p-6">
+      <section className="mb-6 grid gap-4 rounded-2xl border border-borde bg-superficie p-5 md:grid-cols-2 md:p-6">
         <div>
           <label
             htmlFor="grupo-asistencia"
-            className="mb-2 block text-xs font-bold uppercase tracking-[0.12em] text-[#8c847d]"
+            className="mb-2 block text-xs font-bold uppercase tracking-[0.12em] text-texto-suave"
           >
             Grupo de entrenamiento
           </label>
@@ -196,7 +196,7 @@ export default function AsistenciaClient({
             onChange={(event) =>
               cambiarSeleccion({ grupo: event.target.value })
             }
-            className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm font-semibold text-[#141113] outline-none focus:border-[#7d9309]"
+            className="w-full rounded-xl border border-borde bg-fondo px-4 py-3 text-sm font-semibold text-texto outline-none focus:border-verde"
           >
             {grupos.length === 0 && (
               <option value="">No hay grupos disponibles</option>
@@ -213,7 +213,7 @@ export default function AsistenciaClient({
         <div>
           <label
             htmlFor="fecha-asistencia"
-            className="mb-2 block text-xs font-bold uppercase tracking-[0.12em] text-[#8c847d]"
+            className="mb-2 block text-xs font-bold uppercase tracking-[0.12em] text-texto-suave"
           >
             Fecha de entrenamiento
           </label>
@@ -221,7 +221,7 @@ export default function AsistenciaClient({
           <div className="relative">
             <CalendarDays
               size={18}
-              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#7d9309]"
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-verde"
             />
 
             <input
@@ -232,7 +232,7 @@ export default function AsistenciaClient({
                 event.target.value &&
                 cambiarSeleccion({ fecha: event.target.value })
               }
-              className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] py-3 pl-11 pr-4 text-sm font-semibold text-[#141113] outline-none focus:border-[#7d9309]"
+              className="w-full rounded-xl border border-borde bg-fondo py-3 pl-11 pr-4 text-sm font-semibold text-texto outline-none focus:border-verde"
             />
           </div>
         </div>
@@ -244,34 +244,34 @@ export default function AsistenciaClient({
           {
             titulo: "Presentes",
             valor: presentes,
-            color: "text-[#7d9309]",
+            color: "text-verde",
           },
           {
             titulo: "Ausentes",
             valor: ausentes,
-            color: "text-[#c34d42]",
+            color: "text-peligro",
           },
           {
             titulo: "Justificadas",
             valor: justificadas,
-            color: "text-[#b18432]",
+            color: "text-alerta",
           },
           {
             titulo: "Retardos",
             valor: retardos,
-            color: "text-[#5d6b91]",
+            color: "text-azul",
           },
           {
             titulo: "Sin marcar",
             valor: pendientes,
-            color: "text-[#141113]",
+            color: "text-texto",
           },
         ].map((indicador) => (
           <div
             key={indicador.titulo}
-            className="rounded-2xl border border-[#e1dace] bg-white p-5"
+            className="rounded-2xl border border-borde bg-superficie p-5"
           >
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#8c847d]">
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-texto-suave">
               {indicador.titulo}
             </p>
 
@@ -285,18 +285,18 @@ export default function AsistenciaClient({
       </section>
 
       {/* CONTENIDO */}
-      <section className="overflow-hidden rounded-2xl border border-[#e1dace] bg-white">
-        <div className="flex flex-col gap-4 border-b border-[#e1dace] p-5 md:flex-row md:items-center md:justify-between md:p-6">
+      <section className="overflow-hidden rounded-2xl border border-borde bg-superficie">
+        <div className="flex flex-col gap-4 border-b border-borde p-5 md:flex-row md:items-center md:justify-between md:p-6">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7d9309]">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
               Pase de lista
             </p>
 
-            <h2 className="mt-1 text-xl font-black text-[#141113]">
+            <h2 className="mt-1 text-xl font-black text-texto">
               {grupo?.nombre ?? "Sin grupo seleccionado"}
             </h2>
 
-            <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-[#8c847d]">
+            <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-texto-suave">
               <span className="flex items-center gap-1">
                 <UsersRound size={14} />
                 {alumnos.length} alumnos
@@ -316,7 +316,7 @@ export default function AsistenciaClient({
               type="button"
               onClick={marcarTodos}
               disabled={alumnos.length === 0}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#cbd90a] px-4 py-3 text-xs font-black text-[#32390d] transition hover:bg-[#b8c709] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#cbd90a] px-4 py-3 text-xs font-black text-sobre-lima transition hover:bg-[#b8c709] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Check size={16} />
               Todos presentes
@@ -326,7 +326,7 @@ export default function AsistenciaClient({
               type="button"
               onClick={limpiarMarcas}
               disabled={alumnos.length === 0}
-              className="inline-flex items-center gap-2 rounded-xl border border-[#e1dace] px-4 py-3 text-xs font-bold text-[#6f6964] transition hover:bg-[#f6f4ee] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-xl border border-borde px-4 py-3 text-xs font-bold text-texto-3 transition hover:bg-fondo disabled:cursor-not-allowed disabled:opacity-50"
             >
               <RotateCcw size={15} />
               Limpiar
@@ -335,20 +335,20 @@ export default function AsistenciaClient({
         </div>
 
         {/* PROGRESO */}
-        <div className="border-b border-[#e1dace] bg-[#fdfcf9] px-5 py-4 md:px-6">
+        <div className="border-b border-borde bg-superficie-2 px-5 py-4 md:px-6">
           <div className="mb-2 flex items-center justify-between text-xs">
-            <span className="font-semibold text-[#6f6964]">
+            <span className="font-semibold text-texto-3">
               Asistencia del grupo
             </span>
 
-            <span className="font-black text-[#32390d]">
+            <span className="font-black text-verde-noche">
               {porcentaje}% presentes
             </span>
           </div>
 
-          <div className="h-2 overflow-hidden rounded-full bg-[#e7e4da]">
+          <div className="h-2 overflow-hidden rounded-full bg-hundido">
             <div
-              className="h-full rounded-full bg-[#7d9309] transition-all"
+              className="h-full rounded-full bg-verde transition-all"
               style={{ width: `${porcentaje}%` }}
             />
           </div>
@@ -362,17 +362,17 @@ export default function AsistenciaClient({
               className="text-[#a8b65a]"
             />
 
-            <h3 className="mt-4 font-black text-[#141113]">
+            <h3 className="mt-4 font-black text-texto">
               No hay alumnos para pasar lista
             </h3>
 
-            <p className="mt-2 max-w-md text-sm text-[#8c847d]">
+            <p className="mt-2 max-w-md text-sm text-texto-suave">
               Este grupo no tiene alumnos con inscripciones
               activas o todavía no existen grupos disponibles.
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-[#eee9df]">
+          <div className="divide-y divide-borde-suave">
             {alumnos.map((alumno, index) => {
               const estado = obtenerEstado(alumno.id);
 
@@ -382,11 +382,11 @@ export default function AsistenciaClient({
                   className="flex flex-col gap-4 px-5 py-5 md:flex-row md:items-center md:justify-between md:px-6"
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="w-5 text-xs font-bold text-[#aaa39c]">
+                    <span className="w-5 text-xs font-bold text-texto-tenue">
                       {String(index + 1).padStart(2, "0")}
                     </span>
 
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f0f2d8] text-sm font-black text-[#32390d]">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-lima-suave text-sm font-black text-verde-noche">
                       {alumno.nombre
                         .split(" ")
                         .slice(0, 2)
@@ -398,12 +398,12 @@ export default function AsistenciaClient({
                     <div className="min-w-0">
                       <Link
                         href={`/alumnos/${alumno.id}`}
-                        className="font-bold text-[#141113] hover:text-[#7d9309]"
+                        className="font-bold text-texto hover:text-verde"
                       >
                         {alumno.nombre}
                       </Link>
 
-                      <p className="mt-1 text-xs text-[#8c847d]">
+                      <p className="mt-1 text-xs text-texto-suave">
                         {estado ?? "Pendiente de registrar"}
                       </p>
                     </div>
@@ -416,8 +416,8 @@ export default function AsistenciaClient({
                       aria-pressed={estado === "Presente"}
                       className={`flex items-center justify-center gap-1 rounded-xl border px-3 py-3 text-xs font-bold transition ${
                         estado === "Presente"
-                          ? "border-[#7d9309] bg-[#eaf0c5] text-[#52620a]"
-                          : "border-[#e1dace] bg-white text-[#8c847d] hover:bg-[#f6f4ee]"
+                          ? "border-verde bg-lima-suave-2 text-verde-oscuro"
+                          : "border-borde bg-superficie text-texto-suave hover:bg-fondo"
                       }`}
                     >
                       <Check size={15} />
@@ -430,8 +430,8 @@ export default function AsistenciaClient({
                       aria-pressed={estado === "Ausente"}
                       className={`flex items-center justify-center gap-1 rounded-xl border px-3 py-3 text-xs font-bold transition ${
                         estado === "Ausente"
-                          ? "border-[#c34d42] bg-[#fff0ed] text-[#a73d33]"
-                          : "border-[#e1dace] bg-white text-[#8c847d] hover:bg-[#f6f4ee]"
+                          ? "border-peligro bg-peligro-suave text-peligro"
+                          : "border-borde bg-superficie text-texto-suave hover:bg-fondo"
                       }`}
                     >
                       <X size={15} />
@@ -444,8 +444,8 @@ export default function AsistenciaClient({
                       aria-pressed={estado === "Justificada"}
                       className={`flex items-center justify-center gap-1 rounded-xl border px-3 py-3 text-xs font-bold transition ${
                         estado === "Justificada"
-                          ? "border-[#c8a25b] bg-[#fff6df] text-[#926b25]"
-                          : "border-[#e1dace] bg-white text-[#8c847d] hover:bg-[#f6f4ee]"
+                          ? "border-borde-alerta bg-alerta-suave text-alerta"
+                          : "border-borde bg-superficie text-texto-suave hover:bg-fondo"
                       }`}
                     >
                       <Info size={15} />
@@ -458,8 +458,8 @@ export default function AsistenciaClient({
                       aria-pressed={estado === "Retardo"}
                       className={`flex items-center justify-center gap-1 rounded-xl border px-3 py-3 text-xs font-bold transition ${
                         estado === "Retardo"
-                          ? "border-[#5d6b91] bg-[#eef0f7] text-[#4a5679]"
-                          : "border-[#e1dace] bg-white text-[#8c847d] hover:bg-[#f6f4ee]"
+                          ? "border-azul bg-azul-suave text-azul"
+                          : "border-borde bg-superficie text-texto-suave hover:bg-fondo"
                       }`}
                     >
                       <AlarmClock size={15} />
@@ -473,18 +473,18 @@ export default function AsistenciaClient({
         )}
 
         {/* PIE */}
-        <div className="flex flex-col gap-3 border-t border-[#e1dace] bg-[#fdfcf9] p-5 sm:flex-row sm:items-center sm:justify-between md:px-6">
+        <div className="flex flex-col gap-3 border-t border-borde bg-superficie-2 p-5 sm:flex-row sm:items-center sm:justify-between md:px-6">
           <div className="text-xs leading-relaxed">
             {error ? (
-              <p role="alert" className="font-semibold text-[#9d3a2e]">
+              <p role="alert" className="font-semibold text-peligro-fuerte">
                 {error}
               </p>
             ) : aviso ? (
-              <p role="status" className="font-semibold text-[#52620a]">
+              <p role="status" className="font-semibold text-verde-oscuro">
                 {aviso}
               </p>
             ) : (
-              <p className="flex items-start gap-2 text-[#8c847d]">
+              <p className="flex items-start gap-2 text-texto-suave">
                 <Info size={15} className="mt-0.5 shrink-0" />
                 {hayCambios
                   ? "Hay cambios sin guardar."
@@ -497,7 +497,7 @@ export default function AsistenciaClient({
             {grupo && (
               <Link
                 href={`/grupos/${grupo.id}`}
-                className="inline-flex items-center gap-1 text-sm font-bold text-[#7d9309]"
+                className="inline-flex items-center gap-1 text-sm font-bold text-verde"
               >
                 Ver grupo
                 <ChevronRight size={16} />
@@ -508,7 +508,7 @@ export default function AsistenciaClient({
               type="button"
               onClick={guardar}
               disabled={!hayCambios || guardando}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#141113] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-xl bg-boton px-5 py-3 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Save size={16} />
               {guardando ? "Guardando…" : "Guardar asistencia"}

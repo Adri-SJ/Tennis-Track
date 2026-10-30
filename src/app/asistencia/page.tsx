@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import AppLayout from "@/components/AppLayout";
 import { getGrupos, getInscripciones } from "@/lib/api";
 import { getAsistencias } from "@/lib/asistencias";
 import { esFecha, hoy } from "@/lib/formulario";
 import AsistenciaClient from "./AsistenciaClient";
+
+export const metadata: Metadata = {
+  title: "Asistencia",
+};
 
 export default async function AsistenciaPage({
   searchParams,

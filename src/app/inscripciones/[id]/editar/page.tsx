@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AppLayout from "@/components/AppLayout";
 import EncabezadoFormulario from "@/components/EncabezadoFormulario";
 import InscripcionForm from "@/components/InscripcionForm";
 import { getInscripcionById } from "@/lib/api";
 import { actualizarInscripcion } from "../../actions";
+
+export const metadata: Metadata = {
+  title: "Editar inscripción",
+};
 
 export default async function EditarInscripcionPage({
   params,

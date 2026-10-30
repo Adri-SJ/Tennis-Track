@@ -1,5 +1,6 @@
 "use server";
 
+import { autorizarAccion } from "@/lib/auth/servidor";
 import { revalidatePath } from "next/cache";
 import { esFecha, hoy } from "@/lib/formulario";
 import {
@@ -17,6 +18,12 @@ type Resultado = { error: string | null };
 export async function crearMensualidad(
   datos: NuevaMensualidad
 ): Promise<Resultado> {
+  const sinPermiso = await autorizarAccion("/pagos");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   if (!datos.alumnoId) {
     return { error: "Elige un alumno." };
   }
@@ -66,6 +73,12 @@ export async function guardarPago(
   mensualidadId: string,
   pago: NuevoPago
 ): Promise<Resultado> {
+  const sinPermiso = await autorizarAccion("/pagos");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   if (!esFecha(pago.fecha) || pago.fecha > hoy()) {
     return { error: "Elige una fecha de pago válida (no futura)." };
   }
@@ -106,6 +119,12 @@ export async function guardarPago(
 }
 
 export async function anularMensualidad(id: string): Promise<Resultado> {
+  const sinPermiso = await autorizarAccion("/pagos");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   try {
     await cancelarMensualidad(id);
   } catch (error) {

@@ -5,10 +5,10 @@ export type EstadoFormulario = {
 export const estadoInicial: EstadoFormulario = { error: null };
 
 export const claseCampo =
-  "w-full rounded-xl border border-[#e1dace] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#7d9309]";
+  "w-full rounded-xl border border-borde bg-superficie px-4 py-3 text-sm outline-none transition focus:border-verde";
 
 export const claseEtiqueta =
-  "mb-2 block text-sm font-semibold text-[#141113]";
+  "mb-2 block text-sm font-semibold text-texto";
 
 /* Fecha de hoy en formato YYYY-MM-DD, en hora local. */
 export function hoy(): string {

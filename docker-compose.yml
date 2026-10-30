@@ -1,0 +1,18 @@
+# Base de datos de usuarios de TennisTrack (solo desarrollo).
+# Los datos de la academia siguen en Twenty.
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: tennistrack-db
+    environment:
+      POSTGRES_USER: tennistrack
+      POSTGRES_PASSWORD: tennistrack
+      POSTGRES_DB: tennistrack
+    ports:
+      - "5432:5432"
+    volumes:
+      - tennistrack-db:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  tennistrack-db:

@@ -19,7 +19,7 @@ export default function EncabezadoFormulario({
       {/* VOLVER */}
       <Link
         href={volverHref}
-        className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-[#7d9309] transition hover:text-[#5f6d14]"
+        className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-verde transition hover:text-verde-musgo"
       >
         <ArrowLeft size={18} />
         {volverTexto}
@@ -27,15 +27,15 @@ export default function EncabezadoFormulario({
 
       {/* ENCABEZADO */}
       <section className="mb-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7d9309]">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
           {etiqueta}
         </p>
 
-        <h1 className="mt-1 text-3xl font-black text-[#141113] md:text-5xl">
+        <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
           {titulo}
         </h1>
 
-        <p className="mt-2 text-sm text-[#6f6964] md:text-base">
+        <p className="mt-2 text-sm text-texto-3 md:text-base">
           {descripcion}
         </p>
       </section>
