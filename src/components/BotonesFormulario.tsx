@@ -18,7 +18,7 @@ export default function BotonesFormulario({
       {error && (
         <p
           role="alert"
-          className="mt-6 rounded-xl border border-[#f1c9c4] bg-[#fdf1ef] p-4 text-sm font-semibold text-[#9d3a2e]"
+          className="mt-6 rounded-xl border border-borde-peligro bg-peligro-suave p-4 text-sm font-semibold text-peligro-fuerte"
         >
           {error}
         </p>
@@ -28,7 +28,7 @@ export default function BotonesFormulario({
       <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Link
           href={cancelarHref}
-          className="rounded-xl border border-[#e1dace] px-5 py-3 text-center text-sm font-semibold text-[#141113] transition hover:bg-[#f6f4ee]"
+          className="rounded-xl border border-borde px-5 py-3 text-center text-sm font-semibold text-texto transition hover:bg-fondo"
         >
           Cancelar
         </Link>
@@ -36,7 +36,7 @@ export default function BotonesFormulario({
         <button
           type="submit"
           disabled={guardando}
-          className="flex items-center justify-center gap-2 rounded-xl bg-[#141113] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d] disabled:cursor-wait disabled:opacity-60"
+          className="flex items-center justify-center gap-2 rounded-xl bg-boton px-5 py-3 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover disabled:cursor-wait disabled:opacity-60"
         >
           <Save size={18} />
           {guardando ? "Guardando…" : textoGuardar}

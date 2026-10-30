@@ -36,14 +36,14 @@ export default function CambiarGrupoForm({
   return (
     <form
       action={formAction}
-      className="max-w-4xl rounded-2xl border border-[#e1dace] bg-white p-5 md:p-7"
+      className="max-w-4xl rounded-2xl border border-borde bg-superficie p-5 md:p-7"
     >
       <div className="grid gap-5 md:grid-cols-2">
 
         {/* GRUPO ACTUAL */}
         <div className="md:col-span-2">
           <p className={claseEtiqueta}>Grupo actual</p>
-          <p className="rounded-xl bg-[#f6f4ee] px-4 py-3 text-sm font-semibold text-[#141113]">
+          <p className="rounded-xl bg-fondo px-4 py-3 text-sm font-semibold text-texto">
             {grupoActual ?? "Sin grupo"}
           </p>
         </div>
@@ -100,12 +100,12 @@ export default function CambiarGrupoForm({
       </div>
 
       {/* NOTA */}
-      <div className="mt-6 rounded-xl bg-[#f6f4ee] p-4">
-        <p className="text-sm font-semibold text-[#141113]">
+      <div className="mt-6 rounded-xl bg-fondo p-4">
+        <p className="text-sm font-semibold text-texto">
           Se conserva el historial
         </p>
 
-        <p className="mt-1 text-sm text-[#8c847d]">
+        <p className="mt-1 text-sm text-texto-suave">
           La inscripción actual se cierra con esta fecha y se crea una nueva en el grupo elegido.
         </p>
       </div>

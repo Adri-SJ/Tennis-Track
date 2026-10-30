@@ -84,18 +84,18 @@ function formatearFecha(fecha: string | null) {
 
 function estiloEstado(estado: EstadoPago) {
   if (estado === "Pagado") {
-    return "border-[#b9ca75] bg-[#f0f5d8] text-[#657a0b]";
+    return "border-borde-lima bg-lima-suave text-verde-medio";
   }
 
   if (estado === "Pendiente") {
-    return "border-[#e6c58d] bg-[#fff5df] text-[#a16a1b]";
+    return "border-borde-alerta bg-alerta-suave text-alerta";
   }
 
   if (estado === "Cancelado") {
-    return "border-[#d8d0c4] bg-[#f6f4ee] text-[#8c847d]";
+    return "border-borde-fuerte bg-fondo text-texto-suave";
   }
 
-  return "border-[#e6b1a9] bg-[#fff0ed] text-[#b4493c]";
+  return "border-borde-peligro bg-peligro-suave text-peligro";
 }
 
 function IconoMetodo({ metodo }: { metodo: MetodoPago | null }) {
@@ -202,15 +202,15 @@ export default function PagosClient({
       {/* ENCABEZADO */}
       <section className="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7d9309]">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
             Administración
           </p>
 
-          <h1 className="mt-1 text-3xl font-black text-[#141113] md:text-5xl">
+          <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
             PAGOS
           </h1>
 
-          <p className="mt-2 text-sm text-[#6f6964] md:text-base">
+          <p className="mt-2 text-sm text-texto-3 md:text-base">
             Control de mensualidades, cobros y adeudos.
           </p>
         </div>
@@ -218,7 +218,7 @@ export default function PagosClient({
         <button
           type="button"
           onClick={() => setFormulario("mensualidad")}
-          className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d] transition hover:bg-[#dce855]"
+          className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-sobre-lima transition hover:bg-[#dce855]"
         >
           <Plus size={18} />
           Nueva mensualidad
@@ -232,25 +232,25 @@ export default function PagosClient({
             titulo: "Recaudado",
             valor: formatoMoneda.format(totalRecaudado),
             icono: Wallet,
-            color: "text-[#7d9309]",
+            color: "text-verde",
           },
           {
             titulo: "Por cobrar",
             valor: formatoMoneda.format(totalPendiente),
             icono: Clock3,
-            color: "text-[#141113]",
+            color: "text-texto",
           },
           {
             titulo: "Pagos realizados",
             valor: pagosRealizados,
             icono: CircleCheck,
-            color: "text-[#141113]",
+            color: "text-texto",
           },
           {
             titulo: "Pagos vencidos",
             valor: pagosVencidos,
             icono: AlertTriangle,
-            color: "text-[#b4493c]",
+            color: "text-peligro",
           },
         ].map((indicador) => {
           const Icono = indicador.icono;
@@ -258,13 +258,13 @@ export default function PagosClient({
           return (
             <div
               key={indicador.titulo}
-              className="rounded-2xl border border-[#e1dace] bg-white p-5"
+              className="rounded-2xl border border-borde bg-superficie p-5"
             >
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#8c847d]">
+                <p className="text-xs font-bold uppercase tracking-[0.12em] text-texto-suave">
                   {indicador.titulo}
                 </p>
-                <Icono size={18} className="shrink-0 text-[#7d9309]" />
+                <Icono size={18} className="shrink-0 text-verde" />
               </div>
 
               <p
@@ -278,7 +278,7 @@ export default function PagosClient({
       </section>
 
       {/* PROGRESO DE COBRANZA */}
-      <section className="mb-7 rounded-2xl bg-[#32390d] p-6 text-white md:p-7">
+      <section className="mb-7 rounded-2xl bg-banner p-6 text-white md:p-7">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="flex items-center gap-2 text-[#dce6a1]">
@@ -303,7 +303,7 @@ export default function PagosClient({
           </p>
         </div>
 
-        <div className="mt-6 h-3 overflow-hidden rounded-full bg-white/20">
+        <div className="mt-6 h-3 overflow-hidden rounded-full bg-superficie/20">
           <div
             className="h-full rounded-full bg-[#cbd90a] transition-all"
             style={{ width: `${porcentajeCobrado}%` }}
@@ -321,20 +321,20 @@ export default function PagosClient({
       </section>
 
       {/* TABLA DE PAGOS */}
-      <section className="overflow-hidden rounded-2xl border border-[#e1dace] bg-white">
-        <div className="border-b border-[#e1dace] p-5 md:p-6">
+      <section className="overflow-hidden rounded-2xl border border-borde bg-superficie">
+        <div className="border-b border-borde p-5 md:p-6">
           <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7d9309]">
+              <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
                 Registro financiero
               </p>
 
-              <h2 className="mt-1 text-xl font-black text-[#141113]">
+              <h2 className="mt-1 text-xl font-black text-texto">
                 Mensualidades y cobros
               </h2>
             </div>
 
-            <span className="w-fit rounded-full border border-[#e1dace] px-3 py-1 text-xs font-bold text-[#8c847d]">
+            <span className="w-fit rounded-full border border-borde px-3 py-1 text-xs font-bold text-texto-suave">
               {pagosFiltrados.length} resultados
             </span>
           </div>
@@ -343,7 +343,7 @@ export default function PagosClient({
             <div className="relative md:col-span-2">
               <Search
                 size={17}
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8c847d]"
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-texto-suave"
               />
 
               <input
@@ -353,14 +353,14 @@ export default function PagosClient({
                 onChange={(event) =>
                   setBusqueda(event.target.value)
                 }
-                className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] py-3 pl-11 pr-4 text-sm text-[#141113] outline-none focus:border-[#7d9309]"
+                className="w-full rounded-xl border border-borde bg-fondo py-3 pl-11 pr-4 text-sm text-texto outline-none focus:border-verde"
               />
             </div>
 
             <div className="relative">
               <SlidersHorizontal
                 size={16}
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8c847d]"
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-texto-suave"
               />
 
               <select
@@ -369,7 +369,7 @@ export default function PagosClient({
                 onChange={(event) =>
                   setEstado(event.target.value as FiltroEstado)
                 }
-                className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] py-3 pl-11 pr-4 text-sm font-semibold text-[#141113] outline-none focus:border-[#7d9309]"
+                className="w-full rounded-xl border border-borde bg-fondo py-3 pl-11 pr-4 text-sm font-semibold text-texto outline-none focus:border-verde"
               >
                 {estados.map((item) => (
                   <option key={item} value={item}>
@@ -386,8 +386,8 @@ export default function PagosClient({
         {/* DESKTOP */}
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-left">
-            <thead className="bg-[#f6f4ee]">
-              <tr className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#8c847d]">
+            <thead className="bg-fondo">
+              <tr className="text-[11px] font-bold uppercase tracking-[0.12em] text-texto-suave">
                 <th className="px-6 py-4">Alumno</th>
                 <th className="px-4 py-4">Concepto</th>
                 <th className="px-4 py-4">Importe</th>
@@ -397,32 +397,32 @@ export default function PagosClient({
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-[#eee9df]">
+            <tbody className="divide-y divide-borde-suave">
               {pagosFiltrados.map((pago) => (
                 <tr
                   key={pago.id}
-                  className="transition hover:bg-[#fdfcf9]"
+                  className="transition hover:bg-superficie-2"
                 >
                   <td className="px-6 py-5">
-                    <p className="font-bold text-[#141113]">
+                    <p className="font-bold text-texto">
                       {pago.alumno}
                     </p>
                     {pago.metodo && (
-                      <p className="mt-1 text-xs text-[#8c847d]">
+                      <p className="mt-1 text-xs text-texto-suave">
                         {pago.metodo}
                       </p>
                     )}
                   </td>
 
-                  <td className="px-4 py-5 text-sm text-[#6f6964]">
+                  <td className="px-4 py-5 text-sm text-texto-3">
                     {pago.concepto}
                   </td>
 
-                  <td className="px-4 py-5 font-black text-[#141113]">
+                  <td className="px-4 py-5 font-black text-texto">
                     {formatoMoneda.format(pago.monto)}
                   </td>
 
-                  <td className="px-4 py-5 text-sm text-[#6f6964]">
+                  <td className="px-4 py-5 text-sm text-texto-3">
                     {formatearFecha(pago.vencimiento)}
                   </td>
 
@@ -440,7 +440,7 @@ export default function PagosClient({
                     <button
                       type="button"
                       onClick={() => setPagoSeleccionado(pago)}
-                      className="inline-flex items-center gap-1 text-sm font-bold text-[#7d9309] hover:text-[#52620a]"
+                      className="inline-flex items-center gap-1 text-sm font-bold text-verde hover:text-verde-oscuro"
                     >
                       Ver
                       <ArrowUpRight size={16} />
@@ -453,15 +453,15 @@ export default function PagosClient({
         </div>
 
         {/* MÓVIL */}
-        <div className="divide-y divide-[#eee9df] md:hidden">
+        <div className="divide-y divide-borde-suave md:hidden">
           {pagosFiltrados.map((pago) => (
             <div key={pago.id} className="p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-black text-[#141113]">
+                  <p className="font-black text-texto">
                     {pago.alumno}
                   </p>
-                  <p className="mt-1 text-xs text-[#8c847d]">
+                  <p className="mt-1 text-xs text-texto-suave">
                     {pago.concepto}
                   </p>
                 </div>
@@ -475,21 +475,21 @@ export default function PagosClient({
                 </span>
               </div>
 
-              <div className="mt-4 flex items-center justify-between rounded-xl bg-[#f6f4ee] p-3">
+              <div className="mt-4 flex items-center justify-between rounded-xl bg-fondo p-3">
                 <div>
-                  <p className="text-xs text-[#8c847d]">
+                  <p className="text-xs text-texto-suave">
                     Importe
                   </p>
-                  <p className="mt-1 text-lg font-black text-[#141113]">
+                  <p className="mt-1 text-lg font-black text-texto">
                     {formatoMoneda.format(pago.monto)}
                   </p>
                 </div>
 
                 <div className="text-right">
-                  <p className="text-xs text-[#8c847d]">
+                  <p className="text-xs text-texto-suave">
                     Vencimiento
                   </p>
-                  <p className="mt-1 text-xs font-bold text-[#141113]">
+                  <p className="mt-1 text-xs font-bold text-texto">
                     {formatearFecha(pago.vencimiento)}
                   </p>
                 </div>
@@ -498,7 +498,7 @@ export default function PagosClient({
               <button
                 type="button"
                 onClick={() => setPagoSeleccionado(pago)}
-                className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-[#7d9309]"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-verde"
               >
                 Ver detalle
                 <ArrowUpRight size={16} />
@@ -510,10 +510,10 @@ export default function PagosClient({
         {pagosFiltrados.length === 0 && (
           <div className="flex flex-col items-center px-5 py-14 text-center">
             <Search size={34} className="text-[#a8b65a]" />
-            <h3 className="mt-4 font-black text-[#141113]">
+            <h3 className="mt-4 font-black text-texto">
               No encontramos pagos
             </h3>
-            <p className="mt-2 text-sm text-[#8c847d]">
+            <p className="mt-2 text-sm text-texto-suave">
               Prueba con otro alumno o cambia el filtro.
             </p>
             <button
@@ -522,14 +522,14 @@ export default function PagosClient({
                 setBusqueda("");
                 setEstado("Todos");
               }}
-              className="mt-4 text-sm font-bold text-[#7d9309]"
+              className="mt-4 text-sm font-bold text-verde"
             >
               Limpiar filtros
             </button>
           </div>
         )}
 
-        <div className="flex items-center gap-2 border-t border-[#e1dace] bg-[#fdfcf9] px-5 py-4 text-xs text-[#8c847d]">
+        <div className="flex items-center gap-2 border-t border-borde bg-superficie-2 px-5 py-4 text-xs text-texto-suave">
           <Info size={15} className="shrink-0" />
           Mensualidades y pagos guardados en Twenty. Una
           mensualidad pendiente se marca como vencida al pasar
@@ -551,22 +551,22 @@ export default function PagosClient({
             role="dialog"
             aria-modal="true"
             aria-labelledby="titulo-pago"
-            className="relative z-10 max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl"
+            className="relative z-10 max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-superficie shadow-2xl"
           >
-            <div className="flex items-start justify-between bg-[#f6f4ee] p-6">
+            <div className="flex items-start justify-between bg-fondo p-6">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7d9309]">
+                <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
                   Detalle de movimiento
                 </p>
 
                 <h2
                   id="titulo-pago"
-                  className="mt-2 text-2xl font-black text-[#141113]"
+                  className="mt-2 text-2xl font-black text-texto"
                 >
                   {pagoSeleccionado.alumno}
                 </h2>
 
-                <p className="mt-1 text-sm text-[#8c847d]">
+                <p className="mt-1 text-sm text-texto-suave">
                   {pagoSeleccionado.concepto}
                 </p>
               </div>
@@ -575,14 +575,14 @@ export default function PagosClient({
                 type="button"
                 aria-label="Cerrar"
                 onClick={() => setPagoSeleccionado(null)}
-                className="rounded-full bg-white p-2 text-[#141113]"
+                className="rounded-full bg-superficie p-2 text-texto"
               >
                 <X size={20} />
               </button>
             </div>
 
             <div className="space-y-5 p-6">
-              <div className="rounded-xl bg-[#32390d] p-5 text-white">
+              <div className="rounded-xl bg-banner p-5 text-white">
                 <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#dce6a1]">
                   Importe de mensualidad
                 </p>
@@ -593,7 +593,7 @@ export default function PagosClient({
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm text-[#8c847d]">
+                <span className="text-sm text-texto-suave">
                   Estado
                 </span>
 
@@ -638,14 +638,14 @@ export default function PagosClient({
                 return (
                   <div
                     key={campo.titulo}
-                    className="flex items-start justify-between gap-4 border-b border-[#eee9df] pb-3"
+                    className="flex items-start justify-between gap-4 border-b border-borde-suave pb-3"
                   >
-                    <span className="flex items-center gap-2 text-sm text-[#8c847d]">
+                    <span className="flex items-center gap-2 text-sm text-texto-suave">
                       <Icono size={15} />
                       {campo.titulo}
                     </span>
 
-                    <span className="max-w-[60%] text-right text-sm font-bold text-[#141113]">
+                    <span className="max-w-[60%] text-right text-sm font-bold text-texto">
                       {campo.valor}
                     </span>
                   </div>
@@ -653,7 +653,7 @@ export default function PagosClient({
               })}
 
               {pagoSeleccionado.metodo && (
-                <div className="flex items-center gap-3 rounded-xl bg-[#f0f5d8] p-4 text-sm font-semibold text-[#657a0b]">
+                <div className="flex items-center gap-3 rounded-xl bg-lima-suave p-4 text-sm font-semibold text-verde-medio">
                   <IconoMetodo metodo={pagoSeleccionado.metodo} />
                   Pago registrado mediante{" "}
                   {pagoSeleccionado.metodo.toLowerCase()}.
@@ -666,7 +666,7 @@ export default function PagosClient({
                   <button
                     type="button"
                     onClick={() => setFormulario("pago")}
-                    className="inline-flex items-center gap-2 rounded-xl bg-[#141113] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#32390d]"
+                    className="inline-flex items-center gap-2 rounded-xl bg-boton px-4 py-3 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover"
                   >
                     <CircleCheck size={16} />
                     Registrar pago
@@ -676,7 +676,7 @@ export default function PagosClient({
                     type="button"
                     onClick={() => cancelar(pagoSeleccionado.id)}
                     disabled={cancelando}
-                    className="inline-flex items-center gap-2 px-2 py-3 text-sm font-bold text-[#b4493c] disabled:opacity-60"
+                    className="inline-flex items-center gap-2 px-2 py-3 text-sm font-bold text-peligro disabled:opacity-60"
                   >
                     <Ban size={16} />
                     Cancelar mensualidad

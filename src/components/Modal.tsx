@@ -3,7 +3,7 @@
 import { X } from "lucide-react";
 
 export const claseCampoModal =
-  "w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm outline-none focus:border-[#7d9309]";
+  "w-full rounded-xl border border-borde bg-fondo px-4 py-3 text-sm outline-none focus:border-verde";
 
 export default function Modal({
   etiqueta,
@@ -31,17 +31,17 @@ export default function Modal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="titulo-modal"
-        className="relative z-10 flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="relative z-10 flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-superficie shadow-2xl"
       >
-        <div className="flex shrink-0 items-start justify-between bg-[#f6f4ee] p-6">
+        <div className="flex shrink-0 items-start justify-between bg-fondo p-6">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7d9309]">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
               {etiqueta}
             </p>
 
             <h2
               id="titulo-modal"
-              className="mt-2 text-2xl font-black text-[#141113]"
+              className="mt-2 text-2xl font-black text-texto"
             >
               {titulo}
             </h2>
@@ -51,7 +51,7 @@ export default function Modal({
             type="button"
             aria-label="Cerrar"
             onClick={onCerrar}
-            className="rounded-full bg-white p-2 text-[#141113]"
+            className="rounded-full bg-superficie p-2 text-texto"
           >
             <X size={20} />
           </button>
@@ -60,7 +60,7 @@ export default function Modal({
         <div className="space-y-4 overflow-y-auto p-6">{children}</div>
 
         {pie && (
-          <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-[#e1dace] p-5 sm:flex-row sm:justify-end">
+          <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-borde p-5 sm:flex-row sm:justify-end">
             {pie}
           </div>
         )}

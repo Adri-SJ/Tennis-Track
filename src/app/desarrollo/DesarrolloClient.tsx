@@ -162,7 +162,7 @@ function RadarChart({
               }
             )}
             fill="none"
-            stroke="#e1dace"
+            className="stroke-borde"
             strokeWidth="1"
           />
         ))}
@@ -179,7 +179,7 @@ function RadarChart({
                 y1="145"
                 x2={punto.x}
                 y2={punto.y}
-                stroke="#e1dace"
+                className="stroke-borde"
               />
 
               <text
@@ -187,7 +187,7 @@ function RadarChart({
                 y={etiqueta.y}
                 fontSize="10"
                 fontWeight="700"
-                fill="#6f6964"
+                className="fill-texto-3"
                 textAnchor="middle"
                 dominantBaseline="middle"
               >
@@ -200,9 +200,8 @@ function RadarChart({
         {anterior && (
           <polygon
             points={poligonoRadar(anterior)}
-            fill="#bdb8ae"
+            className="fill-texto-tenue stroke-texto-tenue"
             fillOpacity="0.12"
-            stroke="#aaa39c"
             strokeWidth="2"
             strokeDasharray="5 4"
             strokeLinejoin="round"
@@ -213,7 +212,7 @@ function RadarChart({
           points={poligonoRadar(actual)}
           fill="#cbd90a"
           fillOpacity="0.3"
-          stroke="#7d9309"
+          className="stroke-verde"
           strokeWidth="2.5"
           strokeLinejoin="round"
         />
@@ -230,23 +229,22 @@ function RadarChart({
               cx={punto.x}
               cy={punto.y}
               r="4"
-              fill="#7d9309"
-              stroke="white"
+              className="fill-verde stroke-superficie"
               strokeWidth="1.5"
             />
           );
         })}
       </svg>
 
-      <div className="flex flex-wrap items-center justify-center gap-5 text-xs font-semibold text-[#6f6964]">
+      <div className="flex flex-wrap items-center justify-center gap-5 text-xs font-semibold text-texto-3">
         <div className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-full bg-[#7d9309]" />
+          <span className="h-3 w-3 rounded-full bg-verde" />
           Última evaluación
         </div>
 
         {anterior && (
           <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-[#aaa39c]" />
+            <span className="h-3 w-3 rounded-full bg-texto-tenue" />
             Evaluación anterior
           </div>
         )}
@@ -272,11 +270,11 @@ function EvolucionChart({
           className="text-[#a8b65a]"
         />
 
-        <p className="mt-3 font-bold text-[#141113]">
+        <p className="mt-3 font-bold text-texto">
           Aún no hay suficiente historial
         </p>
 
-        <p className="mt-1 text-sm text-[#8c847d]">
+        <p className="mt-1 text-sm text-texto-suave">
           Necesitamos al menos dos evaluaciones.
         </p>
       </div>
@@ -331,7 +329,7 @@ function EvolucionChart({
                 y1={y}
                 x2={derecha}
                 y2={y}
-                stroke="#e1dace"
+                className="stroke-borde"
                 strokeDasharray="4 4"
               />
 
@@ -339,7 +337,7 @@ function EvolucionChart({
                 x="27"
                 y={y + 4}
                 fontSize="11"
-                fill="#8c847d"
+                className="fill-texto-suave"
                 textAnchor="end"
               >
                 {valor}
@@ -351,7 +349,7 @@ function EvolucionChart({
         <polyline
           points={linea}
           fill="none"
-          stroke="#7d9309"
+          className="stroke-verde"
           strokeWidth="3"
           strokeLinejoin="round"
           strokeLinecap="round"
@@ -364,7 +362,7 @@ function EvolucionChart({
               cy={punto.y}
               r="5"
               fill="#cbd90a"
-              stroke="#52620a"
+              className="stroke-verde-oscuro"
               strokeWidth="2"
             />
 
@@ -373,7 +371,7 @@ function EvolucionChart({
               y={punto.y - 12}
               fontSize="12"
               fontWeight="700"
-              fill="#32390d"
+              className="fill-verde-noche"
               textAnchor="middle"
             >
               {formatoNumero(punto.valor)}
@@ -383,7 +381,7 @@ function EvolucionChart({
               x={punto.x}
               y="220"
               fontSize="10"
-              fill="#8c847d"
+              className="fill-texto-suave"
               textAnchor="middle"
             >
               {new Intl.DateTimeFormat("es-MX", {
@@ -565,15 +563,15 @@ export default function DesarrolloClient({
       {/* ENCABEZADO */}
       <section className="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7d9309]">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
             Seguimiento académico-deportivo
           </p>
 
-          <h1 className="mt-1 text-3xl font-black text-[#141113] md:text-5xl">
+          <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
             DESARROLLO DEPORTIVO
           </h1>
 
-          <p className="mt-2 text-sm text-[#6f6964] md:text-base">
+          <p className="mt-2 text-sm text-texto-3 md:text-base">
             Evalúa habilidades y acompaña el progreso de
             cada alumno.
           </p>
@@ -583,7 +581,7 @@ export default function DesarrolloClient({
           type="button"
           onClick={abrirFormulario}
           disabled={!alumnoSeleccionado}
-          className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d] transition hover:bg-[#dce855] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-sobre-lima transition hover:bg-[#dce855] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Plus size={18} />
           Nueva evaluación
@@ -591,18 +589,18 @@ export default function DesarrolloClient({
       </section>
 
       {/* SELECCIÓN DE ALUMNO */}
-      <section className="mb-7 rounded-2xl border border-[#e1dace] bg-white p-5 md:p-6">
+      <section className="mb-7 rounded-2xl border border-borde bg-superficie p-5 md:p-6">
         <div className="mb-4 flex items-center gap-3">
-          <div className="rounded-xl bg-[#eef2cf] p-3 text-[#52620a]">
+          <div className="rounded-xl bg-lima-suave p-3 text-verde-oscuro">
             <UserRound size={22} />
           </div>
 
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7d9309]">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
               Expediente deportivo
             </p>
 
-            <h2 className="text-lg font-black text-[#141113]">
+            <h2 className="text-lg font-black text-texto">
               Seleccionar alumno
             </h2>
           </div>
@@ -615,15 +613,15 @@ export default function DesarrolloClient({
               setSelectorAbierto((abierto) => !abierto)
             }
             disabled={alumnos.length === 0}
-            className="flex w-full items-center justify-between rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-4 text-left"
+            className="flex w-full items-center justify-between rounded-xl border border-borde bg-fondo px-4 py-4 text-left"
           >
             <div>
-              <p className="font-bold text-[#141113]">
+              <p className="font-bold text-texto">
                 {alumnoSeleccionado?.nombre ??
                   "No hay alumnos disponibles"}
               </p>
 
-              <p className="mt-1 text-xs text-[#8c847d]">
+              <p className="mt-1 text-xs text-texto-suave">
                 {alumnoSeleccionado
                   ? `${alumnoSeleccionado.estado} · ${
                       alumnoSeleccionado.edad ??
@@ -639,16 +637,16 @@ export default function DesarrolloClient({
 
             <ChevronDown
               size={19}
-              className="text-[#8c847d]"
+              className="text-texto-suave"
             />
           </button>
 
           {selectorAbierto && (
-            <div className="absolute left-0 right-0 top-full z-30 mt-2 overflow-hidden rounded-xl border border-[#e1dace] bg-white shadow-xl">
+            <div className="absolute left-0 right-0 top-full z-30 mt-2 overflow-hidden rounded-xl border border-borde bg-superficie shadow-xl">
               <div className="relative p-3">
                 <Search
                   size={17}
-                  className="absolute left-7 top-1/2 -translate-y-1/2 text-[#8c847d]"
+                  className="absolute left-7 top-1/2 -translate-y-1/2 text-texto-suave"
                 />
 
                 <input
@@ -659,7 +657,7 @@ export default function DesarrolloClient({
                   onChange={(event) =>
                     setBusquedaAlumno(event.target.value)
                   }
-                  className="w-full rounded-lg bg-[#f6f4ee] py-3 pl-10 pr-3 text-sm outline-none"
+                  className="w-full rounded-lg bg-fondo py-3 pl-10 pr-3 text-sm outline-none"
                 />
               </div>
 
@@ -673,23 +671,23 @@ export default function DesarrolloClient({
                       setSelectorAbierto(false);
                       setBusquedaAlumno("");
                     }}
-                    className="flex w-full items-center justify-between border-t border-[#f1ede5] px-4 py-3 text-left hover:bg-[#f6f4ee]"
+                    className="flex w-full items-center justify-between border-t border-borde-suave px-4 py-3 text-left hover:bg-fondo"
                   >
-                    <span className="text-sm font-semibold text-[#141113]">
+                    <span className="text-sm font-semibold text-texto">
                       {alumno.nombre}
                     </span>
 
                     {alumno.id === alumnoId && (
                       <Check
                         size={17}
-                        className="text-[#7d9309]"
+                        className="text-verde"
                       />
                     )}
                   </button>
                 ))}
 
                 {alumnosFiltrados.length === 0 && (
-                  <p className="px-4 py-5 text-sm text-[#8c847d]">
+                  <p className="px-4 py-5 text-sm text-texto-suave">
                     No encontramos alumnos.
                   </p>
                 )}
@@ -699,7 +697,7 @@ export default function DesarrolloClient({
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-[#8c847d]">
+          <p className="text-xs text-texto-suave">
             Alumnos obtenidos directamente de Twenty CRM.
           </p>
 
@@ -740,20 +738,20 @@ export default function DesarrolloClient({
           return (
             <div
               key={indicador.titulo}
-              className="rounded-2xl border border-[#e1dace] bg-white p-5"
+              className="rounded-2xl border border-borde bg-superficie p-5"
             >
               <div className="flex items-start justify-between gap-2">
-                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#8c847d]">
+                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-texto-suave">
                   {indicador.titulo}
                 </p>
 
                 <Icono
                   size={18}
-                  className="shrink-0 text-[#7d9309]"
+                  className="shrink-0 text-verde"
                 />
               </div>
 
-              <p className="mt-4 break-words text-xl font-black text-[#141113] md:text-2xl">
+              <p className="mt-4 break-words text-xl font-black text-texto md:text-2xl">
                 {indicador.valor}
               </p>
             </div>
@@ -763,17 +761,17 @@ export default function DesarrolloClient({
 
       {/* RESUMEN PRINCIPAL */}
       <section className="mb-7 grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="rounded-2xl border border-[#e1dace] bg-white p-5 md:p-6">
+        <div className="rounded-2xl border border-borde bg-superficie p-5 md:p-6">
           <div className="mb-5">
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7d9309]">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
               Análisis técnico
             </p>
 
-            <h2 className="mt-1 text-xl font-black text-[#141113]">
+            <h2 className="mt-1 text-xl font-black text-texto">
               Perfil de habilidades
             </h2>
 
-            <p className="mt-2 text-sm text-[#8c847d]">
+            <p className="mt-2 text-sm text-texto-suave">
               Comparación entre las dos evaluaciones más
               recientes.
             </p>
@@ -791,11 +789,11 @@ export default function DesarrolloClient({
                 className="text-[#a8b65a]"
               />
 
-              <p className="mt-4 font-bold text-[#141113]">
+              <p className="mt-4 font-bold text-texto">
                 Sin evaluaciones
               </p>
 
-              <p className="mt-2 max-w-xs text-sm text-[#8c847d]">
+              <p className="mt-2 max-w-xs text-sm text-texto-suave">
                 Registra la primera evaluación para
                 visualizar el perfil deportivo.
               </p>
@@ -803,7 +801,7 @@ export default function DesarrolloClient({
           )}
         </div>
 
-        <div className="rounded-2xl bg-[#32390d] p-6 text-white">
+        <div className="rounded-2xl bg-banner p-6 text-white">
           <div className="flex items-center gap-2 text-[#dce6a1]">
             <TrendingUp size={19} />
 
@@ -913,19 +911,19 @@ export default function DesarrolloClient({
       </section>
 
       {/* DESGLOSE DE HABILIDADES */}
-      <section className="mb-7 rounded-2xl border border-[#e1dace] bg-white p-5 md:p-6">
+      <section className="mb-7 rounded-2xl border border-borde bg-superficie p-5 md:p-6">
         <div className="mb-6 flex items-center gap-3">
           <Dumbbell
             size={21}
-            className="text-[#7d9309]"
+            className="text-verde"
           />
 
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7d9309]">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
               Evaluación técnica
             </p>
 
-            <h2 className="text-xl font-black text-[#141113]">
+            <h2 className="text-xl font-black text-texto">
               Desglose de habilidades
             </h2>
           </div>
@@ -943,13 +941,13 @@ export default function DesarrolloClient({
               return (
                 <div key={habilidad.key}>
                   <div className="mb-2 flex items-center justify-between">
-                    <p className="text-sm font-bold text-[#141113]">
+                    <p className="text-sm font-bold text-texto">
                       {habilidad.nombre}
                     </p>
 
                     <div className="flex items-center gap-2">
                       {anteriorValor !== undefined && (
-                        <span className="text-xs text-[#8c847d]">
+                        <span className="text-xs text-texto-suave">
                           {valor - anteriorValor > 0
                             ? "+"
                             : ""}
@@ -957,13 +955,13 @@ export default function DesarrolloClient({
                         </span>
                       )}
 
-                      <span className="font-black text-[#52620a]">
+                      <span className="font-black text-verde-oscuro">
                         {valor}/10
                       </span>
                     </div>
                   </div>
 
-                  <div className="h-3 overflow-hidden rounded-full bg-[#eeeae0]">
+                  <div className="h-3 overflow-hidden rounded-full bg-hundido">
                     <div
                       className="h-full rounded-full bg-[#a5b91b]"
                       style={{
@@ -976,24 +974,24 @@ export default function DesarrolloClient({
             })}
           </div>
         ) : (
-          <p className="text-sm text-[#8c847d]">
+          <p className="text-sm text-texto-suave">
             Todavía no hay puntuaciones para este alumno.
           </p>
         )}
       </section>
 
       {/* EVOLUCIÓN HISTÓRICA */}
-      <section className="mb-7 rounded-2xl border border-[#e1dace] bg-white p-5 md:p-6">
+      <section className="mb-7 rounded-2xl border border-borde bg-superficie p-5 md:p-6">
         <div className="mb-6">
-          <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7d9309]">
+          <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
             Seguimiento
           </p>
 
-          <h2 className="mt-1 text-xl font-black text-[#141113]">
+          <h2 className="mt-1 text-xl font-black text-texto">
             Evolución histórica
           </h2>
 
-          <p className="mt-2 text-sm text-[#8c847d]">
+          <p className="mt-2 text-sm text-texto-suave">
             Promedio general de las últimas ocho
             evaluaciones.
           </p>
@@ -1003,41 +1001,41 @@ export default function DesarrolloClient({
       </section>
 
       {/* HISTORIAL */}
-      <section className="overflow-hidden rounded-2xl border border-[#e1dace] bg-white">
-        <div className="flex flex-col gap-3 border-b border-[#e1dace] p-5 sm:flex-row sm:items-center sm:justify-between md:p-6">
+      <section className="overflow-hidden rounded-2xl border border-borde bg-superficie">
+        <div className="flex flex-col gap-3 border-b border-borde p-5 sm:flex-row sm:items-center sm:justify-between md:p-6">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7d9309]">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
               Registro deportivo
             </p>
 
-            <h2 className="mt-1 text-xl font-black text-[#141113]">
+            <h2 className="mt-1 text-xl font-black text-texto">
               Historial de evaluaciones
             </h2>
           </div>
 
-          <span className="w-fit rounded-full border border-[#e1dace] px-3 py-1 text-xs font-bold text-[#8c847d]">
+          <span className="w-fit rounded-full border border-borde px-3 py-1 text-xs font-bold text-texto-suave">
             {totalEvaluaciones} registros
           </span>
         </div>
 
         {historial.length > 0 ? (
-          <div className="divide-y divide-[#eee9df]">
+          <div className="divide-y divide-borde-suave">
             {historial.map((evaluacion) => (
               <div
                 key={evaluacion.id}
                 className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between md:px-6"
               >
                 <div className="flex items-start gap-4">
-                  <div className="rounded-xl bg-[#eef2cf] p-3 text-[#52620a]">
+                  <div className="rounded-xl bg-lima-suave p-3 text-verde-oscuro">
                     <ClipboardList size={21} />
                   </div>
 
                   <div>
-                    <p className="font-black text-[#141113]">
+                    <p className="font-black text-texto">
                       {formatearFecha(evaluacion.fecha)}
                     </p>
 
-                    <p className="mt-1 text-sm text-[#8c847d]">
+                    <p className="mt-1 text-sm text-texto-suave">
                       Promedio:{" "}
                       {formatoNumero(
                         promedio(evaluacion.puntuaciones)
@@ -1053,7 +1051,7 @@ export default function DesarrolloClient({
                   onClick={() =>
                     setEvaluacionDetalle(evaluacion)
                   }
-                  className="inline-flex items-center gap-2 self-start text-sm font-bold text-[#7d9309]"
+                  className="inline-flex items-center gap-2 self-start text-sm font-bold text-verde"
                 >
                   Ver evaluación
                   <ArrowUpRight size={17} />
@@ -1068,17 +1066,17 @@ export default function DesarrolloClient({
               className="mx-auto text-[#a8b65a]"
             />
 
-            <p className="mt-3 font-bold text-[#141113]">
+            <p className="mt-3 font-bold text-texto">
               No hay evaluaciones registradas
             </p>
 
-            <p className="mt-2 text-sm text-[#8c847d]">
+            <p className="mt-2 text-sm text-texto-suave">
               Comienza creando una evaluación.
             </p>
           </div>
         )}
 
-        <div className="flex items-start gap-2 border-t border-[#e1dace] bg-[#fdfcf9] px-5 py-4 text-xs leading-relaxed text-[#8c847d]">
+        <div className="flex items-start gap-2 border-t border-borde bg-superficie-2 px-5 py-4 text-xs leading-relaxed text-texto-suave">
           <Info size={15} className="mt-0.5 shrink-0" />
 
           <p>
@@ -1096,22 +1094,22 @@ export default function DesarrolloClient({
             role="dialog"
             aria-modal="true"
             aria-labelledby="titulo-nueva-evaluacion"
-            className="flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+            className="flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-superficie shadow-2xl"
           >
-            <div className="flex shrink-0 items-start justify-between bg-[#f6f4ee] p-5 md:p-6">
+            <div className="flex shrink-0 items-start justify-between bg-fondo p-5 md:p-6">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7d9309]">
+                <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
                   Registro deportivo
                 </p>
 
                 <h2
                   id="titulo-nueva-evaluacion"
-                  className="mt-1 text-2xl font-black text-[#141113]"
+                  className="mt-1 text-2xl font-black text-texto"
                 >
                   NUEVA EVALUACIÓN
                 </h2>
 
-                <p className="mt-1 text-sm text-[#8c847d]">
+                <p className="mt-1 text-sm text-texto-suave">
                   {alumnoSeleccionado?.nombre}
                 </p>
               </div>
@@ -1120,7 +1118,7 @@ export default function DesarrolloClient({
                 type="button"
                 aria-label="Cerrar formulario"
                 onClick={() => setModalAbierto(false)}
-                className="rounded-full bg-white p-2 text-[#141113]"
+                className="rounded-full bg-superficie p-2 text-texto"
               >
                 <X size={20} />
               </button>
@@ -1130,7 +1128,7 @@ export default function DesarrolloClient({
               <div>
                 <label
                   htmlFor="fecha-evaluacion"
-                  className="mb-2 block text-sm font-bold text-[#141113]"
+                  className="mb-2 block text-sm font-bold text-texto"
                 >
                   Fecha de evaluación
                 </label>
@@ -1146,16 +1144,16 @@ export default function DesarrolloClient({
                       fecha: event.target.value,
                     }))
                   }
-                  className="w-full rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm outline-none focus:border-[#7d9309]"
+                  className="w-full rounded-xl border border-borde bg-fondo px-4 py-3 text-sm outline-none focus:border-verde"
                 />
               </div>
 
               <div>
-                <h3 className="font-black text-[#141113]">
+                <h3 className="font-black text-texto">
                   Evaluación de habilidades
                 </h3>
 
-                <p className="mt-1 text-sm text-[#8c847d]">
+                <p className="mt-1 text-sm text-texto-suave">
                   Califica cada habilidad del 1 al 10.
                 </p>
               </div>
@@ -1165,12 +1163,12 @@ export default function DesarrolloClient({
                   <div className="mb-3 flex items-center justify-between">
                     <label
                       htmlFor={`habilidad-${habilidad.key}`}
-                      className="text-sm font-bold text-[#141113]"
+                      className="text-sm font-bold text-texto"
                     >
                       {habilidad.nombre}
                     </label>
 
-                    <span className="rounded-lg bg-[#eef2cf] px-3 py-1 text-sm font-black text-[#52620a]">
+                    <span className="rounded-lg bg-lima-suave px-3 py-1 text-sm font-black text-verde-oscuro">
                       {
                         formulario.puntuaciones[
                           habilidad.key
@@ -1197,22 +1195,22 @@ export default function DesarrolloClient({
                         Number(event.target.value)
                       )
                     }
-                    className="w-full accent-[#7d9309]"
+                    className="w-full accent-verde"
                   />
 
-                  <div className="mt-1 flex justify-between text-[11px] text-[#8c847d]">
+                  <div className="mt-1 flex justify-between text-[11px] text-texto-suave">
                     <span>1 · Inicial</span>
                     <span>10 · Excelente</span>
                   </div>
                 </div>
               ))}
 
-              <div className="rounded-xl bg-[#f0f5d8] p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#657a0b]">
+              <div className="rounded-xl bg-lima-suave p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.12em] text-verde-medio">
                   Promedio de la evaluación
                 </p>
 
-                <p className="mt-2 text-3xl font-black text-[#32390d]">
+                <p className="mt-2 text-3xl font-black text-verde-noche">
                   {formatoNumero(
                     promedio(formulario.puntuaciones)
                   )}
@@ -1223,7 +1221,7 @@ export default function DesarrolloClient({
               <div>
                 <label
                   htmlFor="observaciones"
-                  className="mb-2 block text-sm font-bold text-[#141113]"
+                  className="mb-2 block text-sm font-bold text-texto"
                 >
                   Observaciones del entrenador
                 </label>
@@ -1240,30 +1238,30 @@ export default function DesarrolloClient({
                       observaciones: event.target.value,
                     }))
                   }
-                  className="w-full resize-y rounded-xl border border-[#e1dace] bg-[#f6f4ee] px-4 py-3 text-sm outline-none focus:border-[#7d9309]"
+                  className="w-full resize-y rounded-xl border border-borde bg-fondo px-4 py-3 text-sm outline-none focus:border-verde"
                 />
               </div>
 
               {error && (
                 <p
                   role="alert"
-                  className="rounded-xl bg-[#fff0ed] p-3 text-sm font-semibold text-[#b4493c]"
+                  className="rounded-xl bg-peligro-suave p-3 text-sm font-semibold text-peligro"
                 >
                   {error}
                 </p>
               )}
 
-              <div className="flex items-start gap-2 text-xs text-[#8c847d]">
+              <div className="flex items-start gap-2 text-xs text-texto-suave">
                 <Info size={16} className="shrink-0" />
                 La evaluación se guardará en Twenty.
               </div>
             </div>
 
-            <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-[#e1dace] bg-white p-5 sm:flex-row sm:justify-end">
+            <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-borde bg-superficie p-5 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={() => setModalAbierto(false)}
-                className="rounded-xl border border-[#e1dace] px-5 py-3 text-sm font-bold text-[#6f6964]"
+                className="rounded-xl border border-borde px-5 py-3 text-sm font-bold text-texto-3"
               >
                 Cancelar
               </button>
@@ -1272,7 +1270,7 @@ export default function DesarrolloClient({
                 type="button"
                 onClick={guardarEvaluacionActual}
                 disabled={guardando}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d] disabled:cursor-wait disabled:opacity-60"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-sobre-lima disabled:cursor-wait disabled:opacity-60"
               >
                 <Save size={18} />
                 {guardando ? "Guardando…" : "Guardar evaluación"}
@@ -1289,22 +1287,22 @@ export default function DesarrolloClient({
             role="dialog"
             aria-modal="true"
             aria-labelledby="titulo-detalle-evaluacion"
-            className="max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl"
+            className="max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-superficie shadow-2xl"
           >
-            <div className="flex items-start justify-between bg-[#f6f4ee] p-6">
+            <div className="flex items-start justify-between bg-fondo p-6">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7d9309]">
+                <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
                   Expediente deportivo
                 </p>
 
                 <h2
                   id="titulo-detalle-evaluacion"
-                  className="mt-1 text-2xl font-black text-[#141113]"
+                  className="mt-1 text-2xl font-black text-texto"
                 >
                   DETALLE DE EVALUACIÓN
                 </h2>
 
-                <p className="mt-2 text-sm text-[#8c847d]">
+                <p className="mt-2 text-sm text-texto-suave">
                   {formatearFecha(evaluacionDetalle.fecha)}
                 </p>
               </div>
@@ -1313,14 +1311,14 @@ export default function DesarrolloClient({
                 type="button"
                 aria-label="Cerrar detalle"
                 onClick={() => setEvaluacionDetalle(null)}
-                className="rounded-full bg-white p-2"
+                className="rounded-full bg-superficie p-2"
               >
                 <X size={20} />
               </button>
             </div>
 
             <div className="space-y-5 p-6">
-              <div className="rounded-xl bg-[#32390d] p-5 text-white">
+              <div className="rounded-xl bg-banner p-5 text-white">
                 <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#dce6a1]">
                   Promedio general
                 </p>
@@ -1338,13 +1336,13 @@ export default function DesarrolloClient({
               {habilidades.map((habilidad) => (
                 <div
                   key={habilidad.key}
-                  className="flex items-center justify-between border-b border-[#eee9df] pb-3"
+                  className="flex items-center justify-between border-b border-borde-suave pb-3"
                 >
-                  <span className="text-sm text-[#6f6964]">
+                  <span className="text-sm text-texto-3">
                     {habilidad.nombre}
                   </span>
 
-                  <span className="font-black text-[#141113]">
+                  <span className="font-black text-texto">
                     {
                       evaluacionDetalle.puntuaciones[
                         habilidad.key
@@ -1356,11 +1354,11 @@ export default function DesarrolloClient({
               ))}
 
               <div>
-                <p className="text-sm font-bold text-[#141113]">
+                <p className="text-sm font-bold text-texto">
                   Observaciones
                 </p>
 
-                <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-[#6f6964]">
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-texto-3">
                   {evaluacionDetalle.observaciones ||
                     "Sin observaciones registradas."}
                 </p>
@@ -1372,7 +1370,7 @@ export default function DesarrolloClient({
                   eliminarEvaluacion(evaluacionDetalle.id)
                 }
                 disabled={guardando}
-                className="inline-flex items-center gap-2 rounded-xl border border-[#e6b1a9] px-4 py-3 text-sm font-bold text-[#b4493c] disabled:cursor-wait disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-xl border border-borde-peligro px-4 py-3 text-sm font-bold text-peligro disabled:cursor-wait disabled:opacity-60"
               >
                 <Trash2 size={17} />
                 Eliminar evaluación

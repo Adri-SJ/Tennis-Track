@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AppLayout from "@/components/AppLayout";
 import EncabezadoFormulario from "@/components/EncabezadoFormulario";
 import GrupoForm from "@/components/GrupoForm";
 import { getGrupoById } from "@/lib/api";
 import { actualizarGrupo } from "../../actions";
+
+export const metadata: Metadata = {
+  title: "Editar grupo",
+};
 
 export default async function EditarGrupoPage({
   params,

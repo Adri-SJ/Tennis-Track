@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import AppLayout from "@/components/AppLayout";
 import EncabezadoFormulario from "@/components/EncabezadoFormulario";
 import InscripcionForm, {
@@ -6,6 +7,10 @@ import InscripcionForm, {
 } from "@/components/InscripcionForm";
 import { getAlumnos, getGrupos, getInscripciones } from "@/lib/api";
 import { crearInscripcion } from "../actions";
+
+export const metadata: Metadata = {
+  title: "Nueva inscripción",
+};
 
 export default async function NuevaInscripcionPage({
   searchParams,

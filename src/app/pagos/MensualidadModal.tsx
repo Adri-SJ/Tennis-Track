@@ -56,7 +56,7 @@ export default function MensualidadModal({
           <button
             type="button"
             onClick={onCerrar}
-            className="rounded-xl border border-[#e1dace] px-5 py-3 text-sm font-bold text-[#6f6964]"
+            className="rounded-xl border border-borde px-5 py-3 text-sm font-bold text-texto-3"
           >
             Cancelar
           </button>
@@ -65,7 +65,7 @@ export default function MensualidadModal({
             type="button"
             onClick={guardar}
             disabled={guardando}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-[#32390d] disabled:cursor-wait disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-sobre-lima disabled:cursor-wait disabled:opacity-60"
           >
             <Check size={18} />
             {guardando ? "Guardando…" : "Guardar mensualidad"}
@@ -139,7 +139,7 @@ export default function MensualidadModal({
       {error && (
         <p
           role="alert"
-          className="rounded-xl bg-[#fff0ed] p-3 text-sm font-bold text-[#b4493c]"
+          className="rounded-xl bg-peligro-suave p-3 text-sm font-bold text-peligro"
         >
           {error}
         </p>

@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import AppLayout from "@/components/AppLayout";
 import { getAlumnos } from "@/lib/api";
 import { getMensualidades } from "@/lib/pagos";
 import PagosClient from "./PagosClient";
+
+export const metadata: Metadata = {
+  title: "Pagos",
+};
 
 export default async function PagosPage() {
   const [mensualidades, alumnos] = await Promise.all([

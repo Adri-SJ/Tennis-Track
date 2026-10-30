@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import AppLayout from "@/components/AppLayout";
 import AlumnoForm from "@/components/AlumnoForm";
 import EncabezadoFormulario from "@/components/EncabezadoFormulario";
 import { crearAlumno } from "../actions";
+
+export const metadata: Metadata = {
+  title: "Nuevo alumno",
+};
 
 export default function NuevoAlumnoPage() {
   return (

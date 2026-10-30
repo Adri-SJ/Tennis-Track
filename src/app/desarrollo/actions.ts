@@ -1,5 +1,6 @@
 "use server";
 
+import { autorizarAccion } from "@/lib/auth/servidor";
 import { revalidatePath } from "next/cache";
 import { getAlumnoById } from "@/lib/api";
 import {
@@ -16,6 +17,12 @@ export async function guardarEvaluacion(datos: {
   puntuaciones: Puntuaciones;
   observaciones: string;
 }): Promise<{ error: string | null }> {
+  const sinPermiso = await autorizarAccion("/desarrollo");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   if (!esFecha(datos.fecha)) {
     return { error: "Selecciona una fecha." };
   }
@@ -66,6 +73,12 @@ export async function guardarEvaluacion(datos: {
 export async function borrarEvaluacion(
   id: string
 ): Promise<{ error: string | null }> {
+  const sinPermiso = await autorizarAccion("/desarrollo");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
   try {
     await deleteEvaluacion(id);
   } catch (error) {
