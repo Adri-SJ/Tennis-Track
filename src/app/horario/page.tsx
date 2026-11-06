@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import AppLayout from "@/components/AppLayout";
+import { alcanceDePagina } from "@/lib/auth/servidor";
 import Link from "next/link";
 import {
   CalendarDays,
@@ -26,10 +27,16 @@ const diasSemana = [
 ];
 
 export default async function HorarioPage() {
-  const [grupos, inscripciones] = await Promise.all([
+  const { grupos: permitidos } = await alcanceDePagina("/horario");
+
+  const [todos, inscripciones] = await Promise.all([
     getGrupos(),
     getInscripciones(),
   ]);
+
+  const grupos = permitidos
+    ? todos.filter((grupo) => permitidos.has(grupo.id))
+    : todos;
 
   const gruposActivos = grupos.filter(
     (grupo) => grupo.estado === "Activo"

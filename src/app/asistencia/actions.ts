@@ -1,6 +1,10 @@
 "use server";
 
-import { autorizarAccion } from "@/lib/auth/servidor";
+import {
+  autorizarAccion,
+  gruposPermitidos,
+  requiereRol,
+} from "@/lib/auth/servidor";
 import { revalidatePath } from "next/cache";
 import { getAlumnosDeGrupo } from "@/lib/api";
 import {
@@ -19,6 +23,12 @@ export async function guardarPaseDeLista(
 
   if (sinPermiso) {
     return { error: sinPermiso };
+  }
+
+  const permitidos = await gruposPermitidos(await requiereRol());
+
+  if (permitidos && !permitidos.has(grupoId)) {
+    return { error: "Solo puedes pasar lista en tus grupos." };
   }
 
   if (!grupoId || !esFecha(fecha)) {

@@ -52,13 +52,13 @@ Requiere Node.js 22 o superior, Docker (para PostgreSQL) y acceso a un workspace
    npm run migrar
    ```
 
-4. Crea el primer superadmin. Pide nombre, correo y contraseña (oculta, dos veces):
+4. Crea el primer administrador. Pide nombre, correo y contraseña (oculta, dos veces):
 
    ```bash
-   npm run superadmin
+   npm run admin
    ```
 
-   También acepta `SUPERADMIN_NOMBRE`, `SUPERADMIN_CORREO` y `SUPERADMIN_PASSWORD`. Solo puede haber un superadmin: si ya existe con ese correo, le cambia la contraseña; si el correo ya tenía cuenta, la promueve.
+   También acepta `ADMIN_NOMBRE`, `ADMIN_CORREO` y `ADMIN_PASSWORD`. Si el correo ya tiene cuenta, la activa como administrador y le cambia la contraseña.
 
 5. Levanta el servidor de desarrollo y abre http://localhost:3000:
 
@@ -73,7 +73,9 @@ Otros comandos: `npm run build` (compilación de producción), `npm start` (serv
 - **Cuentas:** viven en PostgreSQL (`usuarios` y `codigos_verificacion`, migraciones en `migraciones/`), separadas de Twenty.
 - **Registro:** «Crear cuenta» envía un código de 6 dígitos al correo. Al confirmarlo la cuenta queda **pendiente**, sin rol, hasta que un administrador la apruebe en **Cuentas** (`/cuentas`).
 - **Recuperar contraseña:** también con código por correo.
-- **Roles:** `entrenador`, `recepcion`, `admin` y `superadmin`. Qué módulos ve cada uno está en `src/lib/permisos.ts`. El admin asigna entrenador y recepción; solo el superadmin asigna o modifica administradores.
+- **Roles:** Entrenador y Administrador (`src/lib/permisos.ts`). El administrador ve todo y nadie puede modificar su propia cuenta.
+- **Entrenador:** en **Cuentas** se le asignan sus grupos (tabla `grupos_entrenadores`). Solo ve esos grupos, su horario y sus alumnos, pasa lista en ellos y consulta el inventario sin modificarlo. No inscribe alumnos ni edita grupos; recibir pagos sigue pendiente.
+- **Solicitudes de material:** el entrenador pide material desde Inventario (tabla `solicitudes_material`). Al aprobarla, el administrador registra la salida en Twenty y bajan las existencias.
 - **Sesión:** un JWT con `{ id }` en una cookie `httpOnly` que dura 16 h. `src/proxy.ts` revisa la firma; las páginas, las Server Actions y la API vuelven a leer la cuenta en la base, así que desactivar una cuenta corta su acceso de inmediato.
 - **Límites:** 10 intentos de ingreso por minuto por IP; códigos de 15 minutos con 5 intentos y un reenvío cada 60 s.
 
@@ -87,17 +89,17 @@ Los códigos se envían por el SMTP de [Resend](https://resend.com):
 | `SMTP_PORT` | `465` |
 | `SMTP_USER` | `resend` |
 | `SMTP_PASS` | La API key de Resend (`re_…`, permiso *Sending access*) |
-| `CORREO_REMITENTE` | `TennisTrack <onboarding@resend.dev>` mientras no haya dominio verificado |
+| `CORREO_REMITENTE` | `TennisTrack <no-reply@ozkytech.com>` |
 
-Sin dominio verificado, Resend solo entrega al correo dueño de la cuenta de Resend. Para enviar a cualquier persona, verifica el dominio de la academia en *Domains* (registros DNS) y cambia el remitente a, por ejemplo, `TennisTrack <no-reply@dominio.com>`.
+El remitente debe ser de un dominio verificado en *Domains* de Resend. Sin dominio verificado, Resend solo entrega al correo dueño de la cuenta.
 
 ### Probar el flujo en desarrollo
 
 Con `SMTP_HOST` vacío no se envían correos: el código aparece en la consola de `npm run dev` como `[correo de desarrollo] Para: … | Código: 123456`.
 
-1. Ingresa con el superadmin.
+1. Ingresa con el administrador.
 2. En otra ventana privada, usa «Crear cuenta», copia el código de la consola y confírmalo.
-3. Con el superadmin, abre **Cuentas**, elige un rol y aprueba la cuenta nueva.
+3. Como administrador, abre **Cuentas**, aprueba la cuenta nueva y asígnale sus grupos.
 4. Ingresa con la cuenta nueva: el menú solo muestra los módulos de su rol.
 5. Prueba «¿Olvidaste tu contraseña?» con el código de la consola.
 
@@ -112,7 +114,7 @@ src/
   lib/auth/     sesión, base de usuarios, códigos, correo y validación
   proxy.ts      exige sesión en todas las rutas salvo /login
 migraciones/    SQL numerado de la base de usuarios
-scripts/        migrar y crear el superadmin
+scripts/        migrar y crear un administrador
 ```
 
 La clave de Twenty y la base de usuarios solo se usan en el servidor (`src/lib/api.ts` y `src/lib/auth/*` con `server-only`). Los componentes de cliente solo importan tipos de ahí, más `src/lib/permisos.ts` y `src/lib/auth/cliente.ts`, que no tienen secretos.

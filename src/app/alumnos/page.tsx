@@ -8,14 +8,38 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-import { getAlumnos } from "@/lib/api";
+import { getAlumnos, getInscripciones } from "@/lib/api";
+import { alcanceDePagina } from "@/lib/auth/servidor";
 
 export const metadata: Metadata = {
   title: "Alumnos",
 };
 
 export default async function AlumnosPage() {
-  const alumnos = await getAlumnos();
+  const { esAdmin, grupos } = await alcanceDePagina("/alumnos");
+
+  const [todos, inscripciones] = await Promise.all([
+    getAlumnos(),
+    getInscripciones(),
+  ]);
+
+  /* El entrenador solo ve a los alumnos activos en sus grupos. */
+  const idsVisibles = new Set(
+    inscripciones
+      .filter(
+        (inscripcion) =>
+          inscripcion.estado === "Activa" &&
+          inscripcion.grupo &&
+          grupos?.has(inscripcion.grupo.id)
+      )
+      .flatMap((inscripcion) =>
+        inscripcion.alumnos.map((alumno) => alumno.id)
+      )
+  );
+
+  const alumnos = grupos
+    ? todos.filter((alumno) => idsVisibles.has(alumno.id))
+    : todos;
 
   const alumnosActivos = alumnos.filter(
     (alumno) => alumno.estado === "Activo"
@@ -38,17 +62,21 @@ export default async function AlumnosPage() {
             </h1>
 
             <p className="mt-2 text-sm text-texto-3 md:text-base">
-              Consulta y administra los alumnos registrados en la academia.
+              {esAdmin
+                ? "Consulta y administra los alumnos registrados en la academia."
+                : "Consulta a los alumnos de tus grupos."}
             </p>
           </div>
 
-          <Link
-            href="/alumnos/nuevo"
-            className="flex w-fit items-center gap-2 rounded-xl bg-boton px-4 py-3 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover"
-          >
-            <Plus size={18} />
-            Nuevo alumno
-          </Link>
+          {esAdmin && (
+            <Link
+              href="/alumnos/nuevo"
+              className="flex w-fit items-center gap-2 rounded-xl bg-boton px-4 py-3 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover"
+            >
+              <Plus size={18} />
+              Nuevo alumno
+            </Link>
+          )}
 
         </section>
 

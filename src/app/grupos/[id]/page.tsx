@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import AppLayout from "@/components/AppLayout";
+import { alcanceDePagina } from "@/lib/auth/servidor";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -26,6 +28,13 @@ export default async function GrupoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  const { esAdmin, grupos } = await alcanceDePagina(`/grupos/${id}`);
+
+  /* El entrenador solo abre sus propios grupos. */
+  if (grupos && !grupos.has(id)) {
+    notFound();
+  }
 
   const [grupo, alumnosDelGrupo] = await Promise.all([
     getGrupoById(id),
@@ -91,21 +100,25 @@ export default async function GrupoPage({
                 {grupo.estado}
               </span>
 
-              <Link
-                href={`/grupos/${grupo.id}/editar`}
-                className="inline-flex items-center gap-2 rounded-xl border border-borde px-4 py-2 text-sm font-semibold text-texto transition hover:bg-fondo"
-              >
-                <Pencil size={16} />
-                Editar
-              </Link>
+              {esAdmin && (
+                <>
+                  <Link
+                    href={`/grupos/${grupo.id}/editar`}
+                    className="inline-flex items-center gap-2 rounded-xl border border-borde px-4 py-2 text-sm font-semibold text-texto transition hover:bg-fondo"
+                  >
+                    <Pencil size={16} />
+                    Editar
+                  </Link>
 
-              <Link
-                href={`/inscripciones/nueva?grupo=${grupo.id}`}
-                className="inline-flex items-center gap-2 rounded-xl bg-boton px-4 py-2 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover"
-              >
-                <Plus size={16} />
-                Inscribir alumno
-              </Link>
+                  <Link
+                    href={`/inscripciones/nueva?grupo=${grupo.id}`}
+                    className="inline-flex items-center gap-2 rounded-xl bg-boton px-4 py-2 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover"
+                  >
+                    <Plus size={16} />
+                    Inscribir alumno
+                  </Link>
+                </>
+              )}
             </div>
 
           </div>

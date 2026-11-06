@@ -1,11 +1,10 @@
 /*
-  Crea el superadmin de TennisTrack (solo puede haber uno).
-  Uso: npm run superadmin
-  También acepta SUPERADMIN_NOMBRE, SUPERADMIN_CORREO y SUPERADMIN_PASSWORD.
+  Crea un administrador de TennisTrack.
+  Uso: npm run admin
+  También acepta ADMIN_NOMBRE, ADMIN_CORREO y ADMIN_PASSWORD.
 
-  - Si ya existe un superadmin con ese correo, le cambia la contraseña.
-  - Si el correo ya tenía cuenta, la promueve a superadmin.
-  - Si existe otro superadmin con otro correo, no hace nada.
+  Si el correo ya tiene cuenta, la activa como administrador y le
+  cambia la contraseña.
 */
 import { createInterface } from "node:readline/promises";
 import { stdin, stdout } from "node:process";
@@ -38,7 +37,7 @@ function preguntarOculto(texto: string): Promise<string> {
   return new Promise((resolver, rechazar) => {
     if (!stdin.isTTY) {
       rechazar(
-        new Error("Sin terminal interactiva: usa SUPERADMIN_PASSWORD.")
+        new Error("Sin terminal interactiva: usa ADMIN_PASSWORD.")
       );
       return;
     }
@@ -79,8 +78,8 @@ function preguntarOculto(texto: string): Promise<string> {
 }
 
 async function pedirPassword(): Promise<string> {
-  if (process.env.SUPERADMIN_PASSWORD) {
-    return process.env.SUPERADMIN_PASSWORD;
+  if (process.env.ADMIN_PASSWORD) {
+    return process.env.ADMIN_PASSWORD;
   }
 
   for (;;) {
@@ -102,9 +101,9 @@ async function pedirPassword(): Promise<string> {
 }
 
 const nombre =
-  process.env.SUPERADMIN_NOMBRE?.trim() || (await preguntar("Nombre: "));
+  process.env.ADMIN_NOMBRE?.trim() || (await preguntar("Nombre: "));
 const correo = (
-  process.env.SUPERADMIN_CORREO || (await preguntar("Correo: "))
+  process.env.ADMIN_CORREO || (await preguntar("Correo: "))
 )
   .trim()
   .toLowerCase();
@@ -132,44 +131,23 @@ const cliente = new pg.Client({ connectionString: process.env.DATABASE_URL });
 await cliente.connect();
 
 try {
-  const { rows: superadmins } = await cliente.query<{ correo: string }>(
-    "SELECT correo FROM usuarios WHERE rol = 'superadmin'"
+  const { rowCount } = await cliente.query(
+    `UPDATE usuarios
+        SET rol = 'admin', estado = 'activo', password_hash = $1,
+            nombre = $2, aprobado_en = COALESCE(aprobado_en, now())
+      WHERE correo = $3`,
+    [hash, nombre, correo]
   );
 
-  const actual = superadmins[0];
-
-  if (actual && actual.correo !== correo) {
-    console.error(
-      `Ya existe un superadmin (${actual.correo}). Solo puede haber uno.`
-    );
-    process.exit(1);
-  }
-
-  if (actual) {
-    await cliente.query(
-      "UPDATE usuarios SET password_hash = $1, nombre = $2 WHERE correo = $3",
-      [hash, nombre, correo]
-    );
-    console.log(`Contraseña del superadmin ${correo} actualizada.`);
+  if (rowCount) {
+    console.log(`La cuenta ${correo} ahora es administrador.`);
   } else {
-    const { rowCount } = await cliente.query(
-      `UPDATE usuarios
-          SET rol = 'superadmin', estado = 'activo', password_hash = $1,
-              nombre = $2, aprobado_en = COALESCE(aprobado_en, now())
-        WHERE correo = $3`,
-      [hash, nombre, correo]
+    await cliente.query(
+      `INSERT INTO usuarios (nombre, correo, password_hash, rol, estado, aprobado_en)
+       VALUES ($1, $2, $3, 'admin', 'activo', now())`,
+      [nombre, correo, hash]
     );
-
-    if (rowCount) {
-      console.log(`La cuenta ${correo} ahora es superadmin.`);
-    } else {
-      await cliente.query(
-        `INSERT INTO usuarios (nombre, correo, password_hash, rol, estado, aprobado_en)
-         VALUES ($1, $2, $3, 'superadmin', 'activo', now())`,
-        [nombre, correo, hash]
-      );
-      console.log(`Superadmin ${correo} creado.`);
-    }
+    console.log(`Administrador ${correo} creado.`);
   }
 } finally {
   await cliente.end();

@@ -1,5 +1,7 @@
 import AppLayout from "@/components/AppLayout";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { alcanceDePagina } from "@/lib/auth/servidor";
 
 import {
   getAlumnos,
@@ -8,6 +10,13 @@ import {
 } from "@/lib/api";
 
 export default async function Home() {
+  const { esAdmin } = await alcanceDePagina("/");
+
+  /* El resumen es de toda la academia; el entrenador empieza en su lista. */
+  if (!esAdmin) {
+    redirect("/asistencia");
+  }
+
   const [alumnos, grupos, inscripciones] = await Promise.all([
     getAlumnos(),
     getGrupos(),

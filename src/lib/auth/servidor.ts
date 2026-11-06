@@ -1,7 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { puedeVer, type Rol } from "@/lib/permisos";
+import { esAdministrador, puedeVer, type Rol } from "@/lib/permisos";
 import { db } from "./db";
 import { ErrorHttp } from "./errores";
 import { COOKIE_SESION, leerToken } from "./jwt";
@@ -16,7 +16,7 @@ export type UsuarioSesion = {
 /*
   Verifica el JWT de la cookie y relee al usuario en la base: la
   sesión deja de valer en cuanto la cuenta se desactiva. Sin roles
-  basta con estar activo; el superadmin pasa cualquier verificación.
+  basta con estar activo.
 */
 export async function requiereRol(...roles: Rol[]): Promise<UsuarioSesion> {
   const cookieStore = await cookies();
@@ -38,11 +38,7 @@ export async function requiereRol(...roles: Rol[]): Promise<UsuarioSesion> {
     throw new ErrorHttp(401, "Tu cuenta ya no está activa");
   }
 
-  if (
-    roles.length > 0 &&
-    usuario.rol !== "superadmin" &&
-    !roles.includes(usuario.rol)
-  ) {
+  if (roles.length > 0 && !roles.includes(usuario.rol)) {
     throw new ErrorHttp(403, "No tienes permiso para esta acción");
   }
 
@@ -92,4 +88,35 @@ export async function autorizarAccion(ruta: string): Promise<string | null> {
 
     throw error;
   }
+}
+
+/* Grupos que puede ver el usuario; null significa todos (administrador). */
+export async function gruposPermitidos(
+  usuario: UsuarioSesion
+): Promise<Set<string> | null> {
+  if (esAdministrador(usuario.rol)) {
+    return null;
+  }
+
+  const { rows } = await db().query<{ grupo_id: string }>(
+    "SELECT grupo_id FROM grupos_entrenadores WHERE usuario_id = $1",
+    [usuario.id]
+  );
+
+  return new Set(rows.map((fila) => fila.grupo_id));
+}
+
+/* Para páginas que muestran datos según los grupos del usuario. */
+export async function alcanceDePagina(ruta: string): Promise<{
+  usuario: UsuarioSesion;
+  esAdmin: boolean;
+  grupos: Set<string> | null;
+}> {
+  const { usuario } = await usuarioDePagina(ruta);
+
+  return {
+    usuario,
+    esAdmin: esAdministrador(usuario.rol),
+    grupos: await gruposPermitidos(usuario),
+  };
 }
