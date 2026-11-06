@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Check, Clock3, UserCog, X } from "lucide-react";
+import { Check, Clock3, UserCog, UsersRound, X } from "lucide-react";
 import Modal from "@/components/Modal";
 import { ErrorApi, api } from "@/lib/auth/cliente";
 import { NOMBRE_ROL, type Rol } from "@/lib/permisos";
@@ -15,9 +15,15 @@ type Cuenta = {
   creado_en: string;
   aprobado_en: string | null;
   aprobado_por: string | null;
+  grupos: string[];
 };
 
-type Respuesta = { usuarios: Cuenta[]; roles_asignables: Rol[]; yo: number };
+type Respuesta = {
+  usuarios: Cuenta[];
+  roles_asignables: Rol[];
+  grupos_disponibles: { id: string; nombre: string }[];
+  yo: number;
+};
 
 type Confirmacion = {
   titulo: string;
@@ -51,6 +57,10 @@ export default function CuentasClient() {
   const [ocupado, setOcupado] = useState<number | null>(null);
   const [rolElegido, setRolElegido] = useState<Record<number, Rol>>({});
   const [confirmacion, setConfirmacion] = useState<Confirmacion | null>(null);
+  const [asignando, setAsignando] = useState<{
+    cuenta: Cuenta;
+    grupos: string[];
+  } | null>(null);
 
   const cargar = useCallback(async () => {
     try {
@@ -89,15 +99,15 @@ export default function CuentasClient() {
     );
   }
 
-  const { usuarios, roles_asignables: rolesAsignables, yo } = datos;
+  const {
+    usuarios,
+    roles_asignables: rolesAsignables,
+    grupos_disponibles: gruposDisponibles,
+    yo,
+  } = datos;
   const pendientes = usuarios.filter((cuenta) => cuenta.estado === "pendiente");
   const resto = usuarios.filter((cuenta) => cuenta.estado !== "pendiente");
 
-  /* Las mismas reglas que el servidor, solo para no ofrecer lo imposible. */
-  const editable = (cuenta: Cuenta) =>
-    cuenta.id !== yo &&
-    cuenta.rol !== "superadmin" &&
-    (cuenta.rol !== "admin" || rolesAsignables.includes("admin"));
 
   return (
     <div className="px-5 py-6 md:px-8 lg:px-10">
@@ -219,12 +229,8 @@ export default function CuentasClient() {
         <div className="overflow-hidden rounded-2xl border border-borde bg-superficie">
           {resto.map((cuenta) => {
             const puedeEditar =
-              editable(cuenta) &&
+              cuenta.id !== yo &&
               (cuenta.estado === "activo" || cuenta.estado === "inactivo");
-            const opcionesRol =
-              cuenta.rol && !rolesAsignables.includes(cuenta.rol)
-                ? [cuenta.rol, ...rolesAsignables]
-                : rolesAsignables;
 
             return (
               <article
@@ -289,12 +295,26 @@ export default function CuentasClient() {
                         });
                       }}
                     >
-                      {opcionesRol.map((opcion) => (
+                      {rolesAsignables.map((opcion) => (
                         <option key={opcion} value={opcion}>
                           {NOMBRE_ROL[opcion]}
                         </option>
                       ))}
                     </select>
+
+                    {cuenta.rol === "entrenador" && (
+                      <button
+                        type="button"
+                        disabled={ocupado === cuenta.id}
+                        onClick={() =>
+                          setAsignando({ cuenta, grupos: cuenta.grupos })
+                        }
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-borde px-4 py-2 text-sm font-semibold text-texto transition hover:bg-fondo disabled:opacity-60"
+                      >
+                        <UsersRound size={16} />
+                        Grupos ({cuenta.grupos.length})
+                      </button>
+                    )}
 
                     <button
                       type="button"
@@ -337,6 +357,76 @@ export default function CuentasClient() {
           })}
         </div>
       </section>
+
+      {asignando && (
+        <Modal
+          etiqueta="Entrenador"
+          titulo="Asignar grupos"
+          onCerrar={() => setAsignando(null)}
+          pie={
+            <>
+              <button
+                type="button"
+                onClick={() => setAsignando(null)}
+                className="rounded-xl border border-borde px-5 py-3 text-sm font-semibold text-texto transition hover:bg-fondo"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const { cuenta, grupos } = asignando;
+
+                  setAsignando(null);
+                  await ejecutar(cuenta.id, () =>
+                    api(`/api/usuarios/${cuenta.id}/grupos`, {
+                      method: "PUT",
+                      body: { grupos },
+                    })
+                  );
+                }}
+                className="rounded-xl bg-boton px-5 py-3 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover"
+              >
+                Guardar grupos
+              </button>
+            </>
+          }
+        >
+          <p className="text-sm text-texto-2">
+            {asignando.cuenta.nombre} solo verá estos grupos y a sus alumnos.
+          </p>
+
+          {gruposDisponibles.length === 0 ? (
+            <p className="text-sm text-texto-suave">
+              No se pudieron cargar los grupos de Twenty.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {gruposDisponibles.map((grupo) => (
+                <label
+                  key={grupo.id}
+                  className="flex items-center gap-3 rounded-xl border border-borde p-3 text-sm font-semibold text-texto"
+                >
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 accent-verde"
+                    checked={asignando.grupos.includes(grupo.id)}
+                    onChange={(evento) =>
+                      setAsignando({
+                        ...asignando,
+                        grupos: evento.target.checked
+                          ? [...asignando.grupos, grupo.id]
+                          : asignando.grupos.filter((id) => id !== grupo.id),
+                      })
+                    }
+                  />
+                  {grupo.nombre}
+                </label>
+              ))}
+            </div>
+          )}
+        </Modal>
+      )}
 
       {confirmacion && (
         <Modal

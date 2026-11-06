@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   Search,
   Plus,
+  Send,
   SlidersHorizontal,
   Boxes,
   ArrowUpRight,
@@ -22,6 +23,9 @@ import type { Material, Movimiento } from "@/lib/inventario";
 import { eliminarMaterial } from "./actions";
 import MaterialModal, { CATEGORIAS } from "./MaterialModal";
 import MovimientoModal from "./MovimientoModal";
+import SolicitudModal from "./SolicitudModal";
+import SolicitudesMaterial from "./SolicitudesMaterial";
+import type { Solicitud } from "@/lib/solicitudes";
 
 const categorias = ["Todas", ...CATEGORIAS] as const;
 
@@ -57,9 +61,13 @@ const formatoFecha = new Intl.DateTimeFormat("es-MX", {
 export default function InventarioClient({
   materiales,
   movimientos,
+  solicitudes,
+  esAdmin,
 }: {
   materiales: Material[];
   movimientos: Movimiento[];
+  solicitudes: Solicitud[];
+  esAdmin: boolean;
 }) {
   const router = useRouter();
   const [eliminando, startTransition] = useTransition();
@@ -71,7 +79,10 @@ export default function InventarioClient({
     null
   );
   const [formulario, setFormulario] = useState<
-    { tipo: "material"; material: Material | null } | { tipo: "movimiento" } | null
+    | { tipo: "material"; material: Material | null }
+    | { tipo: "movimiento" }
+    | { tipo: "solicitud" }
+    | null
   >(null);
 
   // Se busca por id para que el detalle muestre los datos
@@ -167,14 +178,16 @@ export default function InventarioClient({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setFormulario({ tipo: "material", material: null })}
-          className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-sobre-lima transition hover:bg-[#dce855]"
-        >
-          <Plus size={18} />
-          Nuevo material
-        </button>
+        {esAdmin && (
+          <button
+            type="button"
+            onClick={() => setFormulario({ tipo: "material", material: null })}
+            className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#cbd90a] px-5 py-3 text-sm font-black text-sobre-lima transition hover:bg-[#dce855]"
+          >
+            <Plus size={18} />
+            Nuevo material
+          </button>
+        )}
       </section>
 
       {/* INDICADORES */}
@@ -258,6 +271,8 @@ export default function InventarioClient({
           </button>
         </section>
       )}
+
+      <SolicitudesMaterial solicitudes={solicitudes} esAdmin={esAdmin} />
 
       {/* CATÁLOGO */}
       <section className="overflow-hidden rounded-2xl border border-borde bg-superficie">
@@ -633,38 +648,52 @@ export default function InventarioClient({
               </div>
 
               <div className="flex flex-wrap gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setFormulario({ tipo: "movimiento" })}
-                  className="inline-flex items-center gap-2 rounded-xl bg-boton px-4 py-3 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover"
-                >
-                  <ArrowLeftRight size={16} />
-                  Registrar movimiento
-                </button>
+                {esAdmin ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setFormulario({ tipo: "movimiento" })}
+                      className="inline-flex items-center gap-2 rounded-xl bg-boton px-4 py-3 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover"
+                    >
+                      <ArrowLeftRight size={16} />
+                      Registrar movimiento
+                    </button>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    setFormulario({
-                      tipo: "material",
-                      material: materialSeleccionado,
-                    })
-                  }
-                  className="inline-flex items-center gap-2 rounded-xl border border-borde px-4 py-3 text-sm font-semibold text-texto transition hover:bg-fondo"
-                >
-                  <Pencil size={16} />
-                  Editar
-                </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormulario({
+                          tipo: "material",
+                          material: materialSeleccionado,
+                        })
+                      }
+                      className="inline-flex items-center gap-2 rounded-xl border border-borde px-4 py-3 text-sm font-semibold text-texto transition hover:bg-fondo"
+                    >
+                      <Pencil size={16} />
+                      Editar
+                    </button>
 
-                <button
-                  type="button"
-                  onClick={() => eliminar(materialSeleccionado)}
-                  disabled={eliminando}
-                  className="inline-flex items-center gap-2 px-2 py-3 text-sm font-bold text-peligro disabled:opacity-60"
-                >
-                  <Trash2 size={16} />
-                  Eliminar
-                </button>
+                    <button
+                      type="button"
+                      onClick={() => eliminar(materialSeleccionado)}
+                      disabled={eliminando}
+                      className="inline-flex items-center gap-2 px-2 py-3 text-sm font-bold text-peligro disabled:opacity-60"
+                    >
+                      <Trash2 size={16} />
+                      Eliminar
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setFormulario({ tipo: "solicitud" })}
+                    disabled={materialSeleccionado.cantidad < 1}
+                    className="inline-flex items-center gap-2 rounded-xl bg-boton px-4 py-3 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <Send size={16} />
+                    Solicitar material
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -674,6 +703,13 @@ export default function InventarioClient({
       {formulario?.tipo === "material" && (
         <MaterialModal
           material={formulario.material}
+          onCerrar={() => setFormulario(null)}
+        />
+      )}
+
+      {formulario?.tipo === "solicitud" && materialSeleccionado && (
+        <SolicitudModal
+          material={materialSeleccionado}
           onCerrar={() => setFormulario(null)}
         />
       )}

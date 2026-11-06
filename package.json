@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "migrar": "node scripts/migrar.mts",
-    "superadmin": "node scripts/superadmin.mts"
+    "admin": "node scripts/admin.mts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

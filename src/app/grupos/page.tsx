@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import AppLayout from "@/components/AppLayout";
+import { alcanceDePagina } from "@/lib/auth/servidor";
 import Link from "next/link";
 import {
   Search,
@@ -20,10 +21,16 @@ export const metadata: Metadata = {
 };
 
 export default async function GruposPage() {
-  const [grupos, inscripciones] = await Promise.all([
+  const { esAdmin, grupos: permitidos } = await alcanceDePagina("/grupos");
+
+  const [todos, inscripciones] = await Promise.all([
     getGrupos(),
     getInscripciones(),
   ]);
+
+  const grupos = permitidos
+    ? todos.filter((grupo) => permitidos.has(grupo.id))
+    : todos;
 
   const gruposActivos = grupos.filter(
     (grupo) => grupo.estado === "Activo"
@@ -70,13 +77,15 @@ export default async function GruposPage() {
             </p>
           </div>
 
-          <Link
-            href="/grupos/nuevo"
-            className="flex w-fit items-center gap-2 rounded-xl bg-boton px-4 py-3 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover"
-          >
-            <Plus size={18} />
-            Nuevo grupo
-          </Link>
+          {esAdmin && (
+            <Link
+              href="/grupos/nuevo"
+              className="flex w-fit items-center gap-2 rounded-xl bg-boton px-4 py-3 text-sm font-semibold text-sobre-boton transition hover:bg-boton-hover"
+            >
+              <Plus size={18} />
+              Nuevo grupo
+            </Link>
+          )}
 
         </section>
 

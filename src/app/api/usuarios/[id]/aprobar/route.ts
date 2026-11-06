@@ -9,7 +9,7 @@ export const POST = manejarErrores(
   async (request: NextRequest, ctx: RouteContext<"/api/usuarios/[id]/aprobar">) => {
     const actor = await requiereRol("admin");
     const { rol } = esquemaAprobar.parse(await leerJson(request));
-    const cuenta = await cuentaGestionable(actor, (await ctx.params).id, rol);
+    const cuenta = await cuentaGestionable(actor, (await ctx.params).id);
 
     if (cuenta.estado !== "pendiente") {
       throw new ErrorHttp(409, "Esta cuenta ya no está pendiente");

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import AppLayout from "@/components/AppLayout";
 import { getGrupos, getInscripciones } from "@/lib/api";
+import { alcanceDePagina } from "@/lib/auth/servidor";
 import { getAsistencias } from "@/lib/asistencias";
 import { esFecha, hoy } from "@/lib/formulario";
 import AsistenciaClient from "./AsistenciaClient";
@@ -16,13 +17,18 @@ export default async function AsistenciaPage({
 }) {
   const parametros = await searchParams;
 
+  const { grupos: permitidos } = await alcanceDePagina("/asistencia");
+
   const [grupos, inscripciones] = await Promise.all([
     getGrupos(),
     getInscripciones(),
   ]);
 
   const gruposActivos = grupos.filter(
-    (grupo) => grupo.estado === "Activo" && grupo.nombre
+    (grupo) =>
+      grupo.estado === "Activo" &&
+      grupo.nombre &&
+      (!permitidos || permitidos.has(grupo.id))
   );
 
   const inscripcionesActivas = inscripciones.filter(

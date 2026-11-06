@@ -3,53 +3,29 @@
   Server Actions, API) y en el cliente (menú), así que no importa
   nada de servidor.
 
-  Admin y superadmin entran a todo; este mapa solo define a los
-  demás roles. Ajustarlo aquí cuando el cliente confirme los permisos.
+  El administrador entra a todo. El entrenador solo consulta sus
+  grupos y alumnos, pasa lista y ve el inventario, donde puede
+  solicitar material; qué grupos son suyos se revisa en cada página.
 */
 
-export const ROLES = ["entrenador", "recepcion", "admin", "superadmin"] as const;
+export const ROLES = ["entrenador", "admin"] as const;
 
 export type Rol = (typeof ROLES)[number];
 
 export const NOMBRE_ROL: Record<Rol, string> = {
   entrenador: "Entrenador",
-  recepcion: "Recepción",
   admin: "Administrador",
-  superadmin: "Superadministrador",
 };
 
-/* Roles que el admin puede asignar; el superadmin además asigna admin. */
-export const ROLES_ASIGNABLES_ADMIN: Rol[] = ["entrenador", "recepcion"];
-export const ROLES_ASIGNABLES_SUPERADMIN: Rol[] = [
-  "entrenador",
-  "recepcion",
-  "admin",
-];
-
-type Regla = { patron: RegExp; roles: Rol[] };
-
-/* Se evalúan en orden; gana la primera que coincide. */
-const REGLAS: Regla[] = [
-  // Altas y ediciones de alumnos y grupos: solo recepción.
-  {
-    patron: /^\/(alumnos|grupos)\/(nuevo|[^/]+\/(editar|cambiar-grupo))$/,
-    roles: ["recepcion"],
-  },
-  { patron: /^\/$/, roles: ["entrenador", "recepcion"] },
-  { patron: /^\/alumnos(\/|$)/, roles: ["entrenador", "recepcion"] },
-  { patron: /^\/grupos(\/|$)/, roles: ["entrenador", "recepcion"] },
-  { patron: /^\/horario(\/|$)/, roles: ["entrenador", "recepcion"] },
-  { patron: /^\/inscripciones(\/|$)/, roles: ["recepcion"] },
-  { patron: /^\/asistencia(\/|$)/, roles: ["entrenador"] },
-  { patron: /^\/desarrollo(\/|$)/, roles: ["entrenador"] },
-  { patron: /^\/pagos(\/|$)/, roles: ["recepcion"] },
-  { patron: /^\/prospectos(\/|$)/, roles: ["recepcion"] },
-  { patron: /^\/inventario(\/|$)/, roles: ["recepcion"] },
-  { patron: /^\/cuentas(\/|$)/, roles: [] },
+const RUTAS_ENTRENADOR = [
+  /^\/(alumnos|grupos)(\/(?!nuevo$)[^/]+)?$/,
+  /^\/horario$/,
+  /^\/asistencia$/,
+  /^\/inventario$/,
 ];
 
 export function esAdministrador(rol: Rol | null): boolean {
-  return rol === "admin" || rol === "superadmin";
+  return rol === "admin";
 }
 
 export function puedeVer(rol: Rol | null, ruta: string): boolean {
@@ -57,11 +33,8 @@ export function puedeVer(rol: Rol | null, ruta: string): boolean {
     return false;
   }
 
-  if (esAdministrador(rol)) {
-    return true;
-  }
-
-  const regla = REGLAS.find(({ patron }) => patron.test(ruta));
-
-  return regla ? regla.roles.includes(rol) : false;
+  return (
+    esAdministrador(rol) ||
+    RUTAS_ENTRENADOR.some((patron) => patron.test(ruta))
+  );
 }

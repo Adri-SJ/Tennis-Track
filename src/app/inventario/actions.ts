@@ -1,6 +1,6 @@
 "use server";
 
-import { autorizarAccion } from "@/lib/auth/servidor";
+import { autorizarAccion, requiereRol } from "@/lib/auth/servidor";
 import { revalidatePath } from "next/cache";
 import { esFecha, hoy } from "@/lib/formulario";
 import {
@@ -16,6 +16,11 @@ import {
   type DatosMaterial,
   type TipoMovimiento,
 } from "@/lib/inventario";
+import {
+  crearSolicitud,
+  reabrirSolicitud,
+  resolverSolicitud,
+} from "@/lib/solicitudes";
 
 type Resultado = { error: string | null };
 
@@ -47,7 +52,7 @@ export async function guardarMaterial(
   id: string | null,
   datos: DatosMaterial
 ): Promise<Resultado> {
-  const sinPermiso = await autorizarAccion("/inventario");
+  const sinPermiso = await autorizarAccion("/inventario/editar");
 
   if (sinPermiso) {
     return { error: sinPermiso };
@@ -86,7 +91,7 @@ export async function guardarMaterial(
 }
 
 export async function eliminarMaterial(id: string): Promise<Resultado> {
-  const sinPermiso = await autorizarAccion("/inventario");
+  const sinPermiso = await autorizarAccion("/inventario/editar");
 
   if (sinPermiso) {
     return { error: sinPermiso };
@@ -114,7 +119,7 @@ export async function guardarMovimiento(
     nota: string;
   }
 ): Promise<Resultado> {
-  const sinPermiso = await autorizarAccion("/inventario");
+  const sinPermiso = await autorizarAccion("/inventario/editar");
 
   if (sinPermiso) {
     return { error: sinPermiso };
@@ -159,6 +164,112 @@ export async function guardarMovimiento(
       error:
         "No se pudo registrar el movimiento en Twenty. Revisa la conexión e inténtalo de nuevo.",
     };
+  }
+
+  revalidatePath("/inventario");
+
+  return { error: null };
+}
+
+/* El entrenador pide material; las existencias cambian hasta que se aprueba. */
+export async function solicitarMaterial(
+  materialId: string,
+  cantidad: number,
+  nota: string
+): Promise<Resultado> {
+  const sinPermiso = await autorizarAccion("/inventario");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
+  if (!Number.isInteger(cantidad) || cantidad < 1) {
+    return { error: "La cantidad debe ser un número entero mayor a 0." };
+  }
+
+  try {
+    const usuario = await requiereRol();
+    const material = await getMaterialById(materialId);
+
+    if (!material) {
+      return { error: "Ese material ya no existe." };
+    }
+
+    if (cantidad > material.cantidad) {
+      return {
+        error: `Solo hay ${material.cantidad} disponibles de ${material.nombre}.`,
+      };
+    }
+
+    await crearSolicitud({
+      usuarioId: usuario.id,
+      materialId,
+      material: material.nombre,
+      cantidad,
+      nota: nota.trim(),
+    });
+  } catch (error) {
+    console.error("No se pudo guardar la solicitud de material:", error);
+
+    return { error: "No se pudo enviar la solicitud." };
+  }
+
+  revalidatePath("/inventario");
+
+  return { error: null };
+}
+
+/* Al aprobar se registra la salida en Twenty y bajan las existencias. */
+export async function decidirSolicitud(
+  id: number,
+  aprobar: boolean
+): Promise<Resultado> {
+  const sinPermiso = await autorizarAccion("/inventario/editar");
+
+  if (sinPermiso) {
+    return { error: sinPermiso };
+  }
+
+  const admin = await requiereRol("admin");
+
+  const solicitud = await resolverSolicitud(
+    id,
+    aprobar ? "aprobada" : "rechazada",
+    admin.id
+  );
+
+  if (!solicitud) {
+    return { error: "Esta solicitud ya fue resuelta." };
+  }
+
+  if (aprobar) {
+    try {
+      const material = await getMaterialById(solicitud.materialId);
+
+      if (!material || solicitud.cantidad > material.cantidad) {
+        await reabrirSolicitud(id);
+
+        return {
+          error: material
+            ? `Solo hay ${material.cantidad} disponibles de ${material.nombre}.`
+            : "Ese material ya no existe.",
+        };
+      }
+
+      await registrarMovimiento(material, {
+        tipo: "Salida",
+        cantidad: solicitud.cantidad,
+        fecha: hoy(),
+        nota: `Solicitud de ${solicitud.entrenador}${
+          solicitud.nota ? `: ${solicitud.nota}` : ""
+        }`,
+      });
+    } catch (error) {
+      await reabrirSolicitud(id);
+      console.error("No se pudo registrar la salida en Twenty:", error);
+
+      return { error: "No se pudo registrar la salida en Twenty." };
+    }
   }
 
   revalidatePath("/inventario");

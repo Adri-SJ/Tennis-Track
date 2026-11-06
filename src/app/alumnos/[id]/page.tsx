@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import AppLayout from "@/components/AppLayout";
+import { alcanceDePagina } from "@/lib/auth/servidor";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -32,6 +34,8 @@ export default async function AlumnoPage({
 }) {
   const { id } = await params;
 
+  const { esAdmin, grupos } = await alcanceDePagina(`/alumnos/${id}`);
+
   const alumno = await getAlumnoById(id);
 
   if (!alumno) {
@@ -59,6 +63,11 @@ export default async function AlumnoPage({
     getInscripcionActivaDeAlumno(alumno.id),
     getInscripcionesDeAlumno(alumno.id),
   ]);
+
+  /* El entrenador solo abre a los alumnos de sus grupos. */
+  if (grupos && !(grupo && grupos.has(grupo.id))) {
+    notFound();
+  }
 
   const iniciales = alumno.nombre
     .split(" ")
@@ -121,13 +130,15 @@ export default async function AlumnoPage({
                 {alumno.estado}
               </span>
 
-              <Link
-                href={`/alumnos/${alumno.id}/editar`}
-                className="inline-flex items-center gap-2 rounded-xl border border-borde px-4 py-2 text-sm font-semibold text-texto transition hover:bg-fondo"
-              >
-                <Pencil size={16} />
-                Editar
-              </Link>
+              {esAdmin && (
+                <Link
+                  href={`/alumnos/${alumno.id}/editar`}
+                  className="inline-flex items-center gap-2 rounded-xl border border-borde px-4 py-2 text-sm font-semibold text-texto transition hover:bg-fondo"
+                >
+                  <Pencil size={16} />
+                  Editar
+                </Link>
+              )}
             </div>
 
           </div>
@@ -242,13 +253,15 @@ export default async function AlumnoPage({
                     Ver grupo
                   </Link>
 
-                  <Link
-                    href={`/alumnos/${alumno.id}/cambiar-grupo`}
-                    className="inline-flex items-center gap-2 rounded-xl border border-borde px-4 py-3 text-sm font-semibold text-texto transition hover:bg-fondo"
-                  >
-                    <ArrowLeftRight size={16} />
-                    Cambiar de grupo
-                  </Link>
+                  {esAdmin && (
+                    <Link
+                      href={`/alumnos/${alumno.id}/cambiar-grupo`}
+                      className="inline-flex items-center gap-2 rounded-xl border border-borde px-4 py-3 text-sm font-semibold text-texto transition hover:bg-fondo"
+                    >
+                      <ArrowLeftRight size={16} />
+                      Cambiar de grupo
+                    </Link>
+                  )}
                 </div>
               </div>
             ) : (
@@ -275,55 +288,57 @@ export default async function AlumnoPage({
         </section>
 
         {/* HISTORIAL */}
-        <section className="mt-5 rounded-2xl border border-borde bg-superficie p-5 md:p-6">
-          <div className="flex items-center gap-2">
-            <History
-              size={20}
-              className="text-verde"
-            />
+        {esAdmin && (
+          <section className="mt-5 rounded-2xl border border-borde bg-superficie p-5 md:p-6">
+            <div className="flex items-center gap-2">
+              <History
+                size={20}
+                className="text-verde"
+              />
 
-            <h2 className="text-lg font-black text-texto">
-              HISTORIAL DE GRUPOS
-            </h2>
-          </div>
+              <h2 className="text-lg font-black text-texto">
+                HISTORIAL DE GRUPOS
+              </h2>
+            </div>
 
-          {historial.length > 0 ? (
-            <ul className="mt-5 divide-y divide-borde">
-              {historial.map((item) => (
-                <li key={item.id}>
-                  <Link
-                    href={`/inscripciones/${item.id}`}
-                    className="flex items-center justify-between gap-4 py-3 transition hover:text-verde"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-texto">
-                        {item.grupo?.nombre ?? "Sin grupo"}
-                      </p>
-
-                      <p className="text-xs text-texto-suave">
-                        {item.fechaInicio} → {item.fechaFin ?? "actual"}
-                      </p>
-                    </div>
-
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-bold ${
-                        item.estado === "Activa"
-                          ? "bg-lima-suave text-verde-musgo"
-                          : "bg-fondo text-texto-suave"
-                      }`}
+            {historial.length > 0 ? (
+              <ul className="mt-5 divide-y divide-borde">
+                {historial.map((item) => (
+                  <li key={item.id}>
+                    <Link
+                      href={`/inscripciones/${item.id}`}
+                      className="flex items-center justify-between gap-4 py-3 transition hover:text-verde"
                     >
-                      {item.estado}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-5 text-sm text-texto-suave">
-              Todavía no tiene inscripciones.
-            </p>
-          )}
-        </section>
+                      <div>
+                        <p className="text-sm font-semibold text-texto">
+                          {item.grupo?.nombre ?? "Sin grupo"}
+                        </p>
+
+                        <p className="text-xs text-texto-suave">
+                          {item.fechaInicio} → {item.fechaFin ?? "actual"}
+                        </p>
+                      </div>
+
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-bold ${
+                          item.estado === "Activa"
+                            ? "bg-lima-suave text-verde-musgo"
+                            : "bg-fondo text-texto-suave"
+                        }`}
+                      >
+                        {item.estado}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-5 text-sm text-texto-suave">
+                Todavía no tiene inscripciones.
+              </p>
+            )}
+          </section>
+        )}
 
       </div>
     </AppLayout>

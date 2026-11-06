@@ -45,3 +45,7 @@ export const esquemaActualizarUsuario = z
       .optional(),
   })
   .refine((datos) => datos.rol || datos.estado, "No hay cambios que guardar");
+
+export const esquemaGruposEntrenador = z.object({
+  grupos: z.array(z.string().min(1), { error: "Elige grupos válidos" }),
+});
