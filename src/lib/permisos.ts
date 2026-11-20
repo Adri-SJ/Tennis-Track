@@ -4,8 +4,9 @@
   nada de servidor.
 
   El administrador entra a todo. El entrenador solo consulta sus
-  grupos y alumnos, pasa lista y ve el inventario, donde puede
-  solicitar material; qué grupos son suyos se revisa en cada página.
+  grupos y alumnos, pasa lista, evalúa a sus alumnos y ve el
+  inventario, donde puede solicitar material; qué grupos son suyos se
+  revisa en cada página.
 */
 
 export const ROLES = ["entrenador", "admin"] as const;
@@ -21,6 +22,7 @@ const RUTAS_ENTRENADOR = [
   /^\/(alumnos|grupos)(\/(?!nuevo$)[^/]+)?$/,
   /^\/horario$/,
   /^\/asistencia$/,
+  /^\/desarrollo$/,
   /^\/inventario$/,
 ];
 

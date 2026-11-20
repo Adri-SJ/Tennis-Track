@@ -74,7 +74,7 @@ Otros comandos: `npm run build` (compilación de producción), `npm start` (serv
 - **Registro:** «Crear cuenta» envía un código de 6 dígitos al correo. Al confirmarlo la cuenta queda **pendiente**, sin rol, hasta que un administrador la apruebe en **Cuentas** (`/cuentas`).
 - **Recuperar contraseña:** también con código por correo.
 - **Roles:** Entrenador y Administrador (`src/lib/permisos.ts`). El administrador ve todo y nadie puede modificar su propia cuenta.
-- **Entrenador:** en **Cuentas** se le asignan sus grupos (tabla `grupos_entrenadores`). Solo ve esos grupos, su horario y sus alumnos, pasa lista en ellos y consulta el inventario sin modificarlo. No inscribe alumnos ni edita grupos; recibir pagos sigue pendiente.
+- **Entrenador:** en **Cuentas** se le asignan sus grupos (tabla `grupos_entrenadores`). Solo ve esos grupos, su horario y sus alumnos; pasa lista, registra evaluaciones de desarrollo deportivo de sus alumnos y consulta el inventario sin modificarlo. No inscribe alumnos ni edita grupos ni horarios (eso lo hace el administrador); recibir pagos sigue pendiente.
 - **Solicitudes de material:** el entrenador pide material desde Inventario (tabla `solicitudes_material`). Al aprobarla, el administrador registra la salida en Twenty y bajan las existencias.
 - **Sesión:** un JWT con `{ id }` en una cookie `httpOnly` que dura 16 h. `src/proxy.ts` revisa la firma; las páginas, las Server Actions y la API vuelven a leer la cuenta en la base, así que desactivar una cuenta corta su acceso de inmediato.
 - **Límites:** 10 intentos de ingreso por minuto por IP; códigos de 15 minutos con 5 intentos y un reenvío cada 60 s.
