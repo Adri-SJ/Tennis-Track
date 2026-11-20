@@ -1,0 +1,12 @@
+# HTTPS automático (Let's Encrypt) para los dos subdominios.
+# Ambos deben apuntar (registro A) a la IP pública del servidor.
+
+{$DOMINIO_PANEL} {
+	encode zstd gzip
+	reverse_proxy panel:3000
+}
+
+{$DOMINIO_TWENTY} {
+	encode zstd gzip
+	reverse_proxy server:3000
+}
