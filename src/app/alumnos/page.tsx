@@ -8,7 +8,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-import { getAlumnos, getInscripciones } from "@/lib/api";
+import { getAlumnos } from "@/lib/api";
+import { alumnosPermitidos } from "@/lib/auth/alcance";
 import { alcanceDePagina } from "@/lib/auth/servidor";
 
 export const metadata: Metadata = {
@@ -18,27 +19,14 @@ export const metadata: Metadata = {
 export default async function AlumnosPage() {
   const { esAdmin, grupos } = await alcanceDePagina("/alumnos");
 
-  const [todos, inscripciones] = await Promise.all([
+  const [todos, visibles] = await Promise.all([
     getAlumnos(),
-    getInscripciones(),
+    alumnosPermitidos(grupos),
   ]);
 
   /* El entrenador solo ve a los alumnos activos en sus grupos. */
-  const idsVisibles = new Set(
-    inscripciones
-      .filter(
-        (inscripcion) =>
-          inscripcion.estado === "Activa" &&
-          inscripcion.grupo &&
-          grupos?.has(inscripcion.grupo.id)
-      )
-      .flatMap((inscripcion) =>
-        inscripcion.alumnos.map((alumno) => alumno.id)
-      )
-  );
-
-  const alumnos = grupos
-    ? todos.filter((alumno) => idsVisibles.has(alumno.id))
+  const alumnos = visibles
+    ? todos.filter((alumno) => visibles.has(alumno.id))
     : todos;
 
   const alumnosActivos = alumnos.filter(

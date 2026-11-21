@@ -1,15 +1,30 @@
 "use server";
 
-import { autorizarAccion } from "@/lib/auth/servidor";
+import { alumnosPermitidos } from "@/lib/auth/alcance";
+import {
+  autorizarAccion,
+  gruposPermitidos,
+  requiereRol,
+} from "@/lib/auth/servidor";
 import { revalidatePath } from "next/cache";
 import { getAlumnoById } from "@/lib/api";
 import {
   createEvaluacion,
   deleteEvaluacion,
+  getEvaluaciones,
   HABILIDADES,
   type Puntuaciones,
 } from "@/lib/evaluaciones";
 import { esFecha, hoy } from "@/lib/formulario";
+
+/* El entrenador solo trabaja con los alumnos de sus grupos. */
+async function alumnoFueraDeAlcance(alumnoId: string): Promise<boolean> {
+  const visibles = await alumnosPermitidos(
+    await gruposPermitidos(await requiereRol())
+  );
+
+  return visibles !== null && !visibles.has(alumnoId);
+}
 
 export async function guardarEvaluacion(datos: {
   alumnoId: string;
@@ -41,6 +56,10 @@ export async function guardarEvaluacion(datos: {
   }
 
   try {
+    if (await alumnoFueraDeAlcance(datos.alumnoId)) {
+      return { error: "Solo puedes evaluar a los alumnos de tus grupos." };
+    }
+
     const alumno = await getAlumnoById(datos.alumnoId);
 
     if (!alumno) {
@@ -80,6 +99,18 @@ export async function borrarEvaluacion(
   }
 
   try {
+    const evaluacion = (await getEvaluaciones()).find(
+      (item) => item.id === id
+    );
+
+    if (!evaluacion) {
+      return { error: "Esa evaluación ya no existe." };
+    }
+
+    if (await alumnoFueraDeAlcance(evaluacion.alumnoId)) {
+      return { error: "Solo puedes eliminar evaluaciones de tus alumnos." };
+    }
+
     await deleteEvaluacion(id);
   } catch (error) {
     console.error("No se pudo eliminar la evaluación en Twenty:", error);
