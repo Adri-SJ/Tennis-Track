@@ -103,6 +103,14 @@ Con `SMTP_HOST` vacío no se envían correos: el código aparece en la consola d
 4. Ingresa con la cuenta nueva: el menú solo muestra los módulos de su rol.
 5. Prueba «¿Olvidaste tu contraseña?» con el código de la consola.
 
+## App instalable (PWA)
+
+El panel se puede instalar en el celular o la computadora («Agregar a pantalla de inicio» o el ícono de instalar del navegador). Necesita HTTPS, así que funciona en el servidor publicado, no en la red local.
+
+- `src/app/manifest.ts`: nombre, colores, íconos (`public/icons/`) y accesos directos a Asistencia, Alumnos e Inventario.
+- `public/sw.js`: service worker que solo guarda la página `public/offline.html` («Sin conexión»). Los datos de la academia nunca se guardan en el dispositivo.
+- El service worker se registra solo en producción (`npm run build` / `npm start`), para no servir páginas viejas mientras se desarrolla.
+
 ## Despliegue
 
 Para publicar el panel junto con Twenty en un servidor, sigue [deploy/LEEME.md](deploy/LEEME.md): un solo `docker compose` con HTTPS, Twenty v2.37.0, PostgreSQL y Redis.

@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import RegistrarServiceWorker from "@/components/RegistrarServiceWorker";
 import { scriptTema } from "@/components/ThemeToggle";
 import "./globals.css";
 
@@ -19,6 +20,20 @@ export const metadata: Metadata = {
     template: "%s · TennisTrack",
   },
   description: "Panel de administración de la academia de tenis",
+  applicationName: "TennisTrack",
+  appleWebApp: {
+    capable: true,
+    title: "TennisTrack",
+    statusBarStyle: "default",
+  },
+};
+
+/* Color de la barra del navegador y de la app instalada, según el tema. */
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#1f1c1e" },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -36,7 +51,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           dangerouslySetInnerHTML={{ __html: scriptTema }}
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <RegistrarServiceWorker />
+      </body>
     </html>
   );
 }
