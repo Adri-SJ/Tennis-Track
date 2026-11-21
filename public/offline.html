@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sin conexión · TennisTrack</title>
+    <style>
+      :root {
+        --fondo: #f6f4ee;
+        --superficie: #ffffff;
+        --borde: #e1dace;
+        --texto: #141113;
+        --suave: #8c847d;
+        --boton: #141113;
+        --sobre-boton: #ffffff;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fondo: #141113;
+          --superficie: #1f1c1e;
+          --borde: #3a3533;
+          --texto: #f1efea;
+          --suave: #a6a39b;
+          --boton: #cbd90a;
+          --sobre-boton: #141113;
+        }
+      }
+
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: 16px;
+        box-sizing: border-box;
+        background: var(--fondo);
+        color: var(--texto);
+        font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+
+      main {
+        width: min(400px, 100%);
+        padding: 28px;
+        border: 1px solid var(--borde);
+        border-radius: 20px;
+        background: var(--superficie);
+        text-align: center;
+      }
+
+      img {
+        width: 72px;
+        height: 72px;
+        border-radius: 16px;
+      }
+
+      h1 {
+        margin: 16px 0 8px;
+        font-size: 1.25rem;
+      }
+
+      p {
+        margin: 0 0 20px;
+        color: var(--suave);
+      }
+
+      button {
+        min-height: 44px;
+        padding: 0 20px;
+        border: 0;
+        border-radius: 10px;
+        background: var(--boton);
+        color: var(--sobre-boton);
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/icons/icon-192.png" alt="TennisTrack" />
+      <h1>Sin conexión</h1>
+      <p>Revisa tu internet y vuelve a intentarlo. TennisTrack necesita conexión para mostrar los datos de la academia.</p>
+      <button type="button" onclick="location.reload()">Reintentar</button>
+    </main>
+  </body>
+</html>
