@@ -1,0 +1,10 @@
+.git
+.next
+node_modules
+.claude
+.env*
+!.env.example
+deploy/.env
+deploy/respaldo
+*.dump
+tsconfig.tsbuildinfo

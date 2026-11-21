@@ -1,0 +1,131 @@
+# Producción de TennisTrack en un solo servidor:
+#   caddy   → HTTPS para el panel y para Twenty
+#   panel   → Next.js (Dockerfile de la raíz)
+#   server  → Twenty v2.37.0, worker → sus tareas en segundo plano
+#   db      → PostgreSQL 16 con dos bases: "default" (Twenty) y "tennistrack" (cuentas)
+#   redis   → cola y caché de Twenty
+#
+# Uso (desde esta carpeta): copiar .env.example a .env, llenarlo y
+#   docker compose up -d --build
+# Para restaurar el respaldo de Twenty ver restaurar-twenty.sh y LEEME.md.
+
+name: tennistrack
+
+x-twenty: &twenty
+  image: twentycrm/twenty:${TWENTY_TAG:-v2.37.0}
+  volumes:
+    - twenty-archivos:/app/packages/twenty-server/.local-storage
+  restart: always
+
+x-twenty-entorno: &twenty-entorno
+  PG_DATABASE_URL: postgres://postgres:${PG_PASSWORD}@db:5432/default
+  SERVER_URL: https://${DOMINIO_TWENTY}
+  REDIS_URL: redis://redis:6379
+  STORAGE_TYPE: local
+  ENCRYPTION_KEY: ${TWENTY_ENCRYPTION_KEY:-}
+  FALLBACK_ENCRYPTION_KEY: ${TWENTY_FALLBACK_ENCRYPTION_KEY:-}
+  APP_SECRET: ${TWENTY_APP_SECRET:-}
+  # Por defecto la API admite 100 peticiones por minuto; cada página del
+  # panel hace varias, así que con varios usuarios se alcanza rápido.
+  API_RATE_LIMITING_LONG_LIMIT: ${TWENTY_LIMITE_API_POR_MINUTO:-1000}
+
+services:
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMINIO_PANEL: ${DOMINIO_PANEL}
+      DOMINIO_TWENTY: ${DOMINIO_TWENTY}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-datos:/data
+      - caddy-config:/config
+    depends_on:
+      - panel
+      - server
+    restart: always
+
+  panel:
+    build:
+      context: ..
+    environment:
+      # Dentro de la red de Docker el panel habla con Twenty directo.
+      TWENTY_API_URL: http://server:3000
+      TWENTY_API_KEY: ${TWENTY_API_KEY}
+      DATABASE_URL: postgres://tennistrack:${TENNISTRACK_DB_PASSWORD}@db:5432/tennistrack
+      JWT_SECRET: ${JWT_SECRET}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      CORREO_REMITENTE: ${CORREO_REMITENTE:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+  server:
+    <<: *twenty
+    environment:
+      <<: *twenty-entorno
+      NODE_PORT: 3000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: curl --fail http://localhost:3000/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  worker:
+    <<: *twenty
+    command: ["yarn", "worker:prod"]
+    environment:
+      <<: *twenty-entorno
+      DISABLE_DB_MIGRATIONS: "true"
+      DISABLE_CRON_JOBS_REGISTRATION: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: default
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      TENNISTRACK_DB_PASSWORD: ${TENNISTRACK_DB_PASSWORD}
+    volumes:
+      - db-datos:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d:ro
+      - ./respaldo:/respaldo:ro
+    healthcheck:
+      test: pg_isready -U postgres -h localhost -d postgres
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: always
+
+  redis:
+    image: redis:7
+    command: ["--maxmemory-policy", "noeviction"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: always
+
+volumes:
+  db-datos:
+  twenty-archivos:
+  caddy-datos:
+  caddy-config:

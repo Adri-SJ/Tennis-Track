@@ -43,3 +43,8 @@ next-env.d.ts
 
 # claude code (configuración local)
 /.claude/
+
+# despliegue (secretos y respaldos)
+/deploy/.env
+/deploy/respaldo/
+*.dump

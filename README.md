@@ -103,6 +103,10 @@ Con `SMTP_HOST` vacío no se envían correos: el código aparece en la consola d
 4. Ingresa con la cuenta nueva: el menú solo muestra los módulos de su rol.
 5. Prueba «¿Olvidaste tu contraseña?» con el código de la consola.
 
+## Despliegue
+
+Para publicar el panel junto con Twenty en un servidor, sigue [deploy/LEEME.md](deploy/LEEME.md): un solo `docker compose` con HTTPS, Twenty v2.37.0, PostgreSQL y Redis.
+
 ## Estructura
 
 ```
@@ -115,6 +119,8 @@ src/
   proxy.ts      exige sesión en todas las rutas salvo /login
 migraciones/    SQL numerado de la base de usuarios
 scripts/        migrar y crear un administrador
+deploy/         docker compose de producción y restauración de Twenty
+Dockerfile      imagen del panel
 ```
 
 La clave de Twenty y la base de usuarios solo se usan en el servidor (`src/lib/api.ts` y `src/lib/auth/*` con `server-only`). Los componentes de cliente solo importan tipos de ahí, más `src/lib/permisos.ts` y `src/lib/auth/cliente.ts`, que no tienen secretos.
