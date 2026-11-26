@@ -20,7 +20,6 @@ import {
   ChevronDown,
   ClipboardList,
   Dumbbell,
-  Info,
   Plus,
   Save,
   Search,
@@ -313,7 +312,7 @@ function EvolucionChart({
     <div className="overflow-x-auto">
       <svg
         viewBox="0 0 600 245"
-        className="min-w-[420px] w-full"
+        className="w-full"
         role="img"
         aria-label="Gráfica de evolución del promedio de evaluaciones"
       >
@@ -538,7 +537,7 @@ export default function DesarrolloClient({
 
   const eliminarEvaluacion = (id: string) => {
     const confirmacion = window.confirm(
-      "¿Eliminar esta evaluación de Twenty?"
+      "¿Eliminar esta evaluación?"
     );
 
     if (!confirmacion) return;
@@ -559,22 +558,13 @@ export default function DesarrolloClient({
   const totalEvaluaciones = evaluacionesAlumno.length;
 
   return (
-    <div className="px-5 py-6 md:px-8 lg:px-10">
+    <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
       {/* ENCABEZADO */}
       <section className="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
-            Seguimiento académico-deportivo
-          </p>
-
-          <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
+          <h1 className="text-2xl font-black text-texto sm:text-3xl md:text-5xl">
             DESARROLLO DEPORTIVO
           </h1>
-
-          <p className="mt-2 text-sm text-texto-3 md:text-base">
-            Evalúa habilidades y acompaña el progreso de
-            cada alumno.
-          </p>
         </div>
 
         <button
@@ -589,17 +579,13 @@ export default function DesarrolloClient({
       </section>
 
       {/* SELECCIÓN DE ALUMNO */}
-      <section className="mb-7 rounded-2xl border border-borde bg-superficie p-5 md:p-6">
+      <section className="mb-5 rounded-2xl border border-borde bg-superficie p-4 md:p-6">
         <div className="mb-4 flex items-center gap-3">
           <div className="rounded-xl bg-lima-suave p-3 text-verde-oscuro">
             <UserRound size={22} />
           </div>
 
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
-              Expediente deportivo
-            </p>
-
             <h2 className="text-lg font-black text-texto">
               Seleccionar alumno
             </h2>
@@ -631,7 +617,7 @@ export default function DesarrolloClient({
                         ? "años"
                         : ""
                     }`
-                  : "Agrega alumnos en Twenty"}
+                  : "Primero registra alumnos"}
               </p>
             </div>
 
@@ -696,16 +682,10 @@ export default function DesarrolloClient({
           )}
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-texto-suave">
-            Alumnos obtenidos directamente de Twenty CRM.
-          </p>
-
-        </div>
       </section>
 
       {/* INDICADORES */}
-      <section className="mb-7 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[
           {
             titulo: "Promedio actual",
@@ -738,7 +718,7 @@ export default function DesarrolloClient({
           return (
             <div
               key={indicador.titulo}
-              className="rounded-2xl border border-borde bg-superficie p-5"
+              className="rounded-2xl border border-borde bg-superficie p-4 sm:p-5"
             >
               <div className="flex items-start justify-between gap-2">
                 <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-texto-suave">
@@ -760,14 +740,10 @@ export default function DesarrolloClient({
       </section>
 
       {/* RESUMEN PRINCIPAL */}
-      <section className="mb-7 grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="rounded-2xl border border-borde bg-superficie p-5 md:p-6">
+      <section className="mb-5 grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="rounded-2xl border border-borde bg-superficie p-4 md:p-6">
           <div className="mb-5">
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
-              Análisis técnico
-            </p>
-
-            <h2 className="mt-1 text-xl font-black text-texto">
+            <h2 className="text-xl font-black text-texto">
               Perfil de habilidades
             </h2>
 
@@ -801,26 +777,19 @@ export default function DesarrolloClient({
           )}
         </div>
 
-        <div className="rounded-2xl bg-banner p-6 text-white">
-          <div className="flex items-center gap-2 text-[#dce6a1]">
-            <TrendingUp size={19} />
-
-            <p className="text-xs font-bold uppercase tracking-[0.15em]">
-              Resumen de progreso
-            </p>
-          </div>
-
-          <h2 className="mt-3 text-2xl font-black">
+        <div className="rounded-2xl bg-banner p-5 text-white sm:p-6">
+          <h2 className="flex items-center gap-2 text-2xl font-black">
+            <TrendingUp size={21} className="text-[#dce6a1]" />
             Evolución del alumno
           </h2>
 
           {ultima ? (
             <>
               <p className="mt-6 text-sm text-[#d1d5ba]">
-                Promedio de la evaluación más reciente
+                Promedio de la última evaluación
               </p>
 
-              <p className="mt-2 text-5xl font-black text-[#eef310]">
+              <p className="mt-1 text-3xl font-black sm:mt-2 sm:text-5xl text-[#eef310]">
                 {formatoNumero(promedioActual!)}
                 <span className="ml-2 text-lg text-[#d1d5ba]">
                   / 10
@@ -911,7 +880,7 @@ export default function DesarrolloClient({
       </section>
 
       {/* DESGLOSE DE HABILIDADES */}
-      <section className="mb-7 rounded-2xl border border-borde bg-superficie p-5 md:p-6">
+      <section className="mb-5 rounded-2xl border border-borde bg-superficie p-4 md:p-6">
         <div className="mb-6 flex items-center gap-3">
           <Dumbbell
             size={21}
@@ -919,10 +888,6 @@ export default function DesarrolloClient({
           />
 
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
-              Evaluación técnica
-            </p>
-
             <h2 className="text-xl font-black text-texto">
               Desglose de habilidades
             </h2>
@@ -981,13 +946,9 @@ export default function DesarrolloClient({
       </section>
 
       {/* EVOLUCIÓN HISTÓRICA */}
-      <section className="mb-7 rounded-2xl border border-borde bg-superficie p-5 md:p-6">
+      <section className="mb-5 rounded-2xl border border-borde bg-superficie p-4 md:p-6">
         <div className="mb-6">
-          <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
-            Seguimiento
-          </p>
-
-          <h2 className="mt-1 text-xl font-black text-texto">
+          <h2 className="text-xl font-black text-texto">
             Evolución histórica
           </h2>
 
@@ -1004,11 +965,7 @@ export default function DesarrolloClient({
       <section className="overflow-hidden rounded-2xl border border-borde bg-superficie">
         <div className="flex flex-col gap-3 border-b border-borde p-5 sm:flex-row sm:items-center sm:justify-between md:p-6">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
-              Registro deportivo
-            </p>
-
-            <h2 className="mt-1 text-xl font-black text-texto">
+            <h2 className="text-xl font-black text-texto">
               Historial de evaluaciones
             </h2>
           </div>
@@ -1076,15 +1033,6 @@ export default function DesarrolloClient({
           </div>
         )}
 
-        <div className="flex items-start gap-2 border-t border-borde bg-superficie-2 px-5 py-4 text-xs leading-relaxed text-texto-suave">
-          <Info size={15} className="mt-0.5 shrink-0" />
-
-          <p>
-            Los alumnos y las evaluaciones se guardan
-            en Twenty. Cada habilidad se califica del
-            1 al 10.
-          </p>
-        </div>
       </section>
 
       {/* MODAL NUEVA EVALUACIÓN */}
@@ -1098,13 +1046,9 @@ export default function DesarrolloClient({
           >
             <div className="flex shrink-0 items-start justify-between bg-fondo p-5 md:p-6">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
-                  Registro deportivo
-                </p>
-
                 <h2
                   id="titulo-nueva-evaluacion"
-                  className="mt-1 text-2xl font-black text-texto"
+                  className="text-2xl font-black text-texto"
                 >
                   NUEVA EVALUACIÓN
                 </h2>
@@ -1210,7 +1154,7 @@ export default function DesarrolloClient({
                   Promedio de la evaluación
                 </p>
 
-                <p className="mt-2 text-3xl font-black text-verde-noche">
+                <p className="mt-1 text-2xl font-black sm:mt-2 sm:text-3xl text-verde-noche">
                   {formatoNumero(
                     promedio(formulario.puntuaciones)
                   )}
@@ -1251,10 +1195,6 @@ export default function DesarrolloClient({
                 </p>
               )}
 
-              <div className="flex items-start gap-2 text-xs text-texto-suave">
-                <Info size={16} className="shrink-0" />
-                La evaluación se guardará en Twenty.
-              </div>
             </div>
 
             <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-borde bg-superficie p-5 sm:flex-row sm:justify-end">
@@ -1291,13 +1231,9 @@ export default function DesarrolloClient({
           >
             <div className="flex items-start justify-between bg-fondo p-6">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
-                  Expediente deportivo
-                </p>
-
                 <h2
                   id="titulo-detalle-evaluacion"
-                  className="mt-1 text-2xl font-black text-texto"
+                  className="text-2xl font-black text-texto"
                 >
                   DETALLE DE EVALUACIÓN
                 </h2>
@@ -1323,7 +1259,7 @@ export default function DesarrolloClient({
                   Promedio general
                 </p>
 
-                <p className="mt-2 text-4xl font-black text-[#eef310]">
+                <p className="mt-2 text-3xl font-black text-[#eef310] sm:text-4xl">
                   {formatoNumero(
                     promedio(
                       evaluacionDetalle.puntuaciones

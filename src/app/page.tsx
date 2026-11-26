@@ -1,13 +1,53 @@
-import AppLayout from "@/components/AppLayout";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { alcanceDePagina } from "@/lib/auth/servidor";
-
 import {
-  getAlumnos,
-  getGrupos,
-  getInscripciones,
-} from "@/lib/api";
+  AlertTriangle,
+  CalendarDays,
+  ChevronRight,
+  CircleCheck,
+  ClipboardCheck,
+  Package,
+  PackageOpen,
+  UserPlus,
+  UserRoundX,
+  type LucideIcon,
+} from "lucide-react";
+import AppLayout from "@/components/AppLayout";
+import { alcanceDePagina } from "@/lib/auth/servidor";
+import { getAlumnos, getGrupos, getInscripciones } from "@/lib/api";
+import { getAsistencias } from "@/lib/asistencias";
+import { aMinutos, ahoraEnMexico, DIAS_CORTOS } from "@/lib/fecha";
+import { getMateriales } from "@/lib/inventario";
+import { getMensualidades } from "@/lib/pagos";
+import { getProspectos } from "@/lib/prospectos";
+import { getSolicitudes } from "@/lib/solicitudes";
+
+/* Si una fuente falla, el resto del inicio se sigue mostrando. */
+async function seguro<T>(promesa: Promise<T>, respaldo: T): Promise<T> {
+  try {
+    return await promesa;
+  } catch (error) {
+    console.error("Inicio: no se pudo cargar una sección", error);
+    return respaldo;
+  }
+}
+
+const moneda = new Intl.NumberFormat("es-MX", {
+  style: "currency",
+  currency: "MXN",
+  maximumFractionDigits: 0,
+});
+
+type EstadoClase = "en-curso" | "proxima" | "terminada";
+
+const ETIQUETA_ESTADO: Record<EstadoClase, string> = {
+  "en-curso": "En curso",
+  proxima: "Próxima",
+  terminada: "Terminada",
+};
+
+const plural = (n: number, uno: string, varios: string) =>
+  `${n} ${n === 1 ? uno : varios}`;
 
 export default async function Home() {
   const { esAdmin } = await alcanceDePagina("/");
@@ -17,452 +57,489 @@ export default async function Home() {
     redirect("/asistencia");
   }
 
-  const [alumnos, grupos, inscripciones] = await Promise.all([
+  const ahora = ahoraEnMexico();
+
+  const [
+    alumnos,
+    grupos,
+    inscripciones,
+    mensualidades,
+    materiales,
+    prospectos,
+    solicitudes,
+  ] = await Promise.all([
     getAlumnos(),
     getGrupos(),
     getInscripciones(),
+    seguro(getMensualidades(), []),
+    seguro(getMateriales(), []),
+    seguro(getProspectos(), []),
+    seguro(getSolicitudes(null), []),
   ]);
 
-  /* =========================================================
-     MÉTRICAS
-  ========================================================= */
+  /* ---------- Alumnos y grupos ---------- */
 
-  const alumnosActivos = alumnos.filter(
-    (alumno) => alumno.estado === "Activo"
+  const alumnosActivos = alumnos.filter((alumno) => alumno.estado === "Activo");
+  const gruposActivos = grupos.filter((grupo) => grupo.estado === "Activo");
+
+  const alumnosDeGrupo = new Map<string, Set<string>>();
+  for (const inscripcion of inscripciones) {
+    if (inscripcion.estado !== "Activa" || !inscripcion.grupo) continue;
+    const ids = alumnosDeGrupo.get(inscripcion.grupo.id) ?? new Set<string>();
+    inscripcion.alumnos.forEach((alumno) => ids.add(alumno.id));
+    alumnosDeGrupo.set(inscripcion.grupo.id, ids);
+  }
+  const cantidadEn = (grupoId: string) => alumnosDeGrupo.get(grupoId)?.size ?? 0;
+
+  const asignados = new Set(
+    [...alumnosDeGrupo.values()].flatMap((ids) => [...ids])
+  );
+  const sinGrupo = alumnosActivos.filter((alumno) => !asignados.has(alumno.id));
+
+  const ocupacion = gruposActivos
+    .map((grupo) => ({
+      grupo,
+      alumnos: cantidadEn(grupo.id),
+      cupo: grupo.capacidadMaxima,
+    }))
+    .sort((a, b) => b.alumnos - a.alumnos);
+
+  const maximoBarra = Math.max(
+    ...ocupacion.map((fila) => fila.cupo ?? fila.alumnos),
+    1
+  );
+  const cupoTotal = ocupacion.reduce((total, fila) => total + (fila.cupo ?? 0), 0);
+  const enGruposConCupo = ocupacion
+    .filter((fila) => fila.cupo)
+    .reduce((total, fila) => total + fila.alumnos, 0);
+  const porcentajeOcupacion =
+    cupoTotal > 0 ? Math.round((enGruposConCupo / cupoTotal) * 100) : null;
+
+  /* ---------- Clases de hoy ---------- */
+
+  const corto = DIAS_CORTOS[ahora.dia];
+  const gruposHoy = gruposActivos
+    .filter((grupo) => grupo.dias.split(" · ").includes(corto))
+    .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
+
+  const listas = await Promise.all(
+    gruposHoy.map((grupo) => seguro(getAsistencias(grupo.id, ahora.iso), []))
   );
 
-  const gruposActivos = grupos.filter(
-    (grupo) => grupo.estado === "Activo"
-  );
-
-  const inscripcionesActivas = inscripciones.filter(
-    (inscripcion) => inscripcion.estado === "Activa"
-  );
-
-  const idsAlumnosAsignados = new Set(
-    inscripcionesActivas.flatMap((inscripcion) =>
-      inscripcion.alumnos.map((alumno) => alumno.id)
-    )
-  );
-
-  const alumnosSinGrupo = alumnos.filter(
-    (alumno) => !idsAlumnosAsignados.has(alumno.id)
-  );
-
-  /* =========================================================
-     ALUMNOS POR GRUPO
-  ========================================================= */
-
-  const alumnosPorGrupo = grupos.map((grupo) => {
-    const cantidad = inscripcionesActivas
-      .filter(
-        (inscripcion) =>
-          inscripcion.grupo?.id === grupo.id
-      )
-      .reduce(
-        (total, inscripcion) =>
-          total + inscripcion.alumnos.length,
-        0
-      );
+  const clasesHoy = gruposHoy.map((grupo, indice) => {
+    const inicio = aMinutos(grupo.horaInicio);
+    const fin = aMinutos(grupo.horaFin);
+    const estado: EstadoClase =
+      ahora.minutos >= fin
+        ? "terminada"
+        : ahora.minutos >= inicio
+          ? "en-curso"
+          : "proxima";
 
     return {
       grupo,
-      cantidad,
+      estado,
+      alumnos: cantidadEn(grupo.id),
+      marcados: listas[indice].length,
     };
   });
 
-  const maxAlumnosGrupo = Math.max(
-    ...alumnosPorGrupo.map((item) => item.cantidad),
-    alumnosSinGrupo.length,
-    1
+  /* ---------- Cobranza del mes ---------- */
+
+  const mes = ahora.iso.slice(0, 7);
+  const delMes = mensualidades.filter(
+    (pago) => pago.periodo.startsWith(mes) && pago.estado !== "Cancelado"
   );
+  const esperado = delMes.reduce((total, pago) => total + pago.monto, 0);
+  const cobrado = delMes
+    .filter((pago) => pago.estado === "Pagado")
+    .reduce((total, pago) => total + pago.monto, 0);
+  const porcentajeCobrado =
+    esperado > 0 ? Math.round((cobrado / esperado) * 100) : null;
 
-  /* =========================================================
-     MANO HÁBIL
-  ========================================================= */
+  const vencidos = mensualidades.filter((pago) => pago.estado === "Vencido");
+  const montoVencido = vencidos.reduce((total, pago) => total + pago.monto, 0);
 
-  const derechos = alumnos.filter(
-    (alumno) => alumno.manoHabil === "Derecha"
+  /* ---------- Pendientes ---------- */
+
+  const solicitudesPendientes = solicitudes.filter(
+    (solicitud) => solicitud.estado === "pendiente"
+  );
+  const stockBajo = materiales.filter(
+    (material) => material.minimo > 0 && material.cantidad <= material.minimo
+  );
+  const prospectosNuevos = prospectos.filter(
+    (prospecto) => prospecto.etapa === "Nuevo"
+  );
+  const enProceso = prospectos.filter((prospecto) =>
+    ["Nuevo", "Contactado", "Clase de prueba"].includes(prospecto.etapa)
+  );
+  const clasesDePrueba = prospectos.filter(
+    (prospecto) => prospecto.etapa === "Clase de prueba"
   ).length;
 
-  const izquierdos = alumnos.filter(
-    (alumno) => alumno.manoHabil === "Izquierda"
-  ).length;
-
-  const conManoRegistrada = derechos + izquierdos;
-
-  const porcentajeDerecha =
-    conManoRegistrada > 0
-      ? Math.round(
-          (derechos / conManoRegistrada) * 100
-        )
-      : 0;
-
-  const porcentajeIzquierda =
-    conManoRegistrada > 0
-      ? Math.round(
-          (izquierdos / conManoRegistrada) * 100
-        )
-      : 0;
-
-  /* =========================================================
-     ENTRENAMIENTOS DE HOY
-  ========================================================= */
-
-  const dias = [
-    "DOMINGO",
-    "LUNES",
-    "MARTES",
-    "MIERCOLES",
-    "JUEVES",
-    "VIERNES",
-    "SABADO",
+  const posibles: (Pendiente | false)[] = [
+    vencidos.length > 0 && {
+      icono: AlertTriangle,
+      tono: "alerta",
+      titulo: plural(vencidos.length, "pago vencido", "pagos vencidos"),
+      detalle: `${moneda.format(montoVencido)} por cobrar`,
+      href: "/pagos",
+    },
+    solicitudesPendientes.length > 0 && {
+      icono: PackageOpen,
+      tono: "aviso",
+      titulo: plural(
+        solicitudesPendientes.length,
+        "solicitud de material",
+        "solicitudes de material"
+      ),
+      detalle: "Esperan tu respuesta",
+      href: "/inventario",
+    },
+    stockBajo.length > 0 && {
+      icono: Package,
+      tono: "aviso",
+      titulo: `${plural(stockBajo.length, "material", "materiales")} con stock bajo`,
+      detalle: stockBajo
+        .slice(0, 3)
+        .map((material) => material.nombre)
+        .join(", "),
+      href: "/inventario",
+    },
+    sinGrupo.length > 0 && {
+      icono: UserRoundX,
+      tono: "aviso",
+      titulo: plural(sinGrupo.length, "alumno sin grupo", "alumnos sin grupo"),
+      detalle: "Asígnalos a un grupo",
+      href: "/alumnos",
+    },
+    prospectosNuevos.length > 0 && {
+      icono: UserPlus,
+      tono: "info",
+      titulo: plural(prospectosNuevos.length, "prospecto nuevo", "prospectos nuevos"),
+      detalle: "Sin contactar todavía",
+      href: "/prospectos",
+    },
   ];
-
-  const nombresDias = [
-    "DOMINGO",
-    "LUNES",
-    "MARTES",
-    "MIÉRCOLES",
-    "JUEVES",
-    "VIERNES",
-    "SÁBADO",
-  ];
-
-  const hoy = new Date();
-
-  const diaActual = dias[hoy.getDay()];
-  const nombreDiaActual = nombresDias[hoy.getDay()];
-
-  /*
-    El tipo Grupo actualmente guarda "dias" ya formateado
-    para la interfaz: Lun · Mar · Mié...
-
-    Convertimos el día actual a esa misma abreviatura.
-  */
-
-  const abreviaturas: Record<string, string> = {
-    DOMINGO: "Dom",
-    LUNES: "Lun",
-    MARTES: "Mar",
-    MIERCOLES: "Mié",
-    JUEVES: "Jue",
-    VIERNES: "Vie",
-    SABADO: "Sáb",
-  };
-
-  const gruposHoy = gruposActivos.filter((grupo) =>
-    grupo.dias
-      .split(" · ")
-      .includes(abreviaturas[diaActual])
-  );
-
-  function cantidadAlumnosGrupo(grupoId: string) {
-    return inscripcionesActivas
-      .filter(
-        (inscripcion) =>
-          inscripcion.grupo?.id === grupoId
-      )
-      .reduce(
-        (total, inscripcion) =>
-          total + inscripcion.alumnos.length,
-        0
-      );
-  }
+  const pendientes = posibles.filter((item): item is Pendiente => Boolean(item));
 
   return (
     <AppLayout>
-      <div className="px-5 py-6 md:px-8 lg:px-10">
-
-        {/* HEADER */}
-        <section className="mb-6 border-b border-borde pb-5">
-          <div className="flex items-start justify-between gap-4">
-
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
-                TennisTrack
-              </p>
-
-              <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
-                RESUMEN DEL DÍA
-              </h1>
-
-              <p className="mt-2 max-w-xl text-sm text-texto-3 md:text-base">
-                Todo lo que pasa hoy en la academia, en una sola pantalla.
-              </p>
-            </div>
-
-          </div>
-
-          <div className="mt-4 flex items-center justify-between md:justify-end md:gap-4">
-
-            <div className="rounded-full border border-borde bg-superficie px-3 py-2 text-xs font-semibold md:text-sm">
-              <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[#98ad09]" />
-              Datos en vivo
-            </div>
-
-          </div>
+      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
+        {/* ENCABEZADO */}
+        <section className="mb-5">
+          <h1 className="text-2xl font-black text-texto sm:text-3xl md:text-5xl">
+            RESUMEN DEL DÍA
+          </h1>
+          <p className="mt-1 text-sm first-letter:uppercase text-texto-3 md:text-base">
+            {ahora.fecha}
+          </p>
         </section>
 
-        {/* MÉTRICAS */}
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-
-          <MetricCard
-            title="Alumnos activos"
-            value={`${alumnosActivos.length}`}
-            subtitle={`${alumnos.length} registrados en la academia`}
+        {/* INDICADORES */}
+        <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+          <Indicador
+            titulo="Alumnos activos"
+            valor={`${alumnosActivos.length}`}
+            detalle={`${alumnos.length} registrados`}
+            href="/alumnos"
           />
-
-          <MetricCard
-            title="Grupos activos"
-            value={`${gruposActivos.length}`}
-            subtitle={`${grupos.length} grupos en total`}
-          />
-
-          <MetricCard
-            title="Inscripciones activas"
-            value={`${inscripcionesActivas.length}`}
-            subtitle={`${inscripciones.length} registros en Twenty`}
-          />
-
-          <MetricCard
-            title="Alumnos sin grupo"
-            value={`${alumnosSinGrupo.length}`}
-            subtitle={
-              alumnosSinGrupo.length === 0
-                ? "Todos tienen grupo asignado"
-                : "Requieren asignación"
+          <Indicador
+            titulo="Ocupación"
+            valor={
+              porcentajeOcupacion === null
+                ? `${asignados.size}`
+                : `${porcentajeOcupacion}%`
             }
+            detalle={
+              porcentajeOcupacion === null
+                ? `alumnos en ${plural(gruposActivos.length, "grupo", "grupos")}`
+                : `${enGruposConCupo} de ${cupoTotal} lugares`
+            }
+            href="/grupos"
+            progreso={porcentajeOcupacion}
           />
-
+          <Indicador
+            titulo="Cobrado del mes"
+            valor={moneda.format(cobrado)}
+            detalle={
+              porcentajeCobrado === null
+                ? "Sin mensualidades este mes"
+                : `${porcentajeCobrado}% de ${moneda.format(esperado)}`
+            }
+            href="/pagos"
+            progreso={porcentajeCobrado}
+          />
+          <Indicador
+            titulo="Prospectos"
+            valor={`${enProceso.length}`}
+            detalle={
+              clasesDePrueba > 0
+                ? `${clasesDePrueba} en clase de prueba`
+                : "en proceso"
+            }
+            href="/prospectos"
+          />
         </section>
 
-        {/* INFORMACIÓN SECUNDARIA */}
-        <section className="mt-6 grid gap-6 xl:grid-cols-2">
-
-          {/* ALUMNOS POR GRUPO */}
-          <div className="rounded-2xl border border-borde bg-superficie p-6">
-
-            <h2 className="text-xl font-black">
-              ALUMNOS POR GRUPO
-            </h2>
-
-            <div className="mt-6 space-y-5">
-
-              {alumnosPorGrupo.map(({ grupo, cantidad }) => (
-                <ProgressRow
-                  key={grupo.id}
-                  label={grupo.nombre}
-                  value={`${cantidad} ${
-                    cantidad === 1
-                      ? "alumno"
-                      : "alumnos"
-                  }`}
-                  width={`${Math.round(
-                    (cantidad / maxAlumnosGrupo) * 100
-                  )}%`}
-                />
-              ))}
-
-              {alumnosSinGrupo.length > 0 && (
-                <ProgressRow
-                  label="Sin asignar"
-                  value={`${alumnosSinGrupo.length} ${
-                    alumnosSinGrupo.length === 1
-                      ? "alumno"
-                      : "alumnos"
-                  }`}
-                  width={`${Math.round(
-                    (alumnosSinGrupo.length /
-                      maxAlumnosGrupo) *
-                      100
-                  )}%`}
-                />
-              )}
-
-            </div>
-          </div>
-
-          {/* MANO HÁBIL */}
-          <div className="rounded-2xl border border-borde bg-superficie p-6">
-
-            <h2 className="text-xl font-black">
-              MANO HÁBIL
-            </h2>
-
-            <div className="mt-6 space-y-5">
-
-              <ProgressRow
-                label="Derecha"
-                value={`${derechos} alumnos · ${porcentajeDerecha}%`}
-                width={`${porcentajeDerecha}%`}
-              />
-
-              <ProgressRow
-                label="Izquierda"
-                value={`${izquierdos} alumnos · ${porcentajeIzquierda}%`}
-                width={`${porcentajeIzquierda}%`}
-              />
-
+        <section className="mt-4 grid gap-4 sm:mt-6 sm:gap-6 xl:grid-cols-5">
+          {/* HOY EN LA CANCHA */}
+          <div className="rounded-2xl border border-borde bg-superficie p-4 sm:p-6 xl:col-span-3">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-lg font-black sm:text-xl">HOY EN LA CANCHA</h2>
+              <Link
+                href="/horario"
+                className="flex shrink-0 items-center gap-1.5 text-sm font-semibold text-verde hover:text-verde-musgo"
+              >
+                <CalendarDays size={16} />
+                Horario
+              </Link>
             </div>
 
+            {clasesHoy.length > 0 ? (
+              <ul className="mt-2 divide-y divide-borde">
+                {clasesHoy.map((clase) => (
+                  <ClaseDeHoy key={clase.grupo.id} {...clase} fecha={ahora.iso} />
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-4 rounded-xl bg-fondo p-4 text-sm text-texto-3">
+                Hoy no hay clases programadas.
+              </p>
+            )}
           </div>
 
+          {/* PENDIENTES */}
+          <div className="rounded-2xl border border-borde bg-superficie p-4 sm:p-6 xl:col-span-2">
+            <h2 className="text-lg font-black sm:text-xl">PENDIENTES</h2>
+
+            {pendientes.length > 0 ? (
+              <ul className="mt-3 space-y-2">
+                {pendientes.map((pendiente) => (
+                  <FilaPendiente key={pendiente.titulo} {...pendiente} />
+                ))}
+              </ul>
+            ) : (
+              <div className="mt-4 flex items-center gap-3 rounded-xl bg-lima-suave p-4 text-verde-oscuro">
+                <CircleCheck size={20} className="shrink-0" />
+                <p className="text-sm font-semibold">Todo al día.</p>
+              </div>
+            )}
+          </div>
         </section>
 
-        {/* HOY */}
-        <section className="mt-6 rounded-2xl border border-borde bg-superficie p-6">
-
+        {/* OCUPACIÓN POR GRUPO */}
+        <section className="mt-4 rounded-2xl border border-borde bg-superficie p-4 sm:mt-6 sm:p-6">
           <div className="flex items-center justify-between gap-4">
-
-            <h2 className="text-xl font-black">
-              HOY EN LA CANCHA · {nombreDiaActual}
-            </h2>
-
+            <h2 className="text-lg font-black sm:text-xl">OCUPACIÓN POR GRUPO</h2>
             <Link
-              href="/horario"
-              className="shrink-0 font-semibold text-verde hover:text-verde-musgo"
+              href="/grupos"
+              className="shrink-0 text-sm font-semibold text-verde hover:text-verde-musgo"
             >
-              Ver horario →
+              Ver grupos
             </Link>
-
           </div>
 
-          {gruposHoy.length > 0 ? (
-            <div className="mt-5 divide-y divide-borde">
-
-              {gruposHoy.map((grupo) => (
-                <TrainingRow
+          {ocupacion.length > 0 ? (
+            <div className="mt-5 grid gap-x-10 gap-y-5 md:grid-cols-2">
+              {ocupacion.map(({ grupo, alumnos: cantidad, cupo }) => (
+                <BarraGrupo
                   key={grupo.id}
-                  time={`${grupo.horaInicio} – ${grupo.horaFin}`}
-                  group={grupo.nombre}
-                  students={`${cantidadAlumnosGrupo(
-                    grupo.id
-                  )} alumnos`}
+                  href={`/grupos/${grupo.id}`}
+                  nombre={grupo.nombre}
+                  cantidad={cantidad}
+                  cupo={cupo}
+                  maximo={maximoBarra}
                 />
               ))}
-
             </div>
           ) : (
-            <div className="mt-5 rounded-xl bg-fondo p-4">
-
-              <p className="text-sm font-semibold text-texto">
-                No hay entrenamientos programados hoy.
-              </p>
-
-              <p className="mt-1 text-sm text-texto-suave">
-                No encontramos grupos activos que entrenen este día.
-              </p>
-
-            </div>
+            <p className="mt-4 rounded-xl bg-fondo p-4 text-sm text-texto-3">
+              Todavía no hay grupos activos.
+            </p>
           )}
-
         </section>
-
       </div>
     </AppLayout>
   );
 }
 
-function MetricCard({
-  title,
-  value,
-  subtitle,
+/* ---------- Componentes ---------- */
+
+function Indicador({
+  titulo,
+  valor,
+  detalle,
+  href,
+  progreso,
 }: {
-  title: string;
-  value: string;
-  subtitle: string;
+  titulo: string;
+  valor: string;
+  detalle: string;
+  href: string;
+  progreso?: number | null;
 }) {
   return (
-    <div className="rounded-2xl border border-borde bg-superficie p-6">
-
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-texto-suave">
-        {title}
+    <Link
+      href={href}
+      className="rounded-2xl border border-borde bg-superficie p-4 transition hover:border-[#cbd90a] sm:p-5"
+    >
+      <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-texto-suave sm:text-xs sm:tracking-[0.15em]">
+        {titulo}
       </p>
-
-      <p className="mt-2 text-5xl font-black text-texto">
-        {value}
+      <p className="mt-1 truncate text-2xl font-black text-texto sm:mt-2 sm:text-4xl">
+        {valor}
       </p>
-
-      <p className="mt-2 text-sm text-texto-3">
-        {subtitle}
-      </p>
-
-    </div>
-  );
-}
-
-function ProgressRow({
-  label,
-  value,
-  width,
-}: {
-  label: string;
-  value: string;
-  width: string;
-}) {
-  return (
-    <div>
-
-      <div className="mb-2 flex justify-between gap-4 text-sm">
-
-        <span className="font-medium">
-          {label}
-        </span>
-
-        <span className="text-right text-texto-3">
-          {value}
-        </span>
-
-      </div>
-
-      <div className="h-2 rounded-full bg-hundido">
-
-        <div
-          className="h-2 rounded-full bg-verde"
-          style={{ width }}
-        />
-
-      </div>
-
-    </div>
-  );
-}
-
-function TrainingRow({
-  time,
-  group,
-  students,
-}: {
-  time: string;
-  group: string;
-  students: string;
-}) {
-  return (
-    <div className="py-5">
-
-      <div className="flex items-start justify-between gap-4">
-
-        <div>
-          <p className="text-xl font-black">
-            {time}
-          </p>
-
-          <p className="mt-1 font-semibold">
-            {group}
-          </p>
-
-          <p className="mt-1 text-sm text-texto-3">
-            {students}
-          </p>
+      {typeof progreso === "number" && (
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-hundido">
+          <div
+            className="h-full rounded-full bg-verde"
+            style={{ width: `${Math.min(progreso, 100)}%` }}
+          />
         </div>
+      )}
+      <p className="mt-1.5 text-xs text-texto-3 sm:text-sm">{detalle}</p>
+    </Link>
+  );
+}
 
-        <span className="rounded-full border border-[#98ad09] px-3 py-1 text-xs font-bold text-verde">
-          ACTIVO
-        </span>
+function ClaseDeHoy({
+  grupo,
+  estado,
+  alumnos,
+  marcados,
+  fecha,
+}: {
+  grupo: { id: string; nombre: string; horaInicio: string; horaFin: string };
+  estado: EstadoClase;
+  alumnos: number;
+  marcados: number;
+  fecha: string;
+}) {
+  const listaCompleta = alumnos > 0 && marcados >= alumnos;
 
+  return (
+    <li className="flex items-center gap-3 py-4 sm:gap-4">
+      <div className="w-14 shrink-0 sm:w-16">
+        <p className="text-lg font-black leading-none sm:text-xl">
+          {grupo.horaInicio}
+        </p>
+        <p className="mt-1 text-xs text-texto-suave">{grupo.horaFin}</p>
       </div>
 
-    </div>
+      <div className="min-w-0 flex-1 border-l border-borde pl-3 sm:pl-4">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <p className="truncate font-bold">{grupo.nombre}</p>
+          <span
+            className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
+              estado === "en-curso"
+                ? "bg-[#cbd90a] text-sobre-lima"
+                : estado === "proxima"
+                  ? "border border-borde text-texto-3"
+                  : "bg-fondo text-texto-suave"
+            }`}
+          >
+            {ETIQUETA_ESTADO[estado]}
+          </span>
+        </div>
+        <p className="mt-1 text-sm text-texto-3">
+          {plural(alumnos, "alumno", "alumnos")}
+          {marcados > 0 && !listaCompleta && ` · ${marcados} marcados`}
+        </p>
+      </div>
+
+      {listaCompleta ? (
+        <span className="flex shrink-0 items-center gap-1.5 text-sm font-semibold text-verde">
+          <CircleCheck size={16} />
+          <span className="hidden sm:inline">Lista tomada</span>
+        </span>
+      ) : (
+        <Link
+          href={`/asistencia?grupo=${grupo.id}&fecha=${fecha}`}
+          className={`flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold transition ${
+            estado === "proxima"
+              ? "border border-borde text-texto hover:bg-fondo"
+              : "bg-boton text-sobre-boton hover:bg-boton-hover"
+          }`}
+        >
+          <ClipboardCheck size={16} />
+          Lista
+        </Link>
+      )}
+    </li>
+  );
+}
+
+type Pendiente = {
+  icono: LucideIcon;
+  tono: "alerta" | "aviso" | "info";
+  titulo: string;
+  detalle: string;
+  href: string;
+};
+
+const COLOR_TONO: Record<Pendiente["tono"], string> = {
+  alerta: "bg-peligro-suave text-peligro",
+  aviso: "bg-lima-suave text-verde-oscuro",
+  info: "bg-superficie text-texto-2",
+};
+
+function FilaPendiente({ icono: Icono, tono, titulo, detalle, href }: Pendiente) {
+  return (
+    <li>
+      <Link
+        href={href}
+        className="flex items-center gap-3 rounded-xl bg-fondo p-3 transition hover:bg-hundido"
+      >
+        <span
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${COLOR_TONO[tono]}`}
+        >
+          <Icono size={17} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-bold text-texto">{titulo}</span>
+          {detalle && (
+            <span className="block truncate text-xs text-texto-3">{detalle}</span>
+          )}
+        </span>
+        <ChevronRight size={16} className="shrink-0 text-texto-suave" />
+      </Link>
+    </li>
+  );
+}
+
+function BarraGrupo({
+  href,
+  nombre,
+  cantidad,
+  cupo,
+  maximo,
+}: {
+  href: string;
+  nombre: string;
+  cantidad: number;
+  cupo: number | null;
+  maximo: number;
+}) {
+  const lleno = cupo !== null && cupo > 0 && cantidad >= cupo;
+  const proporcion = cupo ? cantidad / cupo : cantidad / maximo;
+
+  return (
+    <Link href={href} className="group block">
+      <div className="mb-2 flex justify-between gap-4 text-sm">
+        <span className="truncate font-semibold group-hover:text-verde">{nombre}</span>
+        <span className={`shrink-0 ${lleno ? "font-bold text-peligro" : "text-texto-3"}`}>
+          {cupo ? `${cantidad} / ${cupo}` : plural(cantidad, "alumno", "alumnos")}
+          {lleno && " · lleno"}
+        </span>
+      </div>
+      <div className="h-2 overflow-hidden rounded-full bg-hundido">
+        <div
+          className={`h-full rounded-full ${lleno ? "bg-peligro" : "bg-verde"}`}
+          style={{ width: `${Math.min(Math.round(proporcion * 100), 100)}%` }}
+        />
+      </div>
+    </Link>
   );
 }

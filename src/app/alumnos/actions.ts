@@ -77,7 +77,7 @@ export async function crearAlumno(
 
     return {
       error:
-        "No se pudo guardar el alumno en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudo guardar el alumno. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 
@@ -110,7 +110,7 @@ export async function actualizarAlumno(
 
     return {
       error:
-        "No se pudieron guardar los cambios en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudieron guardar los cambios. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 
@@ -171,7 +171,7 @@ export async function cambiarDeGrupo(
 
     return {
       error:
-        "No se pudo cambiar de grupo en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudo cambiar de grupo. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 

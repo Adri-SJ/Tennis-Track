@@ -111,7 +111,7 @@ export async function crearGrupo(
 
     return {
       error:
-        "No se pudo guardar el grupo en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudo guardar el grupo. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 
@@ -154,7 +154,7 @@ export async function actualizarGrupo(
 
     return {
       error:
-        "No se pudieron guardar los cambios en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudieron guardar los cambios. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 

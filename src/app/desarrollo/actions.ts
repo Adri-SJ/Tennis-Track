@@ -80,7 +80,7 @@ export async function guardarEvaluacion(datos: {
 
     return {
       error:
-        "No se pudo guardar la evaluación en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudo guardar la evaluación. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 
@@ -115,7 +115,7 @@ export async function borrarEvaluacion(
   } catch (error) {
     console.error("No se pudo eliminar la evaluación en Twenty:", error);
 
-    return { error: "No se pudo eliminar la evaluación en Twenty." };
+    return { error: "No se pudo eliminar la evaluación." };
   }
 
   revalidatePath("/desarrollo");

@@ -4,15 +4,14 @@ import { ArrowLeft } from "lucide-react";
 export default function EncabezadoFormulario({
   volverHref,
   volverTexto,
-  etiqueta,
   titulo,
   descripcion,
 }: {
   volverHref: string;
   volverTexto: string;
-  etiqueta: string;
   titulo: string;
-  descripcion: string;
+  /* Dato de contexto (por ejemplo, el nombre del alumno); sin texto genérico. */
+  descripcion?: string;
 }) {
   return (
     <>
@@ -27,17 +26,15 @@ export default function EncabezadoFormulario({
 
       {/* ENCABEZADO */}
       <section className="mb-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
-          {etiqueta}
-        </p>
-
-        <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
+        <h1 className="text-3xl font-black text-texto md:text-5xl">
           {titulo}
         </h1>
 
-        <p className="mt-2 text-sm text-texto-3 md:text-base">
-          {descripcion}
-        </p>
+        {descripcion && (
+          <p className="mt-2 text-sm text-texto-3 md:text-base">
+            {descripcion}
+          </p>
+        )}
       </section>
     </>
   );

@@ -38,7 +38,7 @@ export default async function InscripcionDetallePage({
   if (!inscripcion) {
     return (
       <AppLayout>
-        <div className="px-5 py-6 md:px-8 lg:px-10">
+        <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
 
           <Link
             href="/inscripciones"
@@ -53,7 +53,7 @@ export default async function InscripcionDetallePage({
               Inscripción
             </p>
 
-            <h1 className="mt-2 text-3xl font-black text-texto">
+            <h1 className="mt-1 text-2xl font-black sm:mt-2 sm:text-3xl text-texto">
               INSCRIPCIÓN NO ENCONTRADA
             </h1>
 
@@ -79,7 +79,7 @@ export default async function InscripcionDetallePage({
 
   return (
     <AppLayout>
-      <div className="px-5 py-6 md:px-8 lg:px-10">
+      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
 
         {/* VOLVER */}
         <Link
@@ -98,13 +98,9 @@ export default async function InscripcionDetallePage({
               Inscripción
             </p>
 
-            <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
+            <h1 className="mt-1 text-2xl font-black text-texto sm:text-3xl md:text-5xl">
               {inscripcion.nombre}
             </h1>
-
-            <p className="mt-2 text-sm text-texto-3 md:text-base">
-              Información de la inscripción y su asignación.
-            </p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -133,7 +129,7 @@ export default async function InscripcionDetallePage({
         <section className="mt-7 grid gap-4 md:grid-cols-2">
 
           {/* ALUMNO */}
-          <div className="rounded-2xl border border-borde bg-superficie p-5">
+          <div className="rounded-2xl border border-borde bg-superficie p-4 sm:p-5">
 
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#cbd90a] text-sobre-lima">
@@ -141,7 +137,7 @@ export default async function InscripcionDetallePage({
               </div>
 
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-texto-suave sm:text-xs sm:tracking-[0.15em]">
                   Alumno
                 </p>
 
@@ -166,7 +162,7 @@ export default async function InscripcionDetallePage({
           </div>
 
           {/* GRUPO */}
-          <div className="rounded-2xl border border-borde bg-superficie p-5">
+          <div className="rounded-2xl border border-borde bg-superficie p-4 sm:p-5">
 
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#eef310] text-sobre-lima">
@@ -174,7 +170,7 @@ export default async function InscripcionDetallePage({
               </div>
 
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-texto-suave sm:text-xs sm:tracking-[0.15em]">
                   Grupo
                 </p>
 
@@ -201,7 +197,7 @@ export default async function InscripcionDetallePage({
         </section>
 
         {/* PERIODO */}
-        <section className="mt-4 rounded-2xl border border-borde bg-superficie p-5 md:p-6">
+        <section className="mt-4 rounded-2xl border border-borde bg-superficie p-4 md:p-6">
 
           <div className="mb-5 flex items-center gap-3">
 
@@ -210,7 +206,7 @@ export default async function InscripcionDetallePage({
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-texto-suave sm:text-xs sm:tracking-[0.15em]">
                 Periodo
               </p>
 
@@ -225,7 +221,7 @@ export default async function InscripcionDetallePage({
 
             {/* INICIO */}
             <div className="rounded-xl bg-fondo p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-texto-suave sm:text-xs sm:tracking-[0.15em]">
                 Fecha de inicio
               </p>
 
@@ -236,7 +232,7 @@ export default async function InscripcionDetallePage({
 
             {/* FIN */}
             <div className="rounded-xl bg-fondo p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-texto-suave sm:text-xs sm:tracking-[0.15em]">
                 Fecha de fin
               </p>
 
@@ -250,7 +246,7 @@ export default async function InscripcionDetallePage({
         </section>
 
         {/* ESTADO */}
-        <section className="mt-4 rounded-2xl border border-borde bg-superficie p-5">
+        <section className="mt-4 rounded-2xl border border-borde bg-superficie p-4 sm:p-5">
 
           <div className="flex items-center gap-3">
 
@@ -259,7 +255,7 @@ export default async function InscripcionDetallePage({
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-texto-suave sm:text-xs sm:tracking-[0.15em]">
                 Estado
               </p>
 

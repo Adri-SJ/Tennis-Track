@@ -52,13 +52,12 @@ export default async function CambiarGrupoPage({
 
   return (
     <AppLayout>
-      <div className="px-5 py-6 md:px-8 lg:px-10">
+      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
         <EncabezadoFormulario
           volverHref={`/alumnos/${alumno.id}`}
           volverTexto="Volver al alumno"
-          etiqueta="Control"
           titulo="CAMBIAR DE GRUPO"
-          descripcion={`Mueve a ${alumno.nombre} a otro grupo.`}
+          descripcion={alumno.nombre}
         />
 
         <CambiarGrupoForm

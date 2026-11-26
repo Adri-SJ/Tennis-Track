@@ -14,7 +14,6 @@ import {
   Boxes,
   ArrowUpRight,
   X,
-  Info,
   Pencil,
   ArrowLeftRight,
   Trash2,
@@ -98,7 +97,7 @@ export default function InventarioClient({
     setSeleccionadoId(material?.id ?? null);
 
   const eliminar = (material: Material) => {
-    if (!window.confirm(`¿Eliminar «${material.nombre}» de Twenty?`)) {
+    if (!window.confirm(`¿Eliminar «${material.nombre}»?`)) {
       return;
     }
 
@@ -161,21 +160,13 @@ export default function InventarioClient({
   };
 
   return (
-    <div className="px-5 py-6 md:px-8 lg:px-10">
+    <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
       {/* ENCABEZADO */}
       <section className="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
-            Administración
-          </p>
-
-          <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
+          <h1 className="text-2xl font-black text-texto sm:text-3xl md:text-5xl">
             INVENTARIO
           </h1>
-
-          <p className="mt-2 text-sm text-texto-3 md:text-base">
-            Control de materiales y equipamiento deportivo.
-          </p>
         </div>
 
         {esAdmin && (
@@ -191,7 +182,7 @@ export default function InventarioClient({
       </section>
 
       {/* INDICADORES */}
-      <section className="mb-7 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[
           {
             titulo: "Tipos de material",
@@ -219,7 +210,7 @@ export default function InventarioClient({
           return (
             <div
               key={indicador.titulo}
-              className="rounded-2xl border border-borde bg-superficie p-5"
+              className="rounded-2xl border border-borde bg-superficie p-4 sm:p-5"
             >
               <div className="flex items-center justify-between">
                 <p className="text-xs font-bold uppercase tracking-[0.12em] text-texto-suave">
@@ -228,7 +219,7 @@ export default function InventarioClient({
                 <Icono size={18} className="text-verde" />
               </div>
 
-              <p className="mt-3 text-3xl font-black text-texto">
+              <p className="mt-2 text-2xl font-black sm:mt-3 sm:text-3xl text-texto">
                 {indicador.valor}
               </p>
             </div>
@@ -279,11 +270,7 @@ export default function InventarioClient({
         <div className="border-b border-borde p-5 md:p-6">
           <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
-                Catálogo
-              </p>
-
-              <h2 className="mt-1 text-xl font-black text-texto">
+              <h2 className="text-xl font-black text-texto">
                 Material deportivo
               </h2>
             </div>
@@ -508,11 +495,6 @@ export default function InventarioClient({
           </div>
         )}
 
-        <div className="flex items-center gap-2 border-t border-borde bg-superficie-2 px-5 py-4 text-xs text-texto-suave">
-          <Info size={15} className="shrink-0" />
-          Inventario guardado en Twenty. Las existencias se
-          ajustan registrando entradas y salidas.
-        </div>
       </section>
 
       {/* MODAL DE DETALLE */}
@@ -533,13 +515,9 @@ export default function InventarioClient({
           >
             <div className="flex items-start justify-between bg-fondo p-6">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
-                  Ficha de material
-                </p>
-
                 <h2
                   id="titulo-material"
-                  className="mt-2 text-2xl font-black text-texto"
+                  className="text-2xl font-black text-texto"
                 >
                   {materialSeleccionado.nombre}
                 </h2>

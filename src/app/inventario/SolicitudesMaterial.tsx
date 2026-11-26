@@ -48,7 +48,7 @@ export default function SolicitudesMaterial({
   }
 
   return (
-    <section className="mb-7 rounded-2xl border border-borde bg-superficie p-5 md:p-6">
+    <section className="mb-5 rounded-2xl border border-borde bg-superficie p-4 md:p-6">
       <h2 className="flex items-center gap-2 text-lg font-black text-texto">
         <ClipboardList size={20} className="text-verde" />
         {esAdmin ? "SOLICITUDES DE MATERIAL" : "MIS SOLICITUDES"}
