@@ -41,7 +41,7 @@ export default async function AlumnoPage({
   if (!alumno) {
     return (
       <AppLayout>
-        <div className="px-5 py-6 md:px-8 lg:px-10">
+        <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
           <Link
             href="/alumnos"
             className="inline-flex items-center gap-2 text-sm font-semibold text-verde"
@@ -90,7 +90,7 @@ export default async function AlumnoPage({
 
   return (
     <AppLayout>
-      <div className="px-5 py-6 md:px-8 lg:px-10">
+      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
 
         {/* VOLVER */}
         <Link
@@ -102,7 +102,7 @@ export default async function AlumnoPage({
         </Link>
 
         {/* PERFIL */}
-        <section className="rounded-2xl border border-borde bg-superficie p-5 md:p-7">
+        <section className="rounded-2xl border border-borde bg-superficie p-4 md:p-7">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
             <div className="flex items-center gap-4">
@@ -177,7 +177,7 @@ export default async function AlumnoPage({
         <section className="mt-5 grid gap-5 xl:grid-cols-2">
 
           {/* INFORMACIÓN GENERAL */}
-          <div className="rounded-2xl border border-borde bg-superficie p-5 md:p-6">
+          <div className="rounded-2xl border border-borde bg-superficie p-4 md:p-6">
             <h2 className="text-lg font-black text-texto">
               INFORMACIÓN GENERAL
             </h2>
@@ -211,7 +211,7 @@ export default async function AlumnoPage({
           </div>
 
           {/* INSCRIPCIÓN */}
-          <div className="rounded-2xl border border-borde bg-superficie p-5 md:p-6">
+          <div className="rounded-2xl border border-borde bg-superficie p-4 md:p-6">
             <div className="flex items-center gap-2">
               <CalendarDays
                 size={20}
@@ -289,7 +289,7 @@ export default async function AlumnoPage({
 
         {/* HISTORIAL */}
         {esAdmin && (
-          <section className="mt-5 rounded-2xl border border-borde bg-superficie p-5 md:p-6">
+          <section className="mt-5 rounded-2xl border border-borde bg-superficie p-4 md:p-6">
             <div className="flex items-center gap-2">
               <History
                 size={20}

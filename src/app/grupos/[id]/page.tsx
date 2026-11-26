@@ -44,7 +44,7 @@ export default async function GrupoPage({
   if (!grupo) {
     return (
       <AppLayout>
-        <div className="px-5 py-6 md:px-8 lg:px-10">
+        <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
 
           <Link
             href="/grupos"
@@ -65,7 +65,7 @@ export default async function GrupoPage({
 
   return (
     <AppLayout>
-      <div className="px-5 py-6 md:px-8 lg:px-10">
+      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
 
         {/* VOLVER */}
         <Link
@@ -77,7 +77,7 @@ export default async function GrupoPage({
         </Link>
 
         {/* CABECERA */}
-        <section className="rounded-2xl border border-borde bg-superficie p-6">
+        <section className="rounded-2xl border border-borde bg-superficie p-4 sm:p-6">
 
           <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
 
@@ -86,13 +86,9 @@ export default async function GrupoPage({
                 Grupo
               </p>
 
-              <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
+              <h1 className="mt-1 text-2xl font-black text-texto sm:text-3xl md:text-5xl">
                 {grupo.nombre}
               </h1>
-
-              <p className="mt-2 text-sm text-texto-3 md:text-base">
-                Información general y alumnos inscritos en el grupo.
-              </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -156,7 +152,7 @@ export default async function GrupoPage({
         <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_2fr]">
 
           {/* INFORMACIÓN DEL GRUPO */}
-          <div className="rounded-2xl border border-borde bg-superficie p-6">
+          <div className="rounded-2xl border border-borde bg-superficie p-4 sm:p-6">
 
             <h2 className="text-xl font-black text-texto">
               INFORMACIÓN DEL GRUPO
@@ -210,7 +206,7 @@ export default async function GrupoPage({
           </div>
 
           {/* ALUMNOS INSCRITOS */}
-          <div className="rounded-2xl border border-borde bg-superficie p-6">
+          <div className="rounded-2xl border border-borde bg-superficie p-4 sm:p-6">
 
             <div>
               <h2 className="text-xl font-black text-texto">
@@ -308,7 +304,7 @@ function InfoCard({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl border border-borde bg-superficie p-5">
+    <div className="rounded-2xl border border-borde bg-superficie p-4 sm:p-5">
 
       <div className="flex items-center gap-2 text-verde">
         {icon}

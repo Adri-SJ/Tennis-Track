@@ -210,7 +210,7 @@ export default function ProspectosClient({
   };
 
   const eliminar = (id: string) => {
-    if (!window.confirm("¿Eliminar este prospecto de Twenty?")) {
+    if (!window.confirm("¿Eliminar este prospecto?")) {
       return;
     }
 
@@ -230,7 +230,7 @@ export default function ProspectosClient({
   const convertir = (id: string) => {
     if (
       !window.confirm(
-        "Se creará un alumno en Twenty con los datos de este prospecto. ¿Continuar?"
+        "Se creará un alumno con los datos de este prospecto. ¿Continuar?"
       )
     ) {
       return;
@@ -336,22 +336,13 @@ export default function ProspectosClient({
   };
 
   return (
-    <div className="px-5 py-6 md:px-8 lg:px-10">
+    <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
       {/* ENCABEZADO */}
       <section className="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
-            Crecimiento de la academia
-          </p>
-
-          <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
+          <h1 className="text-2xl font-black text-texto sm:text-3xl md:text-5xl">
             PROSPECTOS
           </h1>
-
-          <p className="mt-2 text-sm text-texto-3 md:text-base">
-            Seguimiento de personas interesadas en formar
-            parte de la academia.
-          </p>
         </div>
 
         <button
@@ -365,7 +356,7 @@ export default function ProspectosClient({
       </section>
 
       {/* INDICADORES */}
-      <section className="mb-7 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[
           {
             titulo: "Total de prospectos",
@@ -393,7 +384,7 @@ export default function ProspectosClient({
           return (
             <div
               key={indicador.titulo}
-              className="rounded-2xl border border-borde bg-superficie p-5"
+              className="rounded-2xl border border-borde bg-superficie p-4 sm:p-5"
             >
               <div className="flex items-center justify-between gap-2">
                 <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-texto-suave">
@@ -406,7 +397,7 @@ export default function ProspectosClient({
                 />
               </div>
 
-              <p className="mt-4 text-3xl font-black text-texto">
+              <p className="mt-3 text-2xl font-black sm:mt-4 sm:text-3xl text-texto">
                 {indicador.valor}
               </p>
             </div>
@@ -415,24 +406,15 @@ export default function ProspectosClient({
       </section>
 
       {/* CONVERSIÓN */}
-      <section className="mb-7 rounded-2xl bg-banner p-6 text-white md:p-7">
+      <section className="mb-5 rounded-2xl bg-banner p-5 text-white md:p-7">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#dce6a1]">
-              Captación de alumnos
-            </p>
-
-            <h2 className="mt-2 text-2xl font-black">
-              Conversión de prospectos
+            <h2 className="text-2xl font-black">
+              Conversión
             </h2>
-
-            <p className="mt-2 text-sm text-[#d1d5ba]">
-              Porcentaje de registros que llegaron a la
-              etapa de inscrito.
-            </p>
           </div>
 
-          <p className="text-5xl font-black text-[#eef310]">
+          <p className="text-4xl font-black text-[#eef310] sm:text-5xl">
             {conversion}%
           </p>
         </div>
@@ -451,7 +433,7 @@ export default function ProspectosClient({
       </section>
 
       {/* CONTROLES */}
-      <section className="mb-5 rounded-2xl border border-borde bg-superficie p-5">
+      <section className="mb-5 rounded-2xl border border-borde bg-superficie p-4 sm:p-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="grid flex-1 gap-3 sm:grid-cols-[1fr_200px]">
             <div className="relative">
@@ -654,9 +636,8 @@ export default function ProspectosClient({
 
       <div className="mt-5 flex items-start gap-2 rounded-xl border border-borde bg-superficie p-4 text-xs leading-relaxed text-texto-suave">
         <Info size={16} className="mt-0.5 shrink-0" />
-        Los prospectos se guardan en Twenty. Para crear
-        el alumno de un prospecto usa «Convertir en
-        alumno» al editarlo.
+        Para crear el alumno de un prospecto usa
+        «Convertir en alumno» al editarlo.
       </div>
 
       {/* FORMULARIO */}
@@ -670,13 +651,9 @@ export default function ProspectosClient({
           >
             <div className="flex shrink-0 items-start justify-between bg-fondo p-5 md:p-6">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
-                  Captación de alumnos
-                </p>
-
                 <h2
                   id="titulo-prospecto"
-                  className="mt-1 text-2xl font-black text-texto"
+                  className="text-2xl font-black text-texto"
                 >
                   {formulario.id
                     ? "EDITAR PROSPECTO"

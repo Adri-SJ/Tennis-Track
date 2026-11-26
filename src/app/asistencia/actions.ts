@@ -56,7 +56,7 @@ export async function guardarPaseDeLista(
 
     return {
       error:
-        "No se pudo guardar la asistencia en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudo guardar la asistencia. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 

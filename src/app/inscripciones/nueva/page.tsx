@@ -62,13 +62,11 @@ export default async function NuevaInscripcionPage({
 
   return (
     <AppLayout>
-      <div className="px-5 py-6 md:px-8 lg:px-10">
+      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
         <EncabezadoFormulario
           volverHref={volverHref}
           volverTexto="Volver"
-          etiqueta="Control"
           titulo="NUEVA INSCRIPCIÓN"
-          descripcion="Asigna un alumno a un grupo."
         />
 
         <InscripcionForm

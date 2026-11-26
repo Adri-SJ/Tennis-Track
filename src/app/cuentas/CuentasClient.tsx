@@ -92,7 +92,7 @@ export default function CuentasClient() {
 
   if (!datos) {
     return (
-      <div className="px-5 py-6 md:px-8 lg:px-10">
+      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
         <Encabezado />
         <p className="text-sm text-texto-suave">{error ?? "Cargando cuentas…"}</p>
       </div>
@@ -110,7 +110,7 @@ export default function CuentasClient() {
 
 
   return (
-    <div className="px-5 py-6 md:px-8 lg:px-10">
+    <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
       <Encabezado />
 
       {error && (
@@ -141,7 +141,7 @@ export default function CuentasClient() {
               return (
                 <article
                   key={cuenta.id}
-                  className="rounded-2xl border-2 border-borde-alerta bg-superficie p-5"
+                  className="rounded-2xl border-2 border-borde-alerta bg-superficie p-4 sm:p-5"
                 >
                   <p className="font-bold text-texto">{cuenta.nombre}</p>
                   <p className="text-sm text-texto-2">{cuenta.correo}</p>
@@ -398,7 +398,7 @@ export default function CuentasClient() {
 
           {gruposDisponibles.length === 0 ? (
             <p className="text-sm text-texto-suave">
-              No se pudieron cargar los grupos de Twenty.
+              No se pudieron cargar los grupos.
             </p>
           ) : (
             <div className="space-y-2">
@@ -471,15 +471,9 @@ export default function CuentasClient() {
 function Encabezado() {
   return (
     <section className="mb-6">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
-        Administración
-      </p>
-      <h1 className="mt-2 text-4xl font-black tracking-tight text-texto">
+      <h1 className="text-4xl font-black tracking-tight text-texto">
         CUENTAS
       </h1>
-      <p className="mt-2 text-sm text-texto-suave">
-        Aprueba solicitudes, asigna roles y desactiva accesos.
-      </p>
     </section>
   );
 }

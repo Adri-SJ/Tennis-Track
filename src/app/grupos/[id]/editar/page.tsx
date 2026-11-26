@@ -25,13 +25,12 @@ export default async function EditarGrupoPage({
 
   return (
     <AppLayout>
-      <div className="px-5 py-6 md:px-8 lg:px-10">
+      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
         <EncabezadoFormulario
           volverHref={`/grupos/${grupo.id}`}
           volverTexto="Volver al grupo"
-          etiqueta="Gestión"
           titulo="EDITAR GRUPO"
-          descripcion={`Actualiza la información de ${grupo.nombre || "este grupo"}.`}
+          descripcion={grupo.nombre || undefined}
         />
 
         <GrupoForm

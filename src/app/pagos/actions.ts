@@ -60,7 +60,7 @@ export async function crearMensualidad(
 
     return {
       error:
-        "No se pudo guardar la mensualidad en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudo guardar la mensualidad. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 
@@ -109,7 +109,7 @@ export async function guardarPago(
 
     return {
       error:
-        "No se pudo registrar el pago en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudo registrar el pago. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 
@@ -130,7 +130,7 @@ export async function anularMensualidad(id: string): Promise<Resultado> {
   } catch (error) {
     console.error("No se pudo cancelar la mensualidad en Twenty:", error);
 
-    return { error: "No se pudo cancelar la mensualidad en Twenty." };
+    return { error: "No se pudo cancelar la mensualidad." };
   }
 
   revalidatePath("/pagos");

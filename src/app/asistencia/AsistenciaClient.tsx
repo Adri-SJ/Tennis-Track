@@ -107,7 +107,7 @@ export default function AsistenciaClient({
         return;
       }
 
-      setAviso("Asistencia guardada en Twenty.");
+      setAviso("Asistencia guardada.");
       router.refresh();
     });
   };
@@ -164,20 +164,12 @@ export default function AsistenciaClient({
   };
 
   return (
-    <div className="px-5 py-6 md:px-8 lg:px-10">
+    <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
       {/* ENCABEZADO */}
       <section className="mb-7">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
-          Entrenamientos
-        </p>
-
-        <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
+        <h1 className="text-2xl font-black text-texto sm:text-3xl md:text-5xl">
           ASISTENCIA
         </h1>
-
-        <p className="mt-2 text-sm text-texto-3 md:text-base">
-          Control de asistencia por grupo y fecha.
-        </p>
       </section>
 
       {/* SELECTORES */}
@@ -269,7 +261,7 @@ export default function AsistenciaClient({
         ].map((indicador) => (
           <div
             key={indicador.titulo}
-            className="rounded-2xl border border-borde bg-superficie p-5"
+            className="rounded-2xl border border-borde bg-superficie p-4 sm:p-5"
           >
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-texto-suave">
               {indicador.titulo}
@@ -483,14 +475,12 @@ export default function AsistenciaClient({
               <p role="status" className="font-semibold text-verde-oscuro">
                 {aviso}
               </p>
-            ) : (
+            ) : hayCambios ? (
               <p className="flex items-start gap-2 text-texto-suave">
                 <Info size={15} className="mt-0.5 shrink-0" />
-                {hayCambios
-                  ? "Hay cambios sin guardar."
-                  : "El pase de lista está guardado en Twenty."}
+                Hay cambios sin guardar.
               </p>
-            )}
+            ) : null}
           </div>
 
           <div className="flex shrink-0 items-center gap-4">

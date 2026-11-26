@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import AppLayout from "@/components/AppLayout";
+import Pestanas, { PESTANAS_ALUMNOS } from "@/components/Pestanas";
 import Link from "next/link";
 import {
   Plus,
@@ -28,22 +29,15 @@ export default async function InscripcionesPage() {
 
   return (
     <AppLayout>
-      <div className="px-5 py-6 md:px-8 lg:px-10">
+      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
+        <Pestanas pestanas={PESTANAS_ALUMNOS} activa="/inscripciones" />
 
         {/* ENCABEZADO */}
         <section className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
-              Control
-            </p>
-
-            <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
+            <h1 className="text-2xl font-black text-texto sm:text-3xl md:text-5xl">
               INSCRIPCIONES
             </h1>
-
-            <p className="mt-2 text-sm text-texto-3 md:text-base">
-              Consulta las inscripciones y los grupos asociados.
-            </p>
           </div>
 
           <Link
@@ -58,21 +52,21 @@ export default async function InscripcionesPage() {
         {/* RESUMEN */}
         <section className="mb-6 grid grid-cols-2 gap-3 md:max-w-lg">
           <div className="rounded-2xl border border-borde bg-superficie p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-texto-suave sm:text-xs sm:tracking-[0.15em]">
               Activas
             </p>
 
-            <p className="mt-2 text-3xl font-black text-texto">
+            <p className="mt-1 text-2xl font-black sm:mt-2 sm:text-3xl text-texto">
               {activas.length}
             </p>
           </div>
 
           <div className="rounded-2xl border border-borde bg-superficie p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-texto-suave sm:text-xs sm:tracking-[0.15em]">
               Inactivas
             </p>
 
-            <p className="mt-2 text-3xl font-black text-texto">
+            <p className="mt-1 text-2xl font-black sm:mt-2 sm:text-3xl text-texto">
               {inactivas.length}
             </p>
           </div>
@@ -295,7 +289,7 @@ export default async function InscripcionesPage() {
             </p>
 
             <p className="mt-1 text-sm text-texto-suave">
-              Las inscripciones creadas en Twenty aparecerán aquí.
+              Las nuevas inscripciones aparecerán aquí.
             </p>
           </section>
         )}

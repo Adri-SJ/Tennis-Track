@@ -83,7 +83,7 @@ export async function guardarProspecto(
 
     return {
       error:
-        "No se pudo guardar el prospecto en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudo guardar el prospecto. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 
@@ -111,7 +111,7 @@ export async function cambiarEtapaProspecto(
   } catch (error) {
     console.error("No se pudo cambiar la etapa en Twenty:", error);
 
-    return { error: "No se pudo cambiar la etapa en Twenty." };
+    return { error: "No se pudo cambiar la etapa." };
   }
 
   revalidatePath("/prospectos");
@@ -131,7 +131,7 @@ export async function eliminarProspecto(id: string): Promise<Resultado> {
   } catch (error) {
     console.error("No se pudo eliminar el prospecto en Twenty:", error);
 
-    return { error: "No se pudo eliminar el prospecto en Twenty." };
+    return { error: "No se pudo eliminar el prospecto." };
   }
 
   revalidatePath("/prospectos");
@@ -156,7 +156,7 @@ export async function convertirEnAlumno(id: string): Promise<Resultado> {
     }
 
     if (prospecto.alumnoId) {
-      return { error: "Este prospecto ya tiene un alumno en Twenty." };
+      return { error: "Este prospecto ya tiene un alumno." };
     }
 
     alumnoId = await convertirProspectoEnAlumno(prospecto);
@@ -164,7 +164,7 @@ export async function convertirEnAlumno(id: string): Promise<Resultado> {
     console.error("No se pudo crear el alumno desde el prospecto:", error);
 
     return {
-      error: "No se pudo crear el alumno en Twenty. Inténtalo de nuevo.",
+      error: "No se pudo crear el alumno. Inténtalo de nuevo.",
     };
   }
 

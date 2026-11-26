@@ -81,7 +81,7 @@ export async function guardarMaterial(
 
     return {
       error:
-        "No se pudo guardar el material en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudo guardar el material. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 
@@ -102,7 +102,7 @@ export async function eliminarMaterial(id: string): Promise<Resultado> {
   } catch (error) {
     console.error("No se pudo eliminar el material en Twenty:", error);
 
-    return { error: "No se pudo eliminar el material en Twenty." };
+    return { error: "No se pudo eliminar el material." };
   }
 
   revalidatePath("/inventario");
@@ -162,7 +162,7 @@ export async function guardarMovimiento(
 
     return {
       error:
-        "No se pudo registrar el movimiento en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudo registrar el movimiento. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 
@@ -268,7 +268,7 @@ export async function decidirSolicitud(
       await reabrirSolicitud(id);
       console.error("No se pudo registrar la salida en Twenty:", error);
 
-      return { error: "No se pudo registrar la salida en Twenty." };
+      return { error: "No se pudo registrar la salida." };
     }
   }
 

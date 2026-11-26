@@ -25,13 +25,12 @@ export default async function EditarAlumnoPage({
 
   return (
     <AppLayout>
-      <div className="px-5 py-6 md:px-8 lg:px-10">
+      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
         <EncabezadoFormulario
           volverHref={`/alumnos/${alumno.id}`}
           volverTexto="Volver al alumno"
-          etiqueta="Gestión"
           titulo="EDITAR ALUMNO"
-          descripcion={`Actualiza la información de ${alumno.nombre}.`}
+          descripcion={alumno.nombre}
         />
 
         <AlumnoForm

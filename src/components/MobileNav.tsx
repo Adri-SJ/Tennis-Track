@@ -1,66 +1,44 @@
-
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  House,
-  Users,
-  UsersRound,
-  CalendarDays,
-  Menu,
-  X,
-  ClipboardList,
-  ClipboardCheck,
-  Wallet,
-  ChartNoAxesCombined,
-  Package,
-  UserPlus,
-  ChevronRight,
-  UserCog,
-} from "lucide-react";
-import { puedeVer } from "@/lib/permisos";
+import { Menu, X, ChevronRight } from "lucide-react";
 import { useSesion } from "./auth/SesionProvider";
-import { rutaActiva } from "./navegacion";
+import {
+  ajustes,
+  itemActivo,
+  nombreDe,
+  paraRol,
+  principales as menuPrincipal,
+  secundarios,
+  type ItemMenu,
+} from "./navegacion";
 
-const accesosPrincipales = [
-  { name: "Inicio", icon: House, href: "/" },
-  { name: "Alumnos", icon: Users, href: "/alumnos" },
-  { name: "Horario", icon: CalendarDays, href: "/horario" },
-];
-
-const otrosModulos = [
-  { name: "Grupos", icon: UsersRound, href: "/grupos" },
-  { name: "Inscripciones", icon: ClipboardList, href: "/inscripciones" },
-  { name: "Asistencia", icon: ClipboardCheck, href: "/asistencia" },
-  { name: "Pagos", icon: Wallet, href: "/pagos" },
-  {
-    name: "Desarrollo deportivo",
-    icon: ChartNoAxesCombined,
-    href: "/desarrollo",
-  },
-  { name: "Inventario", icon: Package, href: "/inventario" },
-  { name: "Prospectos", icon: UserPlus, href: "/prospectos" },
-  { name: "Cuentas", icon: UserCog, href: "/cuentas" },
-];
+/* Orden de la barra inferior: lo de todos los días primero. */
+const BARRA = {
+  admin: ["/", "/alumnos", "/grupos", "/asistencia"],
+  entrenador: ["/asistencia", "/grupos", "/alumnos"],
+};
 
 export default function MobileNav() {
   const pathname = usePathname();
   const { usuario } = useSesion();
-  const principales = accesosPrincipales.filter((item) =>
-    puedeVer(usuario.rol, item.href)
-  );
-  const otros = otrosModulos.filter((item) =>
-    puedeVer(usuario.rol, item.href)
-  );
+  const disponibles = paraRol(usuario.rol, [
+    ...menuPrincipal,
+    ...secundarios,
+    ajustes,
+  ]);
+  const enBarra = BARRA[usuario.rol];
+  const principales = enBarra
+    .map((href) => disponibles.find((item) => item.href === href))
+    .filter((item): item is ItemMenu => Boolean(item));
+  const otros = disponibles.filter((item) => !enBarra.includes(item.href));
   const [menuAbierto, setMenuAbierto] = useState(false);
 
-  const estaActivo = (href: string) => rutaActiva(pathname, href);
+  const estaActivo = (item: ItemMenu) => itemActivo(pathname, item);
 
-  const otroModuloActivo = otros.some((item) =>
-    estaActivo(item.href)
-  );
+  const otroModuloActivo = otros.some(estaActivo);
 
   return (
     <>
@@ -82,11 +60,8 @@ export default function MobileNav() {
           >
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
-                  TennisTrack
-                </p>
-                <h2 className="mt-1 text-2xl font-black text-texto">
-                  MÁS MÓDULOS
+                <h2 className="text-2xl font-black text-texto">
+                  MÁS
                 </h2>
               </div>
 
@@ -103,7 +78,7 @@ export default function MobileNav() {
             <div className="space-y-2">
               {otros.map((item) => {
                 const Icon = item.icon;
-                const activo = estaActivo(item.href);
+                const activo = estaActivo(item);
 
                 return (
                   <Link
@@ -119,7 +94,7 @@ export default function MobileNav() {
                     <Icon size={20} className="shrink-0" />
 
                     <span className="flex-1 text-sm font-bold">
-                      {item.name}
+                      {nombreDe(item, usuario.rol)}
                     </span>
 
                     <ChevronRight
@@ -141,7 +116,7 @@ export default function MobileNav() {
       >
         {principales.map((item) => {
           const Icon = item.icon;
-          const activo = estaActivo(item.href);
+          const activo = estaActivo(item);
 
           return (
             <Link
@@ -156,7 +131,7 @@ export default function MobileNav() {
               }`}
             >
               <Icon size={22} />
-              <span className="text-xs">{item.name}</span>
+              <span className="text-xs">{nombreDe(item, usuario.rol)}</span>
             </Link>
           );
         })}

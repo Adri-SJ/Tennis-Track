@@ -16,7 +16,6 @@ import {
   CreditCard,
   Banknote,
   Receipt,
-  Info,
   TrendingUp,
   SlidersHorizontal,
   Ban,
@@ -197,22 +196,14 @@ export default function PagosClient({
   }, [pagos, busqueda, estado]);
 
   return (
-    <div className="px-5 py-6 md:px-8 lg:px-10">
+    <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
 
       {/* ENCABEZADO */}
       <section className="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
-            Administración
-          </p>
-
-          <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
+          <h1 className="text-2xl font-black text-texto sm:text-3xl md:text-5xl">
             PAGOS
           </h1>
-
-          <p className="mt-2 text-sm text-texto-3 md:text-base">
-            Control de mensualidades, cobros y adeudos.
-          </p>
         </div>
 
         <button
@@ -226,7 +217,7 @@ export default function PagosClient({
       </section>
 
       {/* INDICADORES */}
-      <section className="mb-7 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[
           {
             titulo: "Recaudado",
@@ -258,7 +249,7 @@ export default function PagosClient({
           return (
             <div
               key={indicador.titulo}
-              className="rounded-2xl border border-borde bg-superficie p-5"
+              className="rounded-2xl border border-borde bg-superficie p-4 sm:p-5"
             >
               <div className="flex items-center justify-between gap-2">
                 <p className="text-xs font-bold uppercase tracking-[0.12em] text-texto-suave">
@@ -278,24 +269,13 @@ export default function PagosClient({
       </section>
 
       {/* PROGRESO DE COBRANZA */}
-      <section className="mb-7 rounded-2xl bg-banner p-6 text-white md:p-7">
+      <section className="mb-5 rounded-2xl bg-banner p-5 text-white md:p-7">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div>
-            <div className="flex items-center gap-2 text-[#dce6a1]">
-              <TrendingUp size={18} />
-              <p className="text-xs font-bold uppercase tracking-[0.15em]">
-                Resumen financiero
-              </p>
-            </div>
-
-            <h2 className="mt-3 text-2xl font-black md:text-3xl">
-              Cobranza registrada
+            <h2 className="flex items-center gap-2 text-2xl font-black md:text-3xl">
+              <TrendingUp size={22} className="text-[#dce6a1]" />
+              Cobrado
             </h2>
-
-            <p className="mt-2 text-sm text-[#d1d5ba]">
-              Porcentaje del importe registrado que ya fue pagado
-              (sin contar mensualidades canceladas).
-            </p>
           </div>
 
           <p className="text-4xl font-black text-[#eef310] md:text-5xl">
@@ -325,11 +305,7 @@ export default function PagosClient({
         <div className="border-b border-borde p-5 md:p-6">
           <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
-                Registro financiero
-              </p>
-
-              <h2 className="mt-1 text-xl font-black text-texto">
+              <h2 className="text-xl font-black text-texto">
                 Mensualidades y cobros
               </h2>
             </div>
@@ -529,12 +505,6 @@ export default function PagosClient({
           </div>
         )}
 
-        <div className="flex items-center gap-2 border-t border-borde bg-superficie-2 px-5 py-4 text-xs text-texto-suave">
-          <Info size={15} className="shrink-0" />
-          Mensualidades y pagos guardados en Twenty. Una
-          mensualidad pendiente se marca como vencida al pasar
-          su fecha de vencimiento.
-        </div>
       </section>
 
       {/* MODAL DE DETALLE */}
@@ -555,13 +525,9 @@ export default function PagosClient({
           >
             <div className="flex items-start justify-between bg-fondo p-6">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.15em] text-verde">
-                  Detalle de movimiento
-                </p>
-
                 <h2
                   id="titulo-pago"
-                  className="mt-2 text-2xl font-black text-texto"
+                  className="text-2xl font-black text-texto"
                 >
                   {pagoSeleccionado.alumno}
                 </h2>
@@ -587,7 +553,7 @@ export default function PagosClient({
                   Importe de mensualidad
                 </p>
 
-                <p className="mt-2 text-3xl font-black">
+                <p className="mt-1 text-2xl font-black sm:mt-2 sm:text-3xl">
                   {formatoMoneda.format(pagoSeleccionado.monto)}
                 </p>
               </div>

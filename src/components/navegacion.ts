@@ -2,66 +2,69 @@ import {
   LayoutDashboard,
   Users,
   UsersRound,
-  ClipboardList,
   ClipboardCheck,
-  CalendarDays,
   Wallet,
   ChartNoAxesCombined,
   Package,
   UserPlus,
-  UserCog,
+  Settings,
+  type LucideIcon,
 } from "lucide-react";
 import { puedeVer, type Rol } from "@/lib/permisos";
 
-/* Secciones del menú, compartidas por la barra lateral y el menú móvil. */
-export const secciones = [
+export type ItemMenu = {
+  name: string;
+  /* Nombre para el entrenador, si cambia (solo ve sus grupos). */
+  nameEntrenador?: string;
+  icon: LucideIcon;
+  href: string;
+  /* Rutas que viven dentro de esta sección (sus pestañas). */
+  incluye?: string[];
+};
+
+/* Menú compartido por la barra lateral y la navegación móvil. */
+export const principales: ItemMenu[] = [
+  { name: "Inicio", icon: LayoutDashboard, href: "/" },
+  { name: "Alumnos", icon: Users, href: "/alumnos", incluye: ["/inscripciones"] },
   {
-    titulo: "GENERAL",
-    items: [
-      { name: "Resumen", icon: LayoutDashboard, href: "/" },
-      { name: "Alumnos", icon: Users, href: "/alumnos" },
-      { name: "Grupos", icon: UsersRound, href: "/grupos" },
-      { name: "Horario semanal", icon: CalendarDays, href: "/horario" },
-      { name: "Inscripciones", icon: ClipboardList, href: "/inscripciones" },
-    ],
+    name: "Grupos",
+    nameEntrenador: "Mis grupos",
+    icon: UsersRound,
+    href: "/grupos",
+    incluye: ["/horario"],
   },
-  {
-    titulo: "OPERACIÓN",
-    items: [
-      { name: "Asistencia", icon: ClipboardCheck, href: "/asistencia" },
-      { name: "Pagos", icon: Wallet, href: "/pagos" },
-      {
-        name: "Desarrollo deportivo",
-        icon: ChartNoAxesCombined,
-        href: "/desarrollo",
-      },
-      { name: "Inventario", icon: Package, href: "/inventario" },
-    ],
-  },
-  {
-    titulo: "CRECIMIENTO",
-    items: [
-      { name: "Prospectos", icon: UserPlus, href: "/prospectos" },
-    ],
-  },
-  {
-    titulo: "ADMINISTRACIÓN",
-    items: [{ name: "Cuentas", icon: UserCog, href: "/cuentas" }],
-  },
+  { name: "Asistencia", icon: ClipboardCheck, href: "/asistencia" },
+  { name: "Desarrollo deportivo", icon: ChartNoAxesCombined, href: "/desarrollo" },
+  { name: "Pagos", icon: Wallet, href: "/pagos" },
 ];
 
-/* Solo los módulos que el rol puede ver; las secciones vacías se omiten. */
-export function seccionesPara(rol: Rol) {
-  return secciones
-    .map((seccion) => ({
-      ...seccion,
-      items: seccion.items.filter((item) => puedeVer(rol, item.href)),
-    }))
-    .filter((seccion) => seccion.items.length > 0);
+export const secundarios: ItemMenu[] = [
+  { name: "Inventario", icon: Package, href: "/inventario" },
+  { name: "Prospectos", icon: UserPlus, href: "/prospectos" },
+];
+
+export const ajustes: ItemMenu = { name: "Ajustes", icon: Settings, href: "/cuentas" };
+
+/* Solo lo que el rol puede ver. */
+export function paraRol(rol: Rol, items: ItemMenu[]): ItemMenu[] {
+  return items.filter((item) => puedeVer(rol, item.href));
+}
+
+export function nombreDe(item: ItemMenu, rol: Rol): string {
+  return rol === "entrenador" && item.nameEntrenador
+    ? item.nameEntrenador
+    : item.name;
 }
 
 export function rutaActiva(pathname: string, href: string): boolean {
   return href === "/"
     ? pathname === "/"
     : pathname === href || pathname.startsWith(`${href}/`);
+}
+
+/* La sección está activa en su ruta y en las de sus pestañas. */
+export function itemActivo(pathname: string, item: ItemMenu): boolean {
+  return [item.href, ...(item.incluye ?? [])].some((href) =>
+    rutaActiva(pathname, href)
+  );
 }

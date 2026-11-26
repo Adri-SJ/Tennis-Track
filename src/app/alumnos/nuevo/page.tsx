@@ -11,13 +11,11 @@ export const metadata: Metadata = {
 export default function NuevoAlumnoPage() {
   return (
     <AppLayout>
-      <div className="px-5 py-6 md:px-8 lg:px-10">
+      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
         <EncabezadoFormulario
           volverHref="/alumnos"
           volverTexto="Volver a alumnos"
-          etiqueta="Gestión"
           titulo="NUEVO ALUMNO"
-          descripcion="Registra la información general del alumno."
         />
 
         <AlumnoForm

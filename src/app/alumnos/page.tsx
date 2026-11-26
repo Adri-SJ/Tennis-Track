@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import AppLayout from "@/components/AppLayout";
+import Pestanas, { PESTANAS_ALUMNOS } from "@/components/Pestanas";
 import Link from "next/link";
 import {
   Search,
@@ -35,25 +36,18 @@ export default async function AlumnosPage() {
 
   return (
     <AppLayout>
-      <div className="px-5 py-6 md:px-8 lg:px-10">
+      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
+        {esAdmin && (
+          <Pestanas pestanas={PESTANAS_ALUMNOS} activa="/alumnos" />
+        )}
 
         {/* ENCABEZADO */}
         <section className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-verde">
-              Gestión
-            </p>
-
-            <h1 className="mt-1 text-3xl font-black text-texto md:text-5xl">
+            <h1 className="text-2xl font-black text-texto sm:text-3xl md:text-5xl">
               ALUMNOS
             </h1>
-
-            <p className="mt-2 text-sm text-texto-3 md:text-base">
-              {esAdmin
-                ? "Consulta y administra los alumnos registrados en la academia."
-                : "Consulta a los alumnos de tus grupos."}
-            </p>
           </div>
 
           {esAdmin && (
@@ -72,21 +66,21 @@ export default async function AlumnosPage() {
         <section className="mb-6 grid grid-cols-2 gap-3 md:max-w-lg">
 
           <div className="rounded-2xl border border-borde bg-superficie p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-texto-suave sm:text-xs sm:tracking-[0.15em]">
               Total alumnos
             </p>
 
-            <p className="mt-2 text-3xl font-black text-texto">
+            <p className="mt-1 text-2xl font-black sm:mt-2 sm:text-3xl text-texto">
               {alumnos.length}
             </p>
           </div>
 
           <div className="rounded-2xl border border-borde bg-superficie p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-texto-suave">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-texto-suave sm:text-xs sm:tracking-[0.15em]">
               Alumnos activos
             </p>
 
-            <p className="mt-2 text-3xl font-black text-texto">
+            <p className="mt-1 text-2xl font-black sm:mt-2 sm:text-3xl text-texto">
               {alumnosActivos.length}
             </p>
           </div>
@@ -120,7 +114,7 @@ export default async function AlumnosPage() {
             <Link
               key={alumno.id}
               href={`/alumnos/${alumno.id}`}
-              className="group block rounded-2xl border border-borde bg-superficie p-5 transition hover:border-[#cbd90a]"
+              className="group block rounded-2xl border border-borde bg-superficie p-4 transition sm:p-5 hover:border-[#cbd90a]"
             >
 
               {/* CABECERA */}

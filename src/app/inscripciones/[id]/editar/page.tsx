@@ -25,13 +25,11 @@ export default async function EditarInscripcionPage({
 
   return (
     <AppLayout>
-      <div className="px-5 py-6 md:px-8 lg:px-10">
+      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
         <EncabezadoFormulario
           volverHref={`/inscripciones/${inscripcion.id}`}
           volverTexto="Volver a la inscripción"
-          etiqueta="Control"
           titulo="EDITAR INSCRIPCIÓN"
-          descripcion="Corrige las fechas o el estado. Para mover al alumno de grupo usa «Cambiar de grupo» en su perfil."
         />
 
         <InscripcionForm

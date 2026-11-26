@@ -109,7 +109,7 @@ export async function crearInscripcion(
 
     return {
       error:
-        "No se pudo guardar la inscripción en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudo guardar la inscripción. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 
@@ -173,7 +173,7 @@ export async function actualizarInscripcion(
 
     return {
       error:
-        "No se pudieron guardar los cambios en Twenty. Revisa la conexión e inténtalo de nuevo.",
+        "No se pudieron guardar los cambios. Revisa la conexión e inténtalo de nuevo.",
     };
   }
 
