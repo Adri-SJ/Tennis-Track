@@ -1,28 +1,43 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { COOKIE_SESION, leerToken } from "@/lib/auth/jwt";
+import { COOKIE_SESION, opcionesCookie, renovarToken } from "@/lib/auth/jwt";
 
 /*
   Verificación optimista: solo revisa la firma del JWT. La revisión
   real (cuenta activa y rol) la hacen las páginas, las Server Actions
   y la API contra la base. La API responde sus propios 401 en JSON.
+
+  Cada página o acción con sesión válida renueva la cookie otros 30
+  minutos: así la sesión solo vence por inactividad.
 */
+
+/* Rutas de la API que cuentan como actividad (el latido de la app). */
+const API_QUE_RENUEVA = ["/api/auth/yo"];
+
 export default async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+  const renovado = await renovarToken(request.cookies.get(COOKIE_SESION)?.value);
+
+  const conRenovacion = (respuesta: NextResponse) => {
+    if (renovado) {
+      respuesta.cookies.set(COOKIE_SESION, renovado, opcionesCookie);
+    }
+
+    return respuesta;
+  };
 
   if (pathname.startsWith("/api/")) {
-    return NextResponse.next();
+    return API_QUE_RENUEVA.includes(pathname)
+      ? conRenovacion(NextResponse.next())
+      : NextResponse.next();
   }
 
-  const conSesion =
-    (await leerToken(request.cookies.get(COOKIE_SESION)?.value)) !== null;
-
   if (pathname === "/login") {
-    return conSesion
+    return renovado
       ? NextResponse.redirect(new URL("/", request.nextUrl))
       : NextResponse.next();
   }
 
-  if (!conSesion) {
+  if (!renovado) {
     const url = new URL("/login", request.nextUrl);
 
     if (pathname !== "/") {
@@ -37,7 +52,7 @@ export default async function proxy(request: NextRequest) {
 
   headers.set("x-ruta", pathname);
 
-  return NextResponse.next({ request: { headers } });
+  return conRenovacion(NextResponse.next({ request: { headers } }));
 }
 
 export const config = {

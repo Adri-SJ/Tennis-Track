@@ -21,7 +21,13 @@ function mensajeDe(falla: unknown): string {
 }
 
 /* Una sola pantalla con tres modos; la URL no cambia. */
-export default function PantallaAcceso({ desde }: { desde: string }) {
+export default function PantallaAcceso({
+  desde,
+  porInactividad,
+}: {
+  desde: string;
+  porInactividad: boolean;
+}) {
   const [modo, setModo] = useState<Modo>("ingresar");
 
   const titulo = {
@@ -38,6 +44,12 @@ export default function PantallaAcceso({ desde }: { desde: string }) {
         <LogoTennisTrack className="auth-logo" />
 
         <h1 className="auth-titulo">{titulo}</h1>
+
+        {modo === "ingresar" && porInactividad && (
+          <p className="auth-aviso" role="status">
+            Tu sesión se cerró por inactividad. Vuelve a ingresar para continuar.
+          </p>
+        )}
 
         {modo === "ingresar" && (
           <Ingresar desde={desde} onOlvide={() => setModo("recuperar")} />

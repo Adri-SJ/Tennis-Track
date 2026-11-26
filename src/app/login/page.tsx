@@ -17,7 +17,12 @@ function destinoSeguro(desde: string | string[] | undefined): string {
 }
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
-  const { desde } = await searchParams;
+  const { desde, motivo } = await searchParams;
 
-  return <PantallaAcceso desde={destinoSeguro(desde)} />;
+  return (
+    <PantallaAcceso
+      desde={destinoSeguro(desde)}
+      porInactividad={motivo === "inactividad"}
+    />
+  );
 }
