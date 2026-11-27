@@ -174,7 +174,7 @@ export default async function AlumnoPage({
         </section>
 
         {/* INFORMACIÓN */}
-        <section className="mt-5 grid gap-5 xl:grid-cols-2">
+        <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
 
           {/* INFORMACIÓN GENERAL */}
           <div className="rounded-2xl border border-borde bg-superficie p-4 md:p-6">

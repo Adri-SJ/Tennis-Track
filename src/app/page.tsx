@@ -283,7 +283,7 @@ export default async function Home() {
           />
         </section>
 
-        <section className="mt-4 grid gap-4 sm:mt-6 sm:gap-6 xl:grid-cols-5">
+        <section className="mt-4 grid grid-cols-1 gap-4 sm:mt-6 sm:gap-6 xl:grid-cols-5">
           {/* HOY EN LA CANCHA */}
           <div className="rounded-2xl border border-borde bg-superficie p-4 sm:p-6 xl:col-span-3">
             <div className="flex items-center justify-between gap-4">
@@ -342,7 +342,7 @@ export default async function Home() {
           </div>
 
           {ocupacion.length > 0 ? (
-            <div className="mt-5 grid gap-x-10 gap-y-5 md:grid-cols-2">
+            <div className="mt-5 grid grid-cols-1 gap-x-10 gap-y-5 md:grid-cols-2">
               {ocupacion.map(({ grupo, alumnos: cantidad, cupo }) => (
                 <BarraGrupo
                   key={grupo.id}

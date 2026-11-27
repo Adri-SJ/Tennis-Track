@@ -435,7 +435,7 @@ export default function ProspectosClient({
       {/* CONTROLES */}
       <section className="mb-5 rounded-2xl border border-borde bg-superficie p-4 sm:p-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="grid flex-1 gap-3 sm:grid-cols-[1fr_200px]">
+          <div className="grid grid-cols-1 flex-1 gap-3 sm:grid-cols-[1fr_200px]">
             <div className="relative">
               <Search
                 size={17}
@@ -511,7 +511,7 @@ export default function ProspectosClient({
 
       {/* TABLERO */}
       {vista === "tablero" && (
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
+        <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
           {etapas.map((etapa) => {
             const registros = filtrados.filter(
               (prospecto) => prospecto.etapa === etapa
@@ -746,7 +746,7 @@ export default function ProspectosClient({
                 />
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label
                     htmlFor="prospecto-origen"

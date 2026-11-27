@@ -10,15 +10,15 @@ export const claseCampo =
 export const claseEtiqueta =
   "mb-2 block text-sm font-semibold text-texto";
 
-/* Fecha de hoy en formato YYYY-MM-DD, en hora local. */
+/*
+  Fecha de hoy (YYYY-MM-DD) en la hora de México. El servidor corre en
+  UTC: con la hora local, después de las 6 p.m. ya sería mañana.
+*/
 export function hoy(): string {
-  const ahora = new Date();
-
-  return new Date(
-    ahora.getTime() - ahora.getTimezoneOffset() * 60000
-  )
-    .toISOString()
-    .slice(0, 10);
+  /* en-CA da el formato YYYY-MM-DD. */
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Mexico_City",
+  }).format(new Date());
 }
 
 export function esFecha(valor: string): boolean {

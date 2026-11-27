@@ -84,7 +84,7 @@ export default function PagoModal({
         </span>
       </p>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="pago-fecha" className="mb-2 block text-sm font-bold">
             Fecha de pago

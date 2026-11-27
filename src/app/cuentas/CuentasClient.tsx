@@ -45,6 +45,7 @@ const ETIQUETA_ESTADO: Record<Cuenta["estado"], string> = {
 
 function fecha(valor: string): string {
   return new Date(valor).toLocaleDateString("es-MX", {
+    timeZone: "America/Mexico_City",
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -134,7 +135,7 @@ export default function CuentasClient() {
             No hay cuentas esperando aprobación.
           </p>
         ) : (
-          <div className="grid gap-3 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
             {pendientes.map((cuenta) => {
               const rol = rolElegido[cuenta.id] ?? rolesAsignables[0];
 

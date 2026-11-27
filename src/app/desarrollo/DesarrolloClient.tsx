@@ -4,6 +4,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Alumno } from "@/lib/types";
+import { hoy } from "@/lib/formulario";
 import type {
   Evaluacion,
   Habilidad,
@@ -74,15 +75,6 @@ function formatoNumero(numero: number) {
   return numero.toFixed(1);
 }
 
-function fechaLocalISO() {
-  const fecha = new Date();
-  const anio = fecha.getFullYear();
-  const mes = String(fecha.getMonth() + 1).padStart(2, "0");
-  const dia = String(fecha.getDate()).padStart(2, "0");
-
-  return `${anio}-${mes}-${dia}`;
-}
-
 function formatearFecha(fecha: string) {
   return new Intl.DateTimeFormat("es-MX", {
     day: "numeric",
@@ -94,7 +86,7 @@ function formatearFecha(fecha: string) {
 
 function nuevaEvaluacionForm(): Formulario {
   return {
-    fecha: fechaLocalISO(),
+    fecha: hoy(),
     puntuaciones: { ...puntuacionesIniciales },
     observaciones: "",
   };
@@ -508,7 +500,7 @@ export default function DesarrolloClient({
       return;
     }
 
-    if (formulario.fecha > fechaLocalISO()) {
+    if (formulario.fecha > hoy()) {
       setError(
         "La evaluación no puede tener una fecha futura."
       );
@@ -740,7 +732,7 @@ export default function DesarrolloClient({
       </section>
 
       {/* RESUMEN PRINCIPAL */}
-      <section className="mb-5 grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+      <section className="mb-5 grid grid-cols-1 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="rounded-2xl border border-borde bg-superficie p-4 md:p-6">
           <div className="mb-5">
             <h2 className="text-xl font-black text-texto">
@@ -895,7 +887,7 @@ export default function DesarrolloClient({
         </div>
 
         {ultima ? (
-          <div className="grid gap-x-10 gap-y-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
             {habilidades.map((habilidad) => {
               const valor =
                 ultima.puntuaciones[habilidad.key];
@@ -1080,7 +1072,7 @@ export default function DesarrolloClient({
                 <input
                   id="fecha-evaluacion"
                   type="date"
-                  max={fechaLocalISO()}
+                  max={hoy()}
                   value={formulario.fecha}
                   onChange={(event) =>
                     setFormulario((actual) => ({

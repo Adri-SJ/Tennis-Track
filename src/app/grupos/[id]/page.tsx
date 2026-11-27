@@ -122,7 +122,7 @@ export default async function GrupoPage({
         </section>
 
         {/* MÉTRICAS */}
-        <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
 
           <InfoCard
             icon={<Users size={20} />}
@@ -149,7 +149,7 @@ export default async function GrupoPage({
         </section>
 
         {/* CONTENIDO */}
-        <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_2fr]">
+        <section className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1fr_2fr]">
 
           {/* INFORMACIÓN DEL GRUPO */}
           <div className="rounded-2xl border border-borde bg-superficie p-4 sm:p-6">

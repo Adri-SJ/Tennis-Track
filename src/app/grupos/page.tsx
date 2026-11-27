@@ -129,7 +129,7 @@ export default async function GruposPage() {
         </section>
 
         {/* GRUPOS */}
-        <section className="grid gap-4 xl:grid-cols-2">
+        <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
 
           {grupos.map((grupo) => {
             const cantidadAlumnos =
@@ -162,7 +162,7 @@ export default async function GruposPage() {
                 </div>
 
                 {/* INFORMACIÓN */}
-                <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
 
                   <div className="flex items-start gap-3">
 

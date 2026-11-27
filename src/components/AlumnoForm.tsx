@@ -47,7 +47,7 @@ export default function AlumnoForm({
       action={formAction}
       className="max-w-4xl rounded-2xl border border-borde bg-superficie p-5 md:p-7"
     >
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
 
         {/* NOMBRES */}
         <div>

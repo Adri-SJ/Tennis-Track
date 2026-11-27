@@ -156,7 +156,7 @@ export default function HorarioClient({
       <div className="lg:hidden">
         <nav
           aria-label="Días de la semana"
-          className="sticky top-[57px] z-30 -mx-5 mb-4 grid gap-1.5 bg-fondo px-5 py-2 md:-mx-8 md:px-8"
+          className="sticky top-[57px] z-30 -mx-4 mb-4 grid gap-1.5 bg-fondo px-4 py-2 md:-mx-8 md:px-8"
           style={{ gridTemplateColumns: `repeat(${dias.length}, minmax(0, 1fr))` }}
         >
           {dias.map((dia) => {
