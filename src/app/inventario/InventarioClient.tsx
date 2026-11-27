@@ -280,7 +280,7 @@ export default function InventarioClient({
             </span>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             <div className="relative md:col-span-1">
               <Search
                 size={17}

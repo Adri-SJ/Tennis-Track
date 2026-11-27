@@ -173,7 +173,7 @@ export default function AsistenciaClient({
       </section>
 
       {/* SELECTORES */}
-      <section className="mb-6 grid gap-4 rounded-2xl border border-borde bg-superficie p-5 md:grid-cols-2 md:p-6">
+      <section className="mb-6 grid grid-cols-1 gap-4 rounded-2xl border border-borde bg-superficie p-5 md:grid-cols-2 md:p-6">
         <div>
           <label
             htmlFor="grupo-asistencia"

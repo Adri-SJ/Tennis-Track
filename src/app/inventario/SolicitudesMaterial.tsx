@@ -80,6 +80,7 @@ export default function SolicitudesMaterial({
                 <p className="text-xs text-texto-suave">
                   {esAdmin && `${solicitud.entrenador} · `}
                   {new Date(solicitud.creadaEn).toLocaleDateString("es-MX", {
+                    timeZone: "America/Mexico_City",
                     day: "numeric",
                     month: "short",
                   })}

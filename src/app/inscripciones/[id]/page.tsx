@@ -126,7 +126,7 @@ export default async function InscripcionDetallePage({
         </section>
 
         {/* INFORMACIÓN PRINCIPAL */}
-        <section className="mt-7 grid gap-4 md:grid-cols-2">
+        <section className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-2">
 
           {/* ALUMNO */}
           <div className="rounded-2xl border border-borde bg-superficie p-4 sm:p-5">
@@ -217,7 +217,7 @@ export default async function InscripcionDetallePage({
 
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 
             {/* INICIO */}
             <div className="rounded-xl bg-fondo p-4">

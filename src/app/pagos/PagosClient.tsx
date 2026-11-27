@@ -315,7 +315,7 @@ export default function PagosClient({
             </span>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             <div className="relative md:col-span-2">
               <Search
                 size={17}
