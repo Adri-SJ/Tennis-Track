@@ -12,7 +12,11 @@ export const PATCH = manejarErrores(
     const { rol, estado } = esquemaActualizarUsuario.parse(
       await leerJson(request)
     );
-    const cuenta = await cuentaGestionable(actor, (await ctx.params).id);
+    const cuenta = await cuentaGestionable(
+      actor,
+      (await ctx.params).id,
+      rol
+    );
 
     if (cuenta.estado !== "activo" && cuenta.estado !== "inactivo") {
       throw new ErrorHttp(409, "Primero aprueba o rechaza esta cuenta");

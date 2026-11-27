@@ -38,7 +38,12 @@ export async function requiereRol(...roles: Rol[]): Promise<UsuarioSesion> {
     throw new ErrorHttp(401, "Tu cuenta ya no está activa");
   }
 
-  if (roles.length > 0 && !roles.includes(usuario.rol)) {
+  /* El superadministrador entra donde entra el administrador. */
+  const permitido =
+    roles.includes(usuario.rol) ||
+    (usuario.rol === "superadmin" && roles.includes("admin"));
+
+  if (roles.length > 0 && !permitido) {
     throw new ErrorHttp(403, "No tienes permiso para esta acción");
   }
 
