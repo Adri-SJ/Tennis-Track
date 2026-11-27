@@ -7,7 +7,9 @@
   y además no aparece ante los administradores normales: no ven su
   cuenta ni pueden modificarla ni asignar ese rol. El entrenador solo consulta sus
   grupos y alumnos, pasa lista, evalúa a sus alumnos y ve el
-  inventario, donde puede solicitar material; qué grupos son suyos se
+  inventario, donde puede solicitar material, y
+  Ajustes (tema y cerrar sesión; la gestión de cuentas es del
+  administrador); qué grupos son suyos se
   revisa en cada página.
 */
 
@@ -27,6 +29,7 @@ const RUTAS_ENTRENADOR = [
   /^\/asistencia$/,
   /^\/desarrollo$/,
   /^\/inventario$/,
+  /^\/cuentas$/,
 ];
 
 export function esAdministrador(rol: Rol | null): boolean {

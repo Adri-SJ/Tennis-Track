@@ -93,10 +93,10 @@ export default function CuentasClient() {
 
   if (!datos) {
     return (
-      <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
+      <section className="mt-8">
         <Encabezado />
         <p className="text-sm text-texto-suave">{error ?? "Cargando cuentas…"}</p>
-      </div>
+      </section>
     );
   }
 
@@ -111,7 +111,7 @@ export default function CuentasClient() {
 
 
   return (
-    <div className="px-4 py-5 md:px-8 md:py-6 lg:px-10">
+    <section className="mt-8">
       <Encabezado />
 
       {error && (
@@ -224,7 +224,7 @@ export default function CuentasClient() {
       <section>
         <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[0.15em] text-texto-suave">
           <UserCog size={16} />
-          Cuentas ({resto.length})
+          Registradas ({resto.length})
         </h2>
 
         <div className="overflow-hidden rounded-2xl border border-borde bg-superficie">
@@ -465,16 +465,17 @@ export default function CuentasClient() {
           <p className="text-sm text-texto-2">{confirmacion.mensaje}</p>
         </Modal>
       )}
-    </div>
+    </section>
   );
 }
 
 function Encabezado() {
   return (
-    <section className="mb-6">
-      <h1 className="text-4xl font-black tracking-tight text-texto">
-        CUENTAS
-      </h1>
-    </section>
+    <div className="mb-4">
+      <h2 className="text-lg font-black text-texto sm:text-xl">CUENTAS</h2>
+      <p className="mt-1 text-sm text-texto-suave">
+        Aprueba a quien se registra y elige qué puede hacer cada persona.
+      </p>
+    </div>
   );
 }
