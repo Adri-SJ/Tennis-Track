@@ -7,18 +7,6 @@ type Tema = "sistema" | "claro" | "oscuro";
 
 const CLAVE_TEMA = "tennistrack.tema";
 
-const SIGUIENTE: Record<Tema, Tema> = {
-  sistema: "claro",
-  claro: "oscuro",
-  oscuro: "sistema",
-};
-
-const ETIQUETA: Record<Tema, string> = {
-  sistema: "Tema del sistema",
-  claro: "Tema claro",
-  oscuro: "Tema oscuro",
-};
-
 const ICONO = { sistema: Monitor, claro: Sun, oscuro: Moon };
 
 /*
@@ -27,11 +15,7 @@ const ICONO = { sistema: Monitor, claro: Sun, oscuro: Moon };
 */
 export const scriptTema = `(function(){try{var t=localStorage.getItem("${CLAVE_TEMA}");if(t==="claro"||t==="oscuro")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
 
-/* Avisa a los demás selectores de tema (encabezado, barra, Ajustes). */
-const EVENTO_TEMA = "tennistrack:tema";
-
 function aplicar(tema: Tema) {
-  window.dispatchEvent(new CustomEvent<Tema>(EVENTO_TEMA, { detail: tema }));
 
   if (tema === "sistema") {
     document.documentElement.removeAttribute("data-theme");
@@ -50,63 +34,13 @@ function aplicar(tema: Tema) {
   }
 }
 
-function escucharTema(alCambiar: (tema: Tema) => void): () => void {
-  const manejar = (evento: Event) =>
-    alCambiar((evento as CustomEvent<Tema>).detail);
-
-  window.addEventListener(EVENTO_TEMA, manejar);
-
-  return () => window.removeEventListener(EVENTO_TEMA, manejar);
-}
-
-/* Cambia entre sistema → claro → oscuro. */
-export default function ThemeToggle({
-  conTexto = false,
-  className = "",
-}: {
-  conTexto?: boolean;
-  className?: string;
-}) {
-  const [tema, setTema] = useState<Tema>("sistema");
-
-  /* El tema real solo se conoce en el navegador (lo puso el script). */
-  useEffect(() => {
-    const actual = document.documentElement.getAttribute("data-theme");
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- data-theme solo existe en el navegador
-    setTema(actual === "claro" || actual === "oscuro" ? actual : "sistema");
-
-    return escucharTema(setTema);
-  }, []);
-
-  const Icono = ICONO[tema];
-
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        const nuevo = SIGUIENTE[tema];
-
-        aplicar(nuevo);
-        setTema(nuevo);
-      }}
-      aria-label={`${ETIQUETA[tema]}. Cambiar a ${ETIQUETA[SIGUIENTE[tema]].toLowerCase()}`}
-      title={ETIQUETA[tema]}
-      className={className}
-    >
-      <Icono size={conTexto ? 18 : 20} />
-      {conTexto && ETIQUETA[tema]}
-    </button>
-  );
-}
-
 const OPCIONES: { tema: Tema; nombre: string }[] = [
   { tema: "sistema", nombre: "Sistema" },
   { tema: "claro", nombre: "Claro" },
   { tema: "oscuro", nombre: "Oscuro" },
 ];
 
-/* Las tres opciones a la vista, para la página de Ajustes. */
+/* Selector de tema; solo vive en la página de Ajustes. */
 export function SelectorTema() {
   const [tema, setTema] = useState<Tema>("sistema");
 
@@ -115,8 +49,6 @@ export function SelectorTema() {
 
     // eslint-disable-next-line react-hooks/set-state-in-effect -- data-theme solo existe en el navegador
     setTema(actual === "claro" || actual === "oscuro" ? actual : "sistema");
-
-    return escucharTema(setTema);
   }, []);
 
   return (
