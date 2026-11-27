@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ChevronRight } from "lucide-react";
 import { useSesion } from "./auth/SesionProvider";
+import { esAdministrador } from "@/lib/permisos";
 import {
   ajustes,
   itemActivo,
@@ -29,7 +30,7 @@ export default function MobileNav() {
     ...secundarios,
     ajustes,
   ]);
-  const enBarra = BARRA[usuario.rol];
+  const enBarra = BARRA[esAdministrador(usuario.rol) ? "admin" : "entrenador"];
   const principales = enBarra
     .map((href) => disponibles.find((item) => item.href === href))
     .filter((item): item is ItemMenu => Boolean(item));
