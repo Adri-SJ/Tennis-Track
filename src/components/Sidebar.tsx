@@ -3,9 +3,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import { NOMBRE_ROL, puedeVer } from "@/lib/permisos";
-import ThemeToggle from "./ThemeToggle";
 import { useSesion } from "./auth/SesionProvider";
 import {
   ajustes,
@@ -19,7 +18,7 @@ import {
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { usuario, salir } = useSesion();
+  const { usuario } = useSesion();
 
   const grupos = [paraRol(usuario.rol, principales), paraRol(usuario.rol, secundarios)]
     .filter((items) => items.length > 0);
@@ -112,20 +111,6 @@ export default function Sidebar() {
             </Link>
           )}
         </div>
-
-        <ThemeToggle
-          conTexto
-          className="mt-4 flex items-center gap-3 text-sm text-texto-2 transition hover:text-texto"
-        />
-
-        <button
-          type="button"
-          onClick={salir}
-          className="mt-3 flex items-center gap-3 text-sm text-texto-2 transition hover:text-texto"
-        >
-          <LogOut size={18} />
-          Cerrar sesión
-        </button>
       </div>
     </aside>
   );

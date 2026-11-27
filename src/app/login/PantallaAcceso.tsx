@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import ThemeToggle from "@/components/ThemeToggle";
 import LogoTennisTrack from "@/components/auth/LogoTennisTrack";
 import PasoCodigo from "@/components/auth/PasoCodigo";
 import {
@@ -38,8 +37,6 @@ export default function PantallaAcceso({
 
   return (
     <main className="auth">
-      <ThemeToggle className="auth-boton auth-tema" />
-
       <section className="auth-tarjeta">
         <LogoTennisTrack className="auth-logo" />
 

@@ -21,29 +21,30 @@ export default async function AjustesPage() {
           AJUSTES
         </h1>
 
-        <section className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border border-borde bg-superficie p-4 sm:p-6">
-            <h2 className="text-lg font-black text-texto sm:text-xl">
-              APARIENCIA
-            </h2>
-            <p className="mb-4 mt-1 text-sm text-texto-suave">
-              &quot;Sistema&quot; sigue el modo claro u oscuro de tu dispositivo.
-            </p>
-            <SelectorTema />
-          </div>
-
-          <div className="rounded-2xl border border-borde bg-superficie p-4 sm:p-6">
-            <h2 className="text-lg font-black text-texto sm:text-xl">
-              MI SESIÓN
-            </h2>
-            <p className="mb-4 mt-1 text-sm text-texto-suave">
-              {usuario.nombre} · {NOMBRE_ROL[usuario.rol]}
-            </p>
-            <BotonSalir />
-          </div>
+        <section className="rounded-2xl border border-borde bg-superficie p-4 sm:p-6 lg:max-w-xl">
+          <h2 className="text-lg font-black text-texto sm:text-xl">
+            APARIENCIA
+          </h2>
+          <p className="mb-4 mt-1 text-sm text-texto-suave">
+            &quot;Sistema&quot; sigue el modo claro u oscuro de tu dispositivo.
+          </p>
+          <SelectorTema />
         </section>
 
         {esAdministrador(usuario.rol) && <CuentasClient />}
+
+        {/* Al final de la página, para no cerrar sesión por accidente. */}
+        <section className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-borde bg-superficie p-4 sm:p-6">
+          <div className="min-w-0">
+            <h2 className="text-lg font-black text-texto sm:text-xl">
+              MI SESIÓN
+            </h2>
+            <p className="mt-1 text-sm text-texto-suave">
+              {usuario.nombre} · {NOMBRE_ROL[usuario.rol]}
+            </p>
+          </div>
+          <BotonSalir />
+        </section>
       </div>
     </AppLayout>
   );
